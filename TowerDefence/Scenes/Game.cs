@@ -279,5 +279,10 @@ namespace TowerDefence.Scenes
                 placementIsOverplayfield = IsCursorOnPlayField();
             }
         }
+
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
     }
 }

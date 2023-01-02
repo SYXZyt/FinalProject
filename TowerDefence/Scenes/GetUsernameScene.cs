@@ -64,6 +64,11 @@ namespace TowerDefence.Scenes
             (isNameAllowed ? tick : cross).DrawWithShadow(new(usernameBox.GetBoundingBox.X + usernameBox.GetBoundingBox.Width + crossSize / 2, 468), spriteBatch, 150, 3, Color.Black, Color.White);
         }
 
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
+
         public override void LoadContent()
         {
             lastName = "";

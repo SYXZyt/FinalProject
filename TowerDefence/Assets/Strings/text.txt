@@ -12,3 +12,4 @@ LBL_NO_SERVER||Could not connect to server {}
 LBL_USERNAME_TAKEN||Username '{}' cannot be used
 LBL_USERNAME_AVAIL||Username approved
 LBL_FINDING_GAME||Searching for game...
+LBL_PLAYER_COUNT||Active Players: 

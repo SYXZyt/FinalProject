@@ -9,5 +9,6 @@
         public const char REQUEST_USERNAME              = (char)0x02;
         public const char REQUEST_LOBBY                 = (char)0x03;
         public const char DISCONNECT                    = (char)0x04;
+        public const char REQUEST_TOTAL_CONNECTIONS     = (char)0x05;
     }
 }

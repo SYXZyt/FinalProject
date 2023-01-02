@@ -9,7 +9,9 @@ namespace TowerDefenceServer
         static readonly EventBasedNetListener listener = new();
         static NetManager server;
         
-        static void Main()
+        private static string GetDateTime => $"[{DateTime.Now:T}]";
+
+        private static void Main()
         {
             server = new(listener);
             server.Start(9050);
@@ -22,7 +24,7 @@ namespace TowerDefenceServer
 
             listener.PeerConnectedEvent += peer =>
             {
-                Console.WriteLine($"[{DateTime.Now.TimeOfDay}] We got a connection {peer.EndPoint}");
+                Console.WriteLine($"{GetDateTime} We got a connection {peer.EndPoint}");
                 NetDataWriter writer = new();
                 writer.Put("Connected");
                 peer.Send(writer, DeliveryMethod.ReliableUnordered);
@@ -50,13 +52,12 @@ namespace TowerDefenceServer
         {
             //Read the first byte as it will store what to do
             string data = reader.GetString();
-            Console.WriteLine(data);
 
             byte op = (byte)data[0];
             data = data[1..];
 
             //Write the current time of the server
-            Console.Write($"[{DateTime.Now.TimeOfDay}] ");
+            Console.Write($"{GetDateTime} ");
 
             switch (op)
             {
@@ -80,13 +81,18 @@ namespace TowerDefenceServer
                     {
                         //If we are disconnecting a user, then we need to use their username to get their id, and deallocate it
                         //If the name doesn't exist, then skip everything
-                        if (!UsernameDB.UserIsKnown(data))
+                        Console.WriteLine($"Disconnecting '{data}'");
+                        if (UsernameDB.UserIsKnown(data))
                         {
                             long id = UsernameDB.ReadPlayerId(data);
                             UsernameDB.RemoveUser(data);
                             UsernameDB.FreeId(id);
                         } SendMessageToPeer(peer, "ACK");
                     }
+                    break;
+                case (byte)Header.REQUEST_TOTAL_CONNECTIONS:
+                    Console.WriteLine($"Requested total connections from {peer.EndPoint}");
+                    SendMessageToPeer(peer, $"{server.GetPeersCount(ConnectionState.Connected)}");
                     break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");

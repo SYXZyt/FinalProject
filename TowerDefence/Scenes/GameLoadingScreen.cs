@@ -73,6 +73,11 @@ namespace TowerDefence.Scenes
             progressBar.Draw(spriteBatch);
         }
 
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
+
         public override void LoadContent()
         {
             static Texture2D CreateTexture(GraphicsDevice device, int width, int height, Func<int, Color> paint)

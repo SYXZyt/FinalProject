@@ -14,10 +14,11 @@ namespace TowerDefence
             Environment.Exit(1);
         }
 
-        internal static void ExitHandler(object sender, EventArgs args)
+        internal static void ExitHandler()
         {
-            Client.Instance.SendMessage($"{Header.DISCONNECT}{Client.Instance.PlayerName}");
-            Client.Instance.Disconnect();
+            Client.Instance?.SendMessage($"{Header.DISCONNECT}{Client.Instance.PlayerName}");
+            Thread.Sleep(150);
+            Client.Instance?.Disconnect();
         }
 
         [STAThread]
@@ -26,11 +27,11 @@ namespace TowerDefence
             //Set up events
             AppDomain appDomain = AppDomain.CurrentDomain;
             //appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
-            appDomain.ProcessExit += new(ExitHandler);
 
             Console.WriteLine("Starting Game");
 
             _ = new SceneManager(new(1920, 1080));
+            SceneManager.AddNewExitMethod(ExitHandler);
 
             GameLoadingScreen gameLoadingScreen = new();
             MainMenu mainMenu = new();

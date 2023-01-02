@@ -17,7 +17,7 @@ namespace TowerDefence
         internal static void Main()
         {
             AppDomain appDomain = AppDomain.CurrentDomain;
-            appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
+            //appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
 
             Console.WriteLine("Starting Game");
 

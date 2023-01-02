@@ -6,7 +6,7 @@ using TowerDefenceServer.ServerData;
 
 namespace TowerDefenceServer
 {
-    internal sealed class Server
+    internal sealed class _Server
     {
         private readonly ConcurrentDictionary<string, Player> knownPlayers;
 
@@ -133,7 +133,7 @@ namespace TowerDefenceServer
             }
         }
 
-        public Server()
+        public _Server()
         {
             knownPlayers = new();
         }

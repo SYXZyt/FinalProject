@@ -16,11 +16,14 @@ namespace TowerDefence.Scenes
         Label usernameAllowed;
         ImageTextButton playButton;
 
+        string lastName;
+
         Texture2D   tick;
         Texture2D  cross;
         Texture2D  tickD;
         Texture2D crossD;
 
+        private Client client;
         bool isNameAllowed = false;
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -40,6 +43,8 @@ namespace TowerDefence.Scenes
 
         public override void LoadContent()
         {
+            lastName = "";
+
             Console.WriteLine("LOAD GetUsernameScene");
 
             tick =        AssetContainer.ReadTexture("sTick");
@@ -67,6 +72,9 @@ namespace TowerDefence.Scenes
 
             uIManager.Add(usernameBox);
             uIManager.Add(playButton);
+
+            client = new();
+            client.Connect();
         }
 
         public override void UnloadContent()
@@ -76,15 +84,34 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            client.PollEvents();
+
             //Before we need to check the server, we should check if the name is valid
             if (usernameBox.GetText().ToString().Length < 3)
             {
                 isNameAllowed = false;
+                lastName = usernameBox.GetText().ToString();
             }
             else
             {
                 //Ping server and check if name is allowed
-                isNameAllowed = true;
+                if (!client.IsConnected) throw new("Not connected to server");
+
+                //If the user hasn't changed their username, just skip this check
+                if (usernameBox.GetText().ToString() != lastName)
+                {
+                    lastName = usernameBox.GetText().ToString();
+
+                    int msgCount = client.MessageCount;
+                    Client.Instance.SendMessage($"{(char)0x01}{usernameBox.GetText()}");
+                    while (client.MessageCount == msgCount) { client.PollEvents(); } //Wait til we have a response
+
+                    //Now we have the response, read it
+                    string serverResponse = client.ReadLatestMessage();
+
+                    if (serverResponse is null || serverResponse != "ACK") isNameAllowed = false;
+                    else isNameAllowed = true;
+                }
             }
 
             string labelName = isNameAllowed ? "LBL_USERNAME_AVAIL" : "LBL_USERNAME_TAKEN";

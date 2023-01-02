@@ -1,0 +1,14 @@
+﻿STR_GAME_NAME||Networking Tower Defence
+STR_BTN_EXIT||EXIT
+STR_BTN_PLAY||PLAY
+STR_BTN_CFG||SETTINGS
+STR_BTN_FIND||SEARCH GAME
+LBL_YOD||SYXZ 2022
+LBL_SET_SCREEN_MODE||Fullscreen
+LBL_SET_SERVER||Server IP
+LBL_SET_PORT||Server Port
+LBL_USERNAME||Username
+LBL_NO_SERVER||Could not connect to server {}
+LBL_USERNAME_TAKEN||Username '{}' cannot be used
+LBL_USERNAME_AVAIL||Username approved
+LBL_FINDING_GAME||Searching for game...

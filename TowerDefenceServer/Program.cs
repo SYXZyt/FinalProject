@@ -8,12 +8,9 @@ namespace TowerDefenceServer
     {
         static readonly EventBasedNetListener listener = new();
         static NetManager server;
-        static readonly NetPacketProcessor processor = new();
         
         static void Main()
         {
-            UsernameDB.MakeKnown("Kase");
-
             server = new(listener);
             server.Start(9050);
             Console.WriteLine($"Server running {server.LocalPort}");
@@ -25,7 +22,7 @@ namespace TowerDefenceServer
 
             listener.PeerConnectedEvent += peer =>
             {
-                Console.WriteLine($"We got a connection {peer.EndPoint}");
+                Console.WriteLine($"[{DateTime.Now.TimeOfDay}] We got a connection {peer.EndPoint}");
                 NetDataWriter writer = new();
                 writer.Put("Connected");
                 peer.Send(writer, DeliveryMethod.ReliableUnordered);
@@ -53,20 +50,43 @@ namespace TowerDefenceServer
         {
             //Read the first byte as it will store what to do
             string data = reader.GetString();
+            Console.WriteLine(data);
+
             byte op = (byte)data[0];
             data = data[1..];
 
             //Write the current time of the server
-            Console.Write($"[{DateTime.Now}] ");
+            Console.Write($"[{DateTime.Now.TimeOfDay}] ");
 
             switch (op)
             {
-                case 1:
+                case (byte)Header.REQUEST_USERNAME_AVAILABILITY:
                     Console.WriteLine($"Requested name availability of '{data}' from {peer.EndPoint}");
 
                     //Send data back of name availability
                     if (UsernameDB.UserIsKnown(data)) SendMessageToPeer(peer, "NEG");
                     else SendMessageToPeer(peer, "ACK");
+                    break;
+                case (byte)Header.REQUEST_USERNAME:
+                    {
+                        bool available = !UsernameDB.UserIsKnown(data);
+
+                        long playerId = available ? UsernameDB.NewPlayerID : long.MaxValue;
+                        Console.WriteLine($"Requested name '{data}' from {peer.EndPoint}. Assigned PlayerID {playerId}");
+                        SendMessageToPeer(peer, playerId.ToString());
+                    }
+                    break;
+                case (byte)Header.DISCONNECT:
+                    {
+                        //If we are disconnecting a user, then we need to use their username to get their id, and deallocate it
+                        //If the name doesn't exist, then skip everything
+                        if (!UsernameDB.UserIsKnown(data))
+                        {
+                            long id = UsernameDB.ReadPlayerId(data);
+                            UsernameDB.RemoveUser(data);
+                            UsernameDB.FreeId(id);
+                        } SendMessageToPeer(peer, "ACK");
+                    }
                     break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");

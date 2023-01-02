@@ -1,6 +1,5 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using TowerDefencePackets;
 
 namespace TowerDefence
 {
@@ -11,11 +10,13 @@ namespace TowerDefence
 
         private readonly EventBasedNetListener listener;
         private readonly NetManager client;
-        private readonly NetPacketProcessor processor;
         private NetDataWriter writer;
         private NetPeer server;
 
         private readonly List<string> messages;
+
+        public long PlayerID { get; set; } = -1;
+        public string PlayerName { get; set; } = string.Empty;
 
         private void OnPeerConnect(NetPeer peer) => server = peer;
 
@@ -57,6 +58,10 @@ namespace TowerDefence
             };
         }
 
+        public void Disconnect()
+        {
+            client.Stop();
+        }
         public void SendMessage(string message)
         {
             if (server is null) return;
@@ -75,7 +80,6 @@ namespace TowerDefence
             client = new(listener);
             client.Start();
             messages = new();
-            processor = new();
         }
     }
 }

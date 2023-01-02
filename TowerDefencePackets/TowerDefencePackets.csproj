@@ -7,8 +7,4 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
-  </ItemGroup>
-
 </Project>

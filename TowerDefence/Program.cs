@@ -1,5 +1,6 @@
 ﻿using UILibrary.Scenes;
 using TowerDefence.Scenes;
+using TowerDefencePackets;
 
 namespace TowerDefence
 {
@@ -13,11 +14,19 @@ namespace TowerDefence
             Environment.Exit(1);
         }
 
+        internal static void ExitHandler(object sender, EventArgs args)
+        {
+            Client.Instance.SendMessage($"{Header.DISCONNECT}{Client.Instance.PlayerName}");
+            Client.Instance.Disconnect();
+        }
+
         [STAThread]
         internal static void Main()
         {
+            //Set up events
             AppDomain appDomain = AppDomain.CurrentDomain;
             //appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
+            appDomain.ProcessExit += new(ExitHandler);
 
             Console.WriteLine("Starting Game");
 

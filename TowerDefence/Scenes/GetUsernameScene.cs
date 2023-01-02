@@ -3,6 +3,7 @@ using UILibrary.IO;
 using AssetStreamer;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
+using TowerDefencePackets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -25,6 +26,28 @@ namespace TowerDefence.Scenes
 
         private Client client;
         bool isNameAllowed = false;
+
+        private void OnMainClick()
+        {
+            //If the play button is pressed, we need to ask the server is this name is allowed just to be super sure, as any amount of time may have passed since
+            //  we last checked and the name may have been taken in that time
+            int msgCount = client.MessageCount;
+            Client.Instance.SendMessage($"{Header.REQUEST_USERNAME}{usernameBox.GetText()}"); //This will return our player id
+            while (client.MessageCount == msgCount) { client.PollEvents(); } //Wait til we have a response
+
+            //Now we have the response, read it
+            string serverResponse = client.ReadLatestMessage();
+
+            if (serverResponse is null || serverResponse == "-1")
+            {
+                lastName = ""; //Force an update for the label
+                return;
+            }
+
+            client.PlayerID = long.Parse(serverResponse);
+            Console.WriteLine($"Player ID is {client.PlayerID}");
+            SceneManager.Instance.LoadScene("findGame");
+        }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -103,7 +126,7 @@ namespace TowerDefence.Scenes
                     lastName = usernameBox.GetText().ToString();
 
                     int msgCount = client.MessageCount;
-                    Client.Instance.SendMessage($"{(char)0x01}{usernameBox.GetText()}");
+                    Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_AVAILABILITY}{usernameBox.GetText()}");
                     while (client.MessageCount == msgCount) { client.PollEvents(); } //Wait til we have a response
 
                     //Now we have the response, read it
@@ -117,7 +140,7 @@ namespace TowerDefence.Scenes
             string labelName = isNameAllowed ? "LBL_USERNAME_AVAIL" : "LBL_USERNAME_TAKEN";
             usernameAllowed.SetLabelText(AssetContainer.ReadString(labelName).Replace("{}", $"{usernameBox.GetText()}"));
 
-            if ((playButton.IsClicked() || usernameBox.IsEntered) && isNameAllowed) SceneManager.Instance.LoadScene("findGame");
+            if ((playButton.IsClicked() || usernameBox.IsEntered) && isNameAllowed) OnMainClick();
         }
     }
 }

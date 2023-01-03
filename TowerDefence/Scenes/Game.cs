@@ -83,6 +83,7 @@ namespace TowerDefence.Scenes
         private void CheckForBuildMode()
         {
             if (towers.GetActiveIndex() != -1) gameState = GameState.PLACEMENT;
+            else if (gameState == GameState.PLACEMENT) gameState = GameState.PLAY; //If we are in the placement state and we de-select a tower, we need to go back into the game mode
         }
 
         /// <summary>
@@ -282,7 +283,7 @@ namespace TowerDefence.Scenes
             uIManager.Add(towers);
 
             playFieldOffset = new(1920 / 2 + 32, 96);
-            enemyPlayFieldOffset = new(1920 / 2 - PlayfieldWidth, 96);
+            enemyPlayFieldOffset = new((1920 / 2 - PlayfieldWidth) - (divider.Width / 2), 96);
         }
 
         public override void UnloadContent()

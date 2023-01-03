@@ -45,14 +45,21 @@ namespace TowerDefence.Scenes
         private byte[,] playfield;
         private byte[,] oppPlayfield;
 
-        private readonly Vector2 playFieldOffset = new(1920 / 2 + 32, 96);
-        private readonly Vector2 enemyPlayFieldOffset = new(32, 96);
+        private Vector2 playFieldOffset;
+        private Vector2 enemyPlayFieldOffset;
+
+        private int PlayfieldWidth => playfieldTextures[0].Width * GameSize;
+        private int PlayfieldHeight => playfieldTextures[0].Height * GameSize;
 
         private Texture2D[] playfieldTextures;
 
         private Texture2D bkg;
         private bool placementIsOverplayfield;
 
+        /// <summary>
+        /// Check if the mouse cursor is over the left side play area
+        /// </summary>
+        /// <returns>True if it is</returns>
         private bool IsCursorOnPlayField()
         {
             //Convert the play field to an AABB
@@ -60,8 +67,8 @@ namespace TowerDefence.Scenes
 
             short x = (short)(playFieldOffset.X);
             short y = (short)(playFieldOffset.Y);
-            short width = (short)(playfieldTextures[0].Width * GameSize);
-            short height = (short)(playfieldTextures[0].Height * GameSize);
+            short width = (short)PlayfieldWidth;
+            short height = (short)PlayfieldWidth;
 
             playfield = new(x, y, width, height);
 
@@ -70,16 +77,23 @@ namespace TowerDefence.Scenes
             return playfield.CollisionCheck(mouse);
         }
 
+        /// <summary>
+        /// Check whether a tower button has been clicked
+        /// </summary>
         private void CheckForBuildMode()
         {
             if (towers.GetActiveIndex() != -1) gameState = GameState.PLACEMENT;
         }
 
+        /// <summary>
+        /// Draw all of the play areas onto the screen
+        /// </summary>
+        /// <param name="spriteBatch">The sprite batch to draw with</param>
         private void DrawPlayField(SpriteBatch spriteBatch)
         {
             void DrawNonSpecificField(byte[,] field, Vector2 thisFieldOffset)
             {
-                Rectangle border = new((int)(thisFieldOffset.X - 5), (int)(thisFieldOffset.Y - 5), (playfieldTextures[0].Width * GameSize) + 10, (playfieldTextures[0].Height * GameSize) + 10);
+                Rectangle border = new((int)(thisFieldOffset.X - 5), (int)(thisFieldOffset.Y - 5), PlayfieldWidth + 10, PlayfieldHeight + 10);
                 spriteBatch.Draw(playfieldTextures[0], border, Color.Black);
 
                 for (int y = 0; y < GameSize; y++)
@@ -97,6 +111,9 @@ namespace TowerDefence.Scenes
             DrawNonSpecificField(oppPlayfield, enemyPlayFieldOffset);
         }
 
+        /// <summary>
+        /// Make the cheat panel visible again
+        /// </summary>
         private void ResetCheatPanel()
         {
             cheatPanel = new(Vector2.Zero, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 40, 0.7f);
@@ -104,6 +121,10 @@ namespace TowerDefence.Scenes
             cheatPanel.SetFocus(true);
         }
 
+        /// <summary>
+        /// Process a <see cref="Cheat"/> object
+        /// </summary>
+        /// <param name="cheat">The cheat struct to execute</param>
         private void ParseCheat(Cheat cheat)
         {
             //If the cheat was invalid, we can just not do anything
@@ -163,80 +184,105 @@ namespace TowerDefence.Scenes
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            //Draw the divider over the centre of the screen
             int cX = SceneManager.Instance.graphics.PreferredBackBufferWidth / 2;
             for (int y = 0; y < SceneManager.Instance.graphics.PreferredBackBufferHeight; y += divider.Height)
             {
                 spriteBatch.Draw(divider, new Vector2(cX - divider.Width / 2, y), Color.White);
             }
 
+            //Draw the stat panel on the top right of the screen
             spriteBatch.Draw(statPanel, new Vector2(SceneManager.Instance.graphics.PreferredBackBufferWidth - statPanel.Width, 0), Color.White);
             money.DrawWithShadow(spriteBatch);
             health.DrawWithShadow(spriteBatch);
 
+            //If the game is in the menu state, we need to draw an overlay over everything else
             if (gameState == GameState.MENU)
             {
                 spriteBatch.Draw(menuFilter, new Rectangle(0, 0, SceneManager.Instance.graphics.PreferredBackBufferWidth, SceneManager.Instance.graphics.PreferredBackBufferHeight), Color.White);
             }
 
+            //Draw addition UI elements
             if (gameState == GameState.PLACEMENT && placementIsOverplayfield) spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White);
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
 
+            //Finally draw the usernames of both players
             username.DrawWithShadow(spriteBatch);
             otherUsername.DrawWithShadow(spriteBatch);
         }
 
         public override void LoadContent()
         {
+            void LoadTextures()
+            {
+                bkg = AssetContainer.ReadTexture("sMenu");
+                divider = AssetContainer.ReadTexture("sBorder");
+                towerSelUnclick = AssetContainer.ReadTexture("sTowerSelUnclick");
+                towerSelClick = AssetContainer.ReadTexture("sTowerSelClick");
+                menuFilter = AssetContainer.ReadTexture("sMenuFilter");
+                statPanel = AssetContainer.ReadTexture("sStat");
+
+                playfieldTextures = new Texture2D[2];
+                playfieldTextures[0] = AssetContainer.ReadTexture("sFloor");
+                playfieldTextures[0] = AssetContainer.ReadTexture("sPath");
+            }
+
+            void InitUI()
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    AABB aabb = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
+                    Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
+                    towers.AddSwitch(s);
+
+                    Vector2 topRight = new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0);
+
+                    money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
+                    health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
+
+
+                }
+            }
+
+            void InitPlayerField()
+            {
+                playfield = new byte[GameSize, GameSize];
+                for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) playfield[y, x] = 0;
+
+                oppPlayfield = new byte[GameSize, GameSize];
+                for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) oppPlayfield[y, x] = 0;
+            }
+
+            void SetUpUsernames()
+            {
+                Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
+                Vector2 leftQ = new(centre.X / 2, 0);
+                Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
+                username = new(Client.Instance.PlayerName, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+
+                Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
+                Client.Instance.WaitForNewMessage();
+                string enemyUsername = Client.Instance.ReadLatestMessage();
+                otherUsername = new(enemyUsername, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+            }
+
             Console.WriteLine("LOAD Game");
             towers = new();
-            bkg = AssetContainer.ReadTexture("sMenu");
-
             showCheatPanel = false;
             cheatPanel = null;
-
-            divider = AssetContainer.ReadTexture("sBorder");
-            towerSelUnclick = AssetContainer.ReadTexture("sTowerSelUnclick");
-            towerSelClick = AssetContainer.ReadTexture("sTowerSelClick");
-            menuFilter = AssetContainer.ReadTexture("sMenuFilter");
-            statPanel = AssetContainer.ReadTexture("sStat");
-
-            playfieldTextures = new Texture2D[2];
-            playfieldTextures[0] = AssetContainer.ReadTexture("sFloor");
-            playfieldTextures[0] = AssetContainer.ReadTexture("sPath");
-
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
 
-            for (int i = 0; i < 10; i++)
-            {
-                AABB aabb = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
-                Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
-                towers.AddSwitch(s);
-            }
-
-            Vector2 topRight = new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0);
-
-            money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
-            health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
+            LoadTextures();
+            InitUI();
+            InitPlayerField();
+            SetUpUsernames();
 
             uIManager.Add(towers);
 
-            playfield = new byte[GameSize, GameSize];
-            for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) playfield[y, x] = 0;
-
-            oppPlayfield = new byte[GameSize, GameSize];
-            for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) oppPlayfield[y, x] = 0;
-
-            Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
-            Vector2 leftQ = new(centre.X / 2, 0);
-            Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
-            username = new(Client.Instance.PlayerName, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
-
-            Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
-            Client.Instance.WaitForNewMessage();
-            string enemyUsername = Client.Instance.ReadLatestMessage();
-            otherUsername = new(enemyUsername, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+            playFieldOffset = new(1920 / 2 + 32, 96);
+            enemyPlayFieldOffset = new(1920 / 2 - PlayfieldWidth, 96);
         }
 
         public override void UnloadContent()

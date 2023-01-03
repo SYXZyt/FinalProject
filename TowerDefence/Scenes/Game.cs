@@ -46,6 +46,8 @@ namespace TowerDefence.Scenes
         private byte[,] oppPlayfield;
 
         private readonly Vector2 playFieldOffset = new(1920 / 2 + 32, 96);
+        private readonly Vector2 enemyPlayFieldOffset = new(32, 96);
+
         private Texture2D[] playfieldTextures;
 
         private Texture2D bkg;
@@ -53,7 +55,7 @@ namespace TowerDefence.Scenes
 
         private bool IsCursorOnPlayField()
         {
-            //Convert the playfield to an AABB
+            //Convert the play field to an AABB
             AABB playfield;
 
             short x = (short)(playFieldOffset.X);
@@ -75,18 +77,24 @@ namespace TowerDefence.Scenes
 
         private void DrawPlayField(SpriteBatch spriteBatch)
         {
-            Rectangle border = new((int)(playFieldOffset.X - 5), (int)(playFieldOffset.Y - 5), (playfieldTextures[0].Width * GameSize) + 10, (playfieldTextures[0].Height * GameSize) + 10);
-            spriteBatch.Draw(playfieldTextures[0], border, Color.Black);
-
-            for (int y = 0; y < GameSize; y++)
+            void DrawNonSpecificField(byte[,] field, Vector2 thisFieldOffset)
             {
-                for (int x = 0; x < GameSize; x++)
+                Rectangle border = new((int)(thisFieldOffset.X - 5), (int)(thisFieldOffset.Y - 5), (playfieldTextures[0].Width * GameSize) + 10, (playfieldTextures[0].Height * GameSize) + 10);
+                spriteBatch.Draw(playfieldTextures[0], border, Color.Black);
+
+                for (int y = 0; y < GameSize; y++)
                 {
-                    Texture2D cell = playfieldTextures[playfield[y, x]];
-                    Vector2 v = new(playFieldOffset.X + x * cell.Width, playFieldOffset.Y + y * cell.Height);
-                    cell.Draw(v, spriteBatch, Color.White);
+                    for (int x = 0; x < GameSize; x++)
+                    {
+                        Texture2D cell = playfieldTextures[field[y, x]];
+                        Vector2 v = new(thisFieldOffset.X + x * cell.Width, thisFieldOffset.Y + y * cell.Height);
+                        cell.Draw(v, spriteBatch, Color.White);
+                    }
                 }
             }
+
+            DrawNonSpecificField(playfield, playFieldOffset);
+            DrawNonSpecificField(oppPlayfield, enemyPlayFieldOffset);
         }
 
         private void ResetCheatPanel()
@@ -151,7 +159,10 @@ namespace TowerDefence.Scenes
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
 
             DrawPlayField(spriteBatch);
+        }
 
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
+        {
             int cX = SceneManager.Instance.graphics.PreferredBackBufferWidth / 2;
             for (int y = 0; y < SceneManager.Instance.graphics.PreferredBackBufferHeight; y += divider.Height)
             {
@@ -169,6 +180,9 @@ namespace TowerDefence.Scenes
 
             if (gameState == GameState.PLACEMENT && placementIsOverplayfield) spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White);
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
+
+            username.DrawWithShadow(spriteBatch);
+            otherUsername.DrawWithShadow(spriteBatch);
         }
 
         public override void LoadContent()
@@ -289,12 +303,6 @@ namespace TowerDefence.Scenes
             {
                 placementIsOverplayfield = IsCursorOnPlayField();
             }
-        }
-
-        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            username.DrawWithShadow(spriteBatch);
-            otherUsername.DrawWithShadow(spriteBatch);
         }
     }
 }

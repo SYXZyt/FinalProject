@@ -132,7 +132,7 @@ namespace TowerDefence.Scenes
                     lastName = usernameBox.GetText().ToString().Trim();
 
                     int msgCount = client.MessageCount;
-                    Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_AVAILABILITY}{usernameBox.GetText()}");
+                    Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_AVAILABILITY}{usernameBox.GetText().ToString().Trim()}");
                     while (client.MessageCount == msgCount) { client.PollEvents(); } //Wait til we have a response
 
                     //Now we have the response, read it

@@ -32,7 +32,7 @@ namespace TowerDefence.Scenes
             //If the play button is pressed, we need to ask the server is this name is allowed just to be super sure, as any amount of time may have passed since
             //  we last checked and the name may have been taken in that time
             int msgCount = client.MessageCount;
-            Client.Instance.SendMessage($"{Header.REQUEST_USERNAME}{usernameBox.GetText()}"); //This will return our player id
+            Client.Instance.SendMessage($"{Header.REQUEST_USERNAME}{usernameBox.GetText().ToString().Trim()}"); //This will return our player id
             while (client.MessageCount == msgCount) { client.PollEvents(); } //Wait til we have a response
 
             //Now we have the response, read it
@@ -45,7 +45,7 @@ namespace TowerDefence.Scenes
             }
 
             client.PlayerID = long.Parse(serverResponse);
-            Client.Instance.PlayerName = usernameBox.GetText().ToString();
+            Client.Instance.PlayerName = usernameBox.GetText().ToString().Trim();
             Console.WriteLine($"Player ID is {client.PlayerID}");
             SceneManager.Instance.LoadScene("findGame");
         }
@@ -116,7 +116,7 @@ namespace TowerDefence.Scenes
             client.PollEvents();
 
             //Before we need to check the server, we should check if the name is valid
-            if (usernameBox.GetText().ToString().Length < 3)
+            if (usernameBox.GetText().ToString().Trim().Length < 3)
             {
                 isNameAllowed = false;
                 lastName = usernameBox.GetText().ToString();
@@ -127,9 +127,9 @@ namespace TowerDefence.Scenes
                 if (!client.IsConnected) throw new("Not connected to server");
 
                 //If the user hasn't changed their username, just skip this check
-                if (usernameBox.GetText().ToString() != lastName)
+                if (usernameBox.GetText().ToString().Trim() != lastName)
                 {
-                    lastName = usernameBox.GetText().ToString();
+                    lastName = usernameBox.GetText().ToString().Trim();
 
                     int msgCount = client.MessageCount;
                     Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_AVAILABILITY}{usernameBox.GetText()}");

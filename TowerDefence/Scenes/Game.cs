@@ -3,6 +3,7 @@ using UILibrary.IO;
 using AssetStreamer;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
+using TowerDefencePackets;
 using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
@@ -212,6 +213,16 @@ namespace TowerDefence.Scenes
 
             oppPlayfield = new byte[GameSize, GameSize];
             for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) oppPlayfield[y, x] = 0;
+
+            Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
+            Vector2 leftQ = new(centre.X / 2, 0);
+            Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
+            username = new(Client.Instance.PlayerName, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+
+            Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
+            Client.Instance.WaitForNewMessage();
+            string enemyUsername = Client.Instance.ReadLatestMessage();
+            otherUsername = new(enemyUsername, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
         }
 
         public override void UnloadContent()
@@ -282,7 +293,8 @@ namespace TowerDefence.Scenes
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
-
+            username.DrawWithShadow(spriteBatch);
+            otherUsername.DrawWithShadow(spriteBatch);
         }
     }
 }

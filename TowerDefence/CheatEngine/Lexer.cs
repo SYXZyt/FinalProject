@@ -61,7 +61,7 @@
 
                     tokens.Add(new(TokenType.STRING, value));
                 }
-                else return null; ;
+                else return null;
             }
 
             return tokens.ToArray();

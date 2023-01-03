@@ -135,6 +135,15 @@ namespace TowerDefenceServer
                     Console.WriteLine($"Player {data} requested lobby");
                     playersWaiting.Add((long.Parse(data), peer));
                     break;
+                case (byte)Header.REQUEST_USERNAME_FROM_ID:
+                    {
+                        Console.WriteLine($"Getting username from ID {data}");
+                        long id = long.Parse(data);
+
+                        string username = UsernameDB.GetNameFromId(id);
+                        SendMessageToPeer(peer, username);
+                    }
+                    break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");
                     break;

@@ -23,6 +23,12 @@ namespace TowerDefence
 
         private void OnPeerConnect(NetPeer peer) => server = peer;
 
+        public void WaitForNewMessage()
+        {
+            int count = MessageCount;
+            while (count == MessageCount) PollEvents();
+        }
+
         public string ReadOldestMessage()
         {
             if (MessageCount > 0)

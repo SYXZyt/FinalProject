@@ -225,7 +225,7 @@ namespace TowerDefence.Scenes
 
                 playfieldTextures = new Texture2D[2];
                 playfieldTextures[0] = AssetContainer.ReadTexture("sFloor");
-                playfieldTextures[0] = AssetContainer.ReadTexture("sPath");
+                playfieldTextures[1] = AssetContainer.ReadTexture("sPath");
             }
 
             void InitUI()

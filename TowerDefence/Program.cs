@@ -8,6 +8,7 @@ namespace TowerDefence
     {
         internal static void ExceptionHandler(object sender, UnhandledExceptionEventArgs args)
         {
+            SceneManager.Instance.Exit();
             Exception e = args.ExceptionObject as Exception;
             Console.WriteLine($"ERROR {e.Message}");
             MessageBox.Display($"Unhandled exception.\n{e}");
@@ -29,7 +30,9 @@ namespace TowerDefence
             //Set up events
             AppDomain appDomain = AppDomain.CurrentDomain;
             appDomain.ProcessExit += new EventHandler(ExitEvent);
-            //appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
+#if RELEASE
+            appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
+#endif
 
             Console.WriteLine("Starting Game");
 
@@ -41,12 +44,14 @@ namespace TowerDefence
             GetUsernameScene getUsername = new();
             Game gameScene = new();
             FindGame findGame = new();
+            Scenes.Settings settings = new();
 
             SceneManager.Instance.AddScene("gameLoadingScreen", gameLoadingScreen);
             SceneManager.Instance.AddScene("mainMenu", mainMenu);
             SceneManager.Instance.AddScene("getUsername", getUsername);
             SceneManager.Instance.AddScene("mainGame", gameScene);
             SceneManager.Instance.AddScene("findGame", findGame);
+            SceneManager.Instance.AddScene("settings", settings);
 
             SceneManager.Instance.SetScene("gameLoadingScreen");
             SceneManager.Instance.Run();

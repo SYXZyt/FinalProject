@@ -1,4 +1,5 @@
-﻿using TowerDefence.Settings.ConfigParsing;
+﻿using System.Net;
+using TowerDefence.Settings.ConfigParsing;
 
 namespace TowerDefence.Settings
 {
@@ -8,6 +9,18 @@ namespace TowerDefence.Settings
         private static readonly string path = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\SYXZSoft\MultiplayerTowerDefence";
 
         public static bool DoesSettingsFileExist() => File.Exists($@"{path}\{filename}");
+
+        public static void SaveSettingsFile()
+        {
+            if (!DoesSettingsFileExist()) File.Create($@"{path}\{filename}");
+
+            using CfgWriter writer = new($@"{path}\{filename}");
+
+            writer.Write("fullscreen", GlobalSettings.Fullscreen ? "true" : "false");
+            writer.Write("ip", GlobalSettings.ServerIP.ToString());
+            writer.Write("port", GlobalSettings.Port);
+            writer.Close();
+        }
 
         public static void LoadDefaultSettings()
         {
@@ -39,6 +52,8 @@ namespace TowerDefence.Settings
                 if (cfrServerPort.type != CfgType.I16) throw new CfgIncorrectType("port");
 
                 GlobalSettings.Fullscreen = (cfrFullscreen.result as string) == "true";
+                GlobalSettings.Port = (int)cfrServerPort.result;
+                GlobalSettings.ServerIP = IPAddress.Parse((string)cfrServerIp.result);
                 GlobalSettings.ApplySettings();
                 configParser.Close();
             }
@@ -49,7 +64,7 @@ namespace TowerDefence.Settings
 
                 writer.Write("fullscreen", "true");
                 writer.Write("ip", "127.0.0.1");
-                writer.Write("port", 1414);
+                writer.Write("port", 9050);
 
                 writer.Close();
                 LoadSettingsFile();

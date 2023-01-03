@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using TowerDefence.Settings;
 
 namespace TowerDefence
 {
@@ -52,9 +53,12 @@ namespace TowerDefence
 
         public bool IsConnected => server is not null;
 
+        public IPAddress IP { get; set; } = GlobalSettings.ServerIP;
+        public int Port { get; set; } = GlobalSettings.Port;
+
         public void Connect()
         {
-            IPEndPoint endPoint = new(IPAddress.Parse("86.141.88.49"), 9050);
+            IPEndPoint endPoint = new(IP, Port);
 
             client.Connect(endPoint, string.Empty);
             writer = new();

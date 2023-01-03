@@ -66,6 +66,7 @@ namespace TowerDefence.Scenes
             if (exitButton.IsClicked()) SceneManager.Instance.Exit();
 
             if (playButton.IsClicked()) SceneManager.Instance.LoadScene("getUsername");
+            if (settingsButton.IsClicked()) SceneManager.Instance.LoadScene("settings");
         }
 
         public MainMenu()

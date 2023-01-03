@@ -282,8 +282,8 @@ namespace TowerDefence.Scenes
 
             uIManager.Add(towers);
 
-            playFieldOffset = new(1920 / 2 + 32, 96);
-            enemyPlayFieldOffset = new((1920 / 2 - PlayfieldWidth) - (divider.Width / 2), 96);
+            playFieldOffset = new(1920 / 2 + divider.Width, 96);
+            enemyPlayFieldOffset = new(1920 / 2 - PlayfieldWidth - divider.Width, 96);
         }
 
         public override void UnloadContent()

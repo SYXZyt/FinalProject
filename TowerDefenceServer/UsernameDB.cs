@@ -21,6 +21,7 @@
 
         public static bool UserIsKnown(string name) => knownNames.ContainsKey(name);
         public static long ReadPlayerId(string name) => knownNames[name];
+        public static string GetNameFromId(long id) => knownNames.FirstOrDefault(x => x.Value == id).Key;
         public static void RemoveUser(string name) => knownNames.Remove(name);
         public static void MakeKnown(string name, long playerId) => knownNames[name] = playerId;
 

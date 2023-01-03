@@ -8,8 +8,28 @@ namespace TowerDefenceServer
     {
         static readonly EventBasedNetListener listener = new();
         static NetManager server;
-        
+
+        private static readonly List<(long id, NetPeer client)> playersWaiting = new();
+
         private static string GetDateTime => $"[{DateTime.Now:T}]";
+
+        private static void TryToFindLobby()
+        {
+            //If there are not enough players, then we cannot do anything
+            if (playersWaiting.Count < 2) return;
+
+            var playerA = new { playersWaiting[0].id, playersWaiting[0].client };
+            playersWaiting.RemoveAt(0);
+
+            var playerB = new { playersWaiting[0].id, playersWaiting[0].client };
+            playersWaiting.RemoveAt(0);
+
+            //Tell both players the id of the other player
+            SendMessageToPeer(playerA.client, $"{Header.CONNECT_LOBBY}{playerB.id}");
+            SendMessageToPeer(playerB.client, $"{Header.CONNECT_LOBBY}{playerA.id}");
+
+            Console.WriteLine($"{GetDateTime} Found lobby with {playerA.id} and {playerB.id}");
+        }
 
         private static void Main()
         {
@@ -35,13 +55,14 @@ namespace TowerDefenceServer
             while (!Console.KeyAvailable)
             {
                 server.PollEvents();
+                TryToFindLobby();
                 Thread.Sleep(15);
             }
 
             server.Stop();
         }
 
-        private static void SendMessageToPeer(NetPeer peer, string  message, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        private static void SendMessageToPeer(NetPeer peer, string message, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
         {
             NetDataWriter writer = new();
             writer.Put(message);
@@ -89,12 +110,17 @@ namespace TowerDefenceServer
                             long id = UsernameDB.ReadPlayerId(data);
                             UsernameDB.RemoveUser(data);
                             UsernameDB.FreeId(id);
-                        } SendMessageToPeer(peer, "ACK");
+                        }
+                        SendMessageToPeer(peer, "ACK");
                     }
                     break;
                 case (byte)Header.REQUEST_TOTAL_CONNECTIONS:
                     Console.WriteLine($"Requested total connections from {peer.EndPoint}");
                     SendMessageToPeer(peer, $"{server.GetPeersCount(ConnectionState.Connected)}");
+                    break;
+                case (byte)Header.REQUEST_LOBBY:
+                    Console.WriteLine($"Player {data} requested lobby");
+                    playersWaiting.Add((long.Parse(data), peer));
                     break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");

@@ -19,6 +19,8 @@ namespace TowerDefence
         public long PlayerID { get; set; } = -1;
         public string PlayerName { get; set; } = string.Empty;
 
+        public long EnemyID { get; set; } = -1;
+
         private void OnPeerConnect(NetPeer peer) => server = peer;
 
         public string ReadOldestMessage()

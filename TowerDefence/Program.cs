@@ -14,6 +14,8 @@ namespace TowerDefence
             Environment.Exit(1);
         }
 
+        internal static void ExitEvent(object sender, EventArgs e) => ExitHandler();
+
         internal static void ExitHandler()
         {
             Client.Instance?.SendMessage($"{Header.DISCONNECT}{Client.Instance.PlayerName}");
@@ -26,6 +28,7 @@ namespace TowerDefence
         {
             //Set up events
             AppDomain appDomain = AppDomain.CurrentDomain;
+            appDomain.ProcessExit += new EventHandler(ExitEvent);
             //appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
 
             Console.WriteLine("Starting Game");

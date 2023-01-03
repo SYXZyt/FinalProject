@@ -9,36 +9,28 @@ namespace TowerDefence.Scenes
 {
     internal sealed class FindGame : Scene
     {
-        private int tick = 0;
         private Texture2D bkg;
         private Label searchingLabel;
-        private Label playerCount;
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
             searchingLabel.DrawWithShadow(spriteBatch);
-            playerCount.DrawWithShadow(spriteBatch);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            
+
         }
 
         public override void LoadContent()
         {
-            int messageCount = Client.Instance.MessageCount;
-            Client.Instance.SendMessage($"{Header.REQUEST_TOTAL_CONNECTIONS}\0");
-            while (messageCount == Client.Instance.MessageCount) Client.Instance.PollEvents();
-            int playerCount = int.Parse(Client.Instance.ReadLatestMessage());
-            string playerCountMsg = $"{AssetContainer.ReadString("LBL_PLAYER_COUNT")} {playerCount}";
-
             Console.WriteLine("LOAD FindGame");
             bkg = AssetContainer.ReadTexture("sMenu");
             Vector2 c = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 300);
             searchingLabel = new(AssetContainer.ReadString("LBL_FINDING_GAME"), 1.4f, c, Color.White, AssetContainer.GetFont("fMain"), Origin.MIDDLE_CENTRE, 0f);
-            this.playerCount = new(playerCountMsg, 1.2f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
+
+            Client.Instance.SendMessage($"{Header.REQUEST_LOBBY}{Client.Instance.PlayerID}");
         }
 
         public override void UnloadContent()
@@ -48,16 +40,26 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
-            if (tick++ % 1000 == 0)
+            //Check if we have a newest message
+            if (Client.Instance.MessageCount > 0)
             {
-                int messageCount = Client.Instance.MessageCount;
-                Client.Instance.SendMessage($"{Header.REQUEST_TOTAL_CONNECTIONS}\0");
-                while (messageCount == Client.Instance.MessageCount) Client.Instance.PollEvents();
-                int playerCount = int.Parse(Client.Instance.ReadLatestMessage());
-                string playerCountMsg = $"{AssetContainer.ReadString("LBL_PLAYER_COUNT")} {playerCount}";
+                //If we have anything here then we want to check if it is a lobby confirm packet
+                string packet = Client.Instance.ReadLatestMessage();
+                byte op = (byte)packet[0];
+                packet = packet[1..];
+                
+                if (op == (byte)Header.CONNECT_LOBBY)
+                {
+                    Console.WriteLine("Found enemy");
 
-                this.playerCount.SetLabelText(playerCountMsg);
+                    //The rest of the string is the opponent id, so we need to store that
+                    long oID = long.Parse(packet);
+                    Client.Instance.EnemyID = oID;
+                    SceneManager.Instance.LoadScene("mainGame");
+                }
             }
+
+            Client.Instance.PollEvents();
         }
     }
 }

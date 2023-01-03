@@ -17,7 +17,7 @@ namespace TowerDefence
         internal static void ExitHandler()
         {
             Client.Instance?.SendMessage($"{Header.DISCONNECT}{Client.Instance.PlayerName}");
-            Thread.Sleep(150);
+            Thread.Sleep(150); //Pause to ensure data is send as exit will be near instant
             Client.Instance?.Disconnect();
         }
 

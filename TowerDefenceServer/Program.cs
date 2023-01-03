@@ -74,6 +74,8 @@ namespace TowerDefenceServer
 
                         long playerId = available ? UsernameDB.NewPlayerID : long.MaxValue;
                         Console.WriteLine($"Requested name '{data}' from {peer.EndPoint}. Assigned PlayerID {playerId}");
+
+                        if (available) UsernameDB.MakeKnown(data, playerId);
                         SendMessageToPeer(peer, playerId.ToString());
                     }
                     break;

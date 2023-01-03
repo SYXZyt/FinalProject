@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using System.Net;
+using LiteNetLib;
 using LiteNetLib.Utils;
 
 namespace TowerDefence
@@ -45,7 +46,9 @@ namespace TowerDefence
 
         public void Connect()
         {
-            client.Connect("localhost", 9050, string.Empty);
+            IPEndPoint endPoint = new(IPAddress.Parse("86.141.88.49"), 9050);
+
+            client.Connect(endPoint, string.Empty);
             writer = new();
 
             listener.PeerConnectedEvent += OnPeerConnect;

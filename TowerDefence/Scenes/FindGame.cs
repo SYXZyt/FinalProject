@@ -9,6 +9,7 @@ namespace TowerDefence.Scenes
 {
     internal sealed class FindGame : Scene
     {
+        private int tick = 0;
         private Texture2D bkg;
         private Label searchingLabel;
         private Label playerCount;
@@ -47,7 +48,16 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            if (tick++ % 1000 == 0)
+            {
+                int messageCount = Client.Instance.MessageCount;
+                Client.Instance.SendMessage($"{Header.REQUEST_TOTAL_CONNECTIONS}\0");
+                while (messageCount == Client.Instance.MessageCount) Client.Instance.PollEvents();
+                int playerCount = int.Parse(Client.Instance.ReadLatestMessage());
+                string playerCountMsg = $"{AssetContainer.ReadString("LBL_PLAYER_COUNT")} {playerCount}";
 
+                this.playerCount.SetLabelText(playerCountMsg);
+            }
         }
     }
 }

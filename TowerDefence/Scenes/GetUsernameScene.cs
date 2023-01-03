@@ -45,6 +45,7 @@ namespace TowerDefence.Scenes
             }
 
             client.PlayerID = long.Parse(serverResponse);
+            Client.Instance.PlayerName = usernameBox.GetText().ToString();
             Console.WriteLine($"Player ID is {client.PlayerID}");
             SceneManager.Instance.LoadScene("findGame");
         }

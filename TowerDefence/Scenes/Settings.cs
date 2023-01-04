@@ -24,6 +24,9 @@ namespace TowerDefence.Scenes
         private Label labelIP;
         private Label labelPort;
 
+        private ImageTextButton backButton;
+        private ImageTextButton applyButton;
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
@@ -63,6 +66,26 @@ namespace TowerDefence.Scenes
             labelFullscreenSplash = new(AssetContainer.ReadString("LBL_SET_SCREEN_MODE_SPLASH"), 0.7f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 200), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
             labelIP = new(AssetContainer.ReadString("LBL_SET_SERVER"), 1f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 300), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
             labelPort = new(AssetContainer.ReadString("LBL_SET_PORT"), 1f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 400), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
+
+            short bWidth = 310;
+            short bHeight = 72;
+            short bX = (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - bWidth / 2);
+            short bY = (short)(SceneManager.Instance.graphics.PreferredBackBufferHeight * 0.82);
+            AABB apply = new(bX, bY, bWidth, bHeight);
+
+            applyButton = new(apply, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("LBL_SET_APPLY"), 1.4f, AssetContainer.GetFont("fMain"));
+
+            UIManager.Add(applyButton);
+
+            bWidth = 96;
+            bHeight = 48;
+            bY = 0;
+            bX = 0;
+            AABB back = new(bX, bY, bWidth, bHeight);
+
+            backButton = new(back, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("LBL_SET_BACK"), 1.4f, AssetContainer.GetFont("fMain"));
+
+            UIManager.Add(backButton);
         }
 
         public override void UnloadContent()
@@ -72,13 +95,9 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
-            if (KeyboardController.IsPressed(Keys.Escape))
+            if (KeyboardController.IsPressed(Keys.Escape) || backButton.IsClicked())
             {
-                if (IPAddress.TryParse(settingIP.GetText().ToString(), out IPAddress ip)) GlobalSettings.ServerIP = ip;
-                if (!int.TryParse(settingPort.GetText().ToString(), out int port)) GlobalSettings.Port = port;
-
-                GlobalSettings.ApplySettings();
-                SettingFileHandler.SaveSettingsFile();
+                Save();
                 SceneManager.Instance.LoadScene("mainMenu");
             }
 
@@ -89,7 +108,7 @@ namespace TowerDefence.Scenes
             }
             if (settingPort.IsEntered)
             {
-                if (!int.TryParse(settingPort.GetText().ToString(), out int port)) GlobalSettings.Port = port;
+                if (int.TryParse(settingPort.GetText().ToString(), out int port)) GlobalSettings.Port = port;
             }
 
             if (settingFullscreen.State != GlobalSettings.Fullscreen)
@@ -97,6 +116,17 @@ namespace TowerDefence.Scenes
                 GlobalSettings.Fullscreen = settingFullscreen.State;
                 GlobalSettings.ApplySettings();
             }
+
+            if (applyButton.IsClicked()) Save();
+        }
+
+        private void Save()
+        {
+            if (IPAddress.TryParse(settingIP.GetText().ToString(), out IPAddress ip)) GlobalSettings.ServerIP = ip;
+            if (int.TryParse(settingPort.GetText().ToString(), out int port)) GlobalSettings.Port = port;
+            GlobalSettings.Fullscreen = settingFullscreen.State;
+            GlobalSettings.ApplySettings();
+            SettingFileHandler.SaveSettingsFile();
         }
     }
 }

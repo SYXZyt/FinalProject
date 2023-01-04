@@ -29,6 +29,7 @@ namespace AssetStreamer.Assets
                     Environment.Exit(1);
                 }
 
+                split[1] = split[1].Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\b", "\b").Replace("\\r", "\r");
                 AssetContainer.AddString(split[0], split[1]);
             }
 

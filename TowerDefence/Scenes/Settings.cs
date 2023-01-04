@@ -43,7 +43,7 @@ namespace TowerDefence.Scenes
             bkg = AssetContainer.ReadTexture("sMenu");
 
             AABB fullScreenBox = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - 16), 200, 32, 32);
-            settingFullscreen = new(fullScreenBox, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"));
+            settingFullscreen = new(fullScreenBox, AssetContainer.ReadTexture("sSettingWindowed"), AssetContainer.ReadTexture("sSettingFullscreen"));
             settingFullscreen.SetState(GlobalSettings.Fullscreen);
 
             Vector2 ipBox = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 300);

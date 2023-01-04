@@ -59,6 +59,12 @@
     <None Update="Assets\Textures\menuButtonUnclicked.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\settingFullscreen.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\settingWindowed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\stats.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

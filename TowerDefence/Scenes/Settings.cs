@@ -19,19 +19,30 @@ namespace TowerDefence.Scenes
         private Textbox settingIP;
         private Textbox settingPort;
 
+        private Label labelFullscreen;
+        private Label labelFullscreenSplash;
+        private Label labelIP;
+        private Label labelPort;
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
         }
 
-        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime) { }
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            labelFullscreen.DrawWithShadow(spriteBatch);
+            labelFullscreenSplash.DrawWithShadow(spriteBatch);
+            labelIP.DrawWithShadow(spriteBatch);
+            labelPort.DrawWithShadow(spriteBatch);
+        }
 
         public override void LoadContent()
         {
             Console.WriteLine("LOAD Settings");
             bkg = AssetContainer.ReadTexture("sMenu");
 
-            AABB fullScreenBox = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - 32), 200, 32, 32);
+            AABB fullScreenBox = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - 16), 200, 32, 32);
             settingFullscreen = new(fullScreenBox, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"));
             settingFullscreen.SetState(GlobalSettings.Fullscreen);
 
@@ -47,6 +58,11 @@ namespace TowerDefence.Scenes
             UIManager.Add(settingFullscreen);
             UIManager.Add(settingIP);
             UIManager.Add(settingPort);
+
+            labelFullscreen = new(AssetContainer.ReadString("LBL_SET_SCREEN_MODE"), 1f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 185), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
+            labelFullscreenSplash = new(AssetContainer.ReadString("LBL_SET_SCREEN_MODE_SPLASH"), 0.7f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 200), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
+            labelIP = new(AssetContainer.ReadString("LBL_SET_SERVER"), 1f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 300), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
+            labelPort = new(AssetContainer.ReadString("LBL_SET_PORT"), 1f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 400), Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
         }
 
         public override void UnloadContent()

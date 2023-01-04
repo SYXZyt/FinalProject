@@ -5,6 +5,7 @@ STR_BTN_CFG||SETTINGS
 STR_BTN_FIND||SEARCH GAME
 LBL_YOD||SYXZ 2022
 LBL_SET_SCREEN_MODE||Fullscreen
+LBL_SET_SCREEN_MODE_SPLASH||(May take a minute and may require a room change))
 LBL_SET_SERVER||Server IP
 LBL_SET_PORT||Server Port
 LBL_USERNAME||Username

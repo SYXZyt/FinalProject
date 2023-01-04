@@ -12,6 +12,7 @@ namespace TowerDefence.Settings
 
         public static void ApplySettings()
         {
+            SceneManager.Instance.graphics.HardwareModeSwitch = true;
             SceneManager.Instance.graphics.IsFullScreen = Fullscreen;
             SceneManager.Instance.graphics.ApplyChanges();
 

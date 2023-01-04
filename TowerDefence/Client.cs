@@ -77,6 +77,7 @@ namespace TowerDefence
         {
             client.Stop();
         }
+
         public void SendMessage(string message)
         {
             if (server is null) return;

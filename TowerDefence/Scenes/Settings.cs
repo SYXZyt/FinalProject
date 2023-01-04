@@ -14,8 +14,8 @@ namespace TowerDefence.Scenes
     internal sealed class Settings : Scene
     {
         private Texture2D bkg;
-        private Switch settingFullscreen;
 
+        private Switch settingFullscreen;
         private Textbox settingIP;
         private Textbox settingPort;
 
@@ -35,11 +35,11 @@ namespace TowerDefence.Scenes
             settingFullscreen = new(fullScreenBox, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"));
             settingFullscreen.SetState(GlobalSettings.Fullscreen);
 
-            Vector2 ipBox = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - 150, 300);
-            settingIP = new(ipBox, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f, GlobalSettings.ServerIP.ToString());
+            Vector2 ipBox = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 300);
+            settingIP = new(ipBox, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f, Origin.TOP_CENTRE, GlobalSettings.ServerIP.ToString());
 
             ipBox = new(ipBox.X, 400);
-            settingPort = new(ipBox, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f, GlobalSettings.Port.ToString());
+            settingPort = new(ipBox, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f, Origin.TOP_CENTRE, GlobalSettings.Port.ToString());
 
             settingIP.SetActive(true);
             settingPort.SetActive(true);

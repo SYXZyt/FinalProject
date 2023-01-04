@@ -11,21 +11,23 @@ namespace TowerDefence.Scenes
 {
     internal sealed class GetUsernameScene : Scene
     {
-        Label title;
-        Label usernameLabel;
-        Textbox usernameBox;
-        Label usernameAllowed;
-        ImageTextButton playButton;
+        private Label title;
+        private Label usernameLabel;
+        private Textbox usernameBox;
+        private Label usernameAllowed;
+        private ImageTextButton playButton;
 
-        string lastName;
+        private string lastName;
 
-        Texture2D   tick;
-        Texture2D  cross;
-        Texture2D  tickD;
-        Texture2D crossD;
+        private Texture2D   tick;
+        private Texture2D  cross;
+        private Texture2D  tickD;
+        private Texture2D crossD;
+
+        private Vector2 textboxOffset;
 
         private Client client;
-        bool isNameAllowed = false;
+        private bool isNameAllowed = false;
 
         private void OnMainClick()
         {
@@ -60,9 +62,9 @@ namespace TowerDefence.Scenes
             int crossSize = usernameBox.GetBoundingBox.Height;
 
             //Make sure we draw the drop shadow first, as we want it on the bottom
-            (isNameAllowed ? tickD : crossD).Draw(new(usernameBox.GetBoundingBox.X + usernameBox.GetBoundingBox.Width + crossSize / 2, 476), spriteBatch, Color.White);
+            (isNameAllowed ? tickD : crossD).Draw(new(usernameBox.GetBoundingBox.X + usernameBox.GetBoundingBox.Width + crossSize / 2 - textboxOffset.X, 476), spriteBatch, Color.White);
 
-            (isNameAllowed ? tick : cross).DrawWithShadow(new(usernameBox.GetBoundingBox.X + usernameBox.GetBoundingBox.Width + crossSize / 2, 468), spriteBatch, 150, 3, Color.Black, Color.White);
+            (isNameAllowed ? tick : cross).DrawWithShadow(new(usernameBox.GetBoundingBox.X + usernameBox.GetBoundingBox.Width + crossSize / 2 - textboxOffset.X, 468), spriteBatch, 150, 3, Color.Black, Color.White);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
@@ -83,7 +85,7 @@ namespace TowerDefence.Scenes
 
             Vector2 pos = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 50);
             title = new(AssetContainer.ReadString("STR_GAME_NAME"), 2f, pos, Color.White, AssetContainer.GetFont("fMain"), Origin.MIDDLE_CENTRE, 0f);
-            usernameBox = new(new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - 150, 468), AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f);
+            usernameBox = new(new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 468), AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 20, 1f, Origin.TOP_CENTRE);
             usernameBox.SetFocus(true);
             usernameBox.SetActive(true);
 
@@ -104,6 +106,8 @@ namespace TowerDefence.Scenes
 
             client = new();
             client.Connect();
+
+            textboxOffset = usernameBox.CalculateOriginOffset();
         }
 
         public override void UnloadContent()

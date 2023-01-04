@@ -117,7 +117,7 @@ namespace TowerDefence.Scenes
         /// </summary>
         private void ResetCheatPanel()
         {
-            cheatPanel = new(Vector2.Zero, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 40, 0.7f);
+            cheatPanel = new(Vector2.Zero, AssetContainer.GetFont("fMain"), AssetContainer.ReadTexture("sTextboxBkg"), 40, 0.7f, Origin.TOP_LEFT);
             cheatPanel.SetActive(true);
             cheatPanel.SetFocus(true);
         }

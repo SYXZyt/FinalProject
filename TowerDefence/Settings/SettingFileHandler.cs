@@ -63,7 +63,7 @@ namespace TowerDefence.Settings
                 using CfgWriter writer = new($@"{path}\{filename}");
 
                 writer.Write("fullscreen", "true");
-                writer.Write("ip", "127.0.0.1");
+                writer.Write("ip", "86.141.88.49");
                 writer.Write("port", 9050);
 
                 writer.Close();

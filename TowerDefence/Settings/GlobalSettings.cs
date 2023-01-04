@@ -7,7 +7,7 @@ namespace TowerDefence.Settings
     {
         public static bool Fullscreen { get; set; } = true;
         public static string Username { get; set; } = "Unnamed";
-        public static IPAddress ServerIP { get; set; } = IPAddress.Loopback;
+        public static IPAddress ServerIP { get; set; } = IPAddress.Parse("86.141.88.49");
         public static int Port { get; set; } = 9050;
 
         public static void ApplySettings()

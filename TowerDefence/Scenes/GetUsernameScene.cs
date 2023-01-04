@@ -106,6 +106,7 @@ namespace TowerDefence.Scenes
 
             client = new();
             client.Connect();
+            if (!client.IsConnected) throw new("Not connected to server"); //If we were unable to connect, we will just throw an error
 
             textboxOffset = usernameBox.CalculateOriginOffset();
         }

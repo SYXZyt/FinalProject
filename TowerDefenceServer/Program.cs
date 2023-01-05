@@ -41,24 +41,21 @@ namespace TowerDefenceServer
         {
             foreach (Lobby lobby in lobbies)
             {
-                int end = 4000;
                 lobby.Update();
 
                 //Check if either player has timed out
-                if (lobby.PlayerA.clientRef.TimeSinceLastPacket >= end)
+                if (lobby.PlayerA.clientRef.TimeSinceLastPacket >= lobby.PlayerA.clientRef.NetManager.DisconnectTimeout)
                 {
                     //Tell Player B they win
                     SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x01}");
                     SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x00}");
                 }
-                else if (lobby.PlayerB.clientRef.TimeSinceLastPacket >= end)
+                else if (lobby.PlayerB.clientRef.TimeSinceLastPacket >= lobby.PlayerB.clientRef.NetManager.DisconnectTimeout)
                 {
                     //Same but if player b left this time
                     SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x01}");
                     SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x00}");
                 }
-
-                Console.WriteLine($"{lobby.PlayerA.clientRef.TimeSinceLastPacket} {lobby.PlayerB.clientRef.TimeSinceLastPacket}");
             }
         }
 
@@ -203,6 +200,22 @@ namespace TowerDefenceServer
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");
                     break;
+            }
+        }
+
+        private static void LoadMaps()
+        {
+            //If the map folder does not exist, throw an error
+            if (!Directory.Exists("Maps")) throw new DirectoryNotFoundException($"Could not find maps directory. Expected {Path.GetFullPath("maps")}");
+
+            string[] mapPaths = Directory.GetFiles("maps", "*.map");
+
+            //If no maps were loaded, throw an error as we need at least one map
+            if (mapPaths.Length == 0) throw new Exception("Could not find any map files");
+
+            foreach (string map in mapPaths)
+            {
+                Map _map = Map.LoadFromDisk(map);
             }
         }
 

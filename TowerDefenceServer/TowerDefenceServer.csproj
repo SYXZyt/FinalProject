@@ -15,4 +15,8 @@
     <ProjectReference Include="..\TowerDefencePackets\TowerDefencePackets.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Maps\" />
+  </ItemGroup>
+
 </Project>

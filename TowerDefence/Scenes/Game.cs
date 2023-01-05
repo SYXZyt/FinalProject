@@ -14,6 +14,8 @@ namespace TowerDefence.Scenes
     internal sealed class Game : Scene
     {
         private bool isWinner = false;
+        private float gameOverOpacity = 0f;
+        private const float GameOverOpacitySpeed = 0.01f;
 
         private const int TileSize = 16;
         private readonly Vector2 GameSize = new(42, 48);
@@ -62,6 +64,28 @@ namespace TowerDefence.Scenes
 
         private Texture2D bkg;
         private bool placementIsOverplayfield;
+
+        private void ProcessStateMachine()
+        {
+            switch (gameState)
+            {
+
+                case GameState.PLACEMENT:
+                    placementIsOverplayfield = IsCursorOnPlayField();
+                    break;
+                case GameState.MENU:
+                    pausedMenuUILayer.Update();
+
+                    //Check if buttons pressed
+                    if (resumeButton.IsClicked()) gameState = GameState.PLAY;
+                    if (disconnectButton.IsClicked()) Disconnect();
+                    break;
+                case GameState.END:
+                    gameOverOpacity += GameOverOpacitySpeed;
+                    gameOverOpacity = Math.Clamp(gameOverOpacity, 0f, 1f);
+                    break;
+            }
+        }
 
         private void HandleServer()
         {
@@ -273,7 +297,7 @@ namespace TowerDefence.Scenes
             if (gameState == GameState.END)
             {
                 string msg = isWinner ? "WIN" : "LOSE";
-                spriteBatch.DrawString(AssetContainer.GetFont("fMain"), msg, new(100, 100), Color.White);
+                spriteBatch.DrawString(AssetContainer.GetFont("fMain"), msg, new(100, 100), Color.White * gameOverOpacity);
             }
         }
 
@@ -423,18 +447,7 @@ namespace TowerDefence.Scenes
                 }
             }
 
-            if (gameState == GameState.PLACEMENT)
-            {
-                placementIsOverplayfield = IsCursorOnPlayField();
-            }
-            else if (gameState == GameState.MENU)
-            {
-                pausedMenuUILayer.Update();
-
-                //Check if buttons pressed
-                if (resumeButton.IsClicked()) gameState = GameState.PLAY;
-                if (disconnectButton.IsClicked()) Disconnect();
-            }
+            ProcessStateMachine();
 
             if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
             CheckForBuildMode();

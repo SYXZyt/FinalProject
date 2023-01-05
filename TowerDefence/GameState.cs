@@ -5,5 +5,6 @@
         PLAY,
         PLACEMENT,
         MENU,
+        END,
     }
 }

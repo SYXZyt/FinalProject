@@ -13,8 +13,10 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
-        private const int TileSize = 32;
-        private const int GameSize = 18;
+        private const int TileSize = 16;
+        private readonly Vector2 GameSize = new(42, 48);
+
+        private UIManager pausedMenuUILayer;
 
         private Texture2D towerSelUnclick;
         private Texture2D towerSelClick;
@@ -48,8 +50,8 @@ namespace TowerDefence.Scenes
         private Vector2 playFieldOffset;
         private Vector2 enemyPlayFieldOffset;
 
-        private int PlayfieldWidth => playfieldTextures[0].Width * GameSize;
-        private int PlayfieldHeight => playfieldTextures[0].Height * GameSize;
+        private int PlayfieldWidth => (int)(playfieldTextures[0].Width * GameSize.X);
+        private int PlayfieldHeight => (int)(playfieldTextures[0].Height * GameSize.Y);
 
         private Texture2D[] playfieldTextures;
 
@@ -68,7 +70,7 @@ namespace TowerDefence.Scenes
             short x = (short)(playFieldOffset.X);
             short y = (short)(playFieldOffset.Y);
             short width = (short)PlayfieldWidth;
-            short height = (short)PlayfieldWidth;
+            short height = (short)PlayfieldHeight;
 
             playfield = new(x, y, width, height);
 
@@ -82,8 +84,11 @@ namespace TowerDefence.Scenes
         /// </summary>
         private void CheckForBuildMode()
         {
-            if (towers.GetActiveIndex() != -1) gameState = GameState.PLACEMENT;
-            else if (gameState == GameState.PLACEMENT) gameState = GameState.PLAY; //If we are in the placement state and we de-select a tower, we need to go back into the game mode
+            if (towers.GetActiveIndex() != -1)
+            {
+                gameState = GameState.PLACEMENT;
+            }
+            else if (gameState == GameState.PLACEMENT) gameState = GameState.PLAY; //If we are in the placement state and we deselect a tower, we need to go back into the game mode
         }
 
         /// <summary>
@@ -97,11 +102,11 @@ namespace TowerDefence.Scenes
                 Rectangle border = new((int)(thisFieldOffset.X - 5), (int)(thisFieldOffset.Y - 5), PlayfieldWidth + 10, PlayfieldHeight + 10);
                 spriteBatch.Draw(playfieldTextures[0], border, Color.Black);
 
-                for (int y = 0; y < GameSize; y++)
+                for (int y = 0; y < GameSize.Y; y++)
                 {
-                    for (int x = 0; x < GameSize; x++)
+                    for (int x = 0; x < GameSize.X; x++)
                     {
-                        Texture2D cell = playfieldTextures[field[y, x]];
+                        Texture2D cell = playfieldTextures[field[x, y]];
                         Vector2 v = new(thisFieldOffset.X + x * cell.Width, thisFieldOffset.Y + y * cell.Height);
                         cell.Draw(v, spriteBatch, Color.White);
                     }
@@ -197,19 +202,24 @@ namespace TowerDefence.Scenes
             money.DrawWithShadow(spriteBatch);
             health.DrawWithShadow(spriteBatch);
 
-            //If the game is in the menu state, we need to draw an overlay over everything else
-            if (gameState == GameState.MENU)
-            {
-                spriteBatch.Draw(menuFilter, new Rectangle(0, 0, SceneManager.Instance.graphics.PreferredBackBufferWidth, SceneManager.Instance.graphics.PreferredBackBufferHeight), Color.White);
-            }
-
             //Draw addition UI elements
             if (gameState == GameState.PLACEMENT && placementIsOverplayfield) spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White);
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
 
-            //Finally draw the usernames of both players
+            //Draw the username of both players
             username.DrawWithShadow(spriteBatch);
             otherUsername.DrawWithShadow(spriteBatch);
+
+            UIManager.Draw(spriteBatch);
+
+            //If the game is in the menu state, we need to draw an overlay over everything else
+            if (gameState == GameState.MENU)
+            {
+                spriteBatch.Draw(menuFilter, new Rectangle(0, 0, SceneManager.Instance.graphics.PreferredBackBufferWidth, SceneManager.Instance.graphics.PreferredBackBufferHeight), Color.White);
+
+                //If we are in the paused menu, we want to draw the paused buttons
+                pausedMenuUILayer.Draw(spriteBatch);
+            }
         }
 
         public override void LoadContent()
@@ -240,18 +250,16 @@ namespace TowerDefence.Scenes
 
                     money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
                     health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
-
-
                 }
             }
 
             void InitPlayerField()
             {
-                playfield = new byte[GameSize, GameSize];
-                for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) playfield[y, x] = 0;
+                playfield = new byte[(int)GameSize.X, (int)GameSize.Y];
+                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) playfield[x, y] = 0;
 
-                oppPlayfield = new byte[GameSize, GameSize];
-                for (int y = 0; y < GameSize; y++) for (int x = 0; x < GameSize; x++) oppPlayfield[y, x] = 0;
+                oppPlayfield = new byte[(int)GameSize.X, (int)GameSize.Y];
+                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) oppPlayfield[x, y] = 0;
             }
 
             void SetUpUsernames()
@@ -259,21 +267,23 @@ namespace TowerDefence.Scenes
                 Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
                 Vector2 leftQ = new(centre.X / 2, 0);
                 Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
-                username = new(Client.Instance.PlayerName, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                username = new(Client.Instance.PlayerName, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
 
                 Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
                 Client.Instance.WaitForNewMessage();
                 string enemyUsername = Client.Instance.ReadLatestMessage();
-                otherUsername = new(enemyUsername, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
             }
 
             Console.WriteLine("LOAD Game");
+            pausedMenuUILayer = new();
             towers = new();
             showCheatPanel = false;
             cheatPanel = null;
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
+            SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
             LoadTextures();
             InitUI();
@@ -289,6 +299,7 @@ namespace TowerDefence.Scenes
         public override void UnloadContent()
         {
             Console.WriteLine($"UNLOAD Game");
+            SceneManager.Instance.ManagedUIManager = true; //Pass control back to the SceneManager
         }
 
         public override void Update(GameTime gameTime)
@@ -321,7 +332,6 @@ namespace TowerDefence.Scenes
                         break;
                 }
             }
-            CheckForBuildMode();
 
             if (KeyboardController.IsPressed(Keys.Home))
             {
@@ -350,6 +360,9 @@ namespace TowerDefence.Scenes
             {
                 placementIsOverplayfield = IsCursorOnPlayField();
             }
+
+            if (gameState != GameState.MENU) UIManager.Update();
+            CheckForBuildMode();
         }
     }
 }

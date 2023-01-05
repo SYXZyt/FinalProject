@@ -90,7 +90,6 @@
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\" />
-    <Folder Include="Assets\Maps\" />
   </ItemGroup>
 
   <ItemGroup>

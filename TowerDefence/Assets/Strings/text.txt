@@ -15,3 +15,5 @@ LBL_USERNAME_AVAIL||Username approved
 LBL_FINDING_GAME||Searching for game...
 LBL_SET_APPLY||Apply
 LBL_SET_BACK||Back
+GM_MENU_PLAY||Resume
+GM_MENU_EXIT||Disconnect

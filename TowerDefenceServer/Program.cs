@@ -20,11 +20,46 @@ namespace TowerDefenceServer
         private static string GetDateTime => $"[{DateTime.Now:T}]";
 
         /// <summary>
+        /// Try to find an ongoing game using a player ID
+        /// </summary>
+        /// <param name="id">The id to look for</param>
+        /// <returns>The lobby, or null if no lobby can be found</returns>
+        private static Lobby FindLobbyWithID(long id)
+        {
+            foreach (Lobby lobby in lobbies)
+            {
+                if (lobby.PlayerA.playerNumber == id || lobby.PlayerB.playerNumber == id) return lobby;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Update all of the lobbies that the server has ongoing
         /// </summary>
         private static void UpdateLobbies()
         {
-            foreach (Lobby lobby in lobbies) lobby.Update();
+            foreach (Lobby lobby in lobbies)
+            {
+                int end = 4000;
+                lobby.Update();
+
+                //Check if either player has timed out
+                if (lobby.PlayerA.clientRef.TimeSinceLastPacket >= end)
+                {
+                    //Tell Player B they win
+                    SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x01}");
+                    SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x00}");
+                }
+                else if (lobby.PlayerB.clientRef.TimeSinceLastPacket >= end)
+                {
+                    //Same but if player b left this time
+                    SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x01}");
+                    SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x00}");
+                }
+
+                Console.WriteLine($"{lobby.PlayerA.clientRef.TimeSinceLastPacket} {lobby.PlayerB.clientRef.TimeSinceLastPacket}");
+            }
         }
 
         /// <summary>
@@ -144,6 +179,27 @@ namespace TowerDefenceServer
                         SendMessageToPeer(peer, username);
                     }
                     break;
+                case (byte)Header.GAME_OVER:
+                    {
+                        //We need to read the id of the player who won, and send them a unique message
+                        Console.WriteLine($"Game over. {data} ({UsernameDB.GetNameFromId(long.Parse(data))}) is the winner");
+                        long id = long.Parse(data);
+
+                        //We need to find the lobby with this player
+                        Lobby lobby = FindLobbyWithID(id);
+                        if (lobby is null) break;
+
+                        //Now message each user
+                        NetPeer winner = lobby.GetPlayerFromID(id).clientRef;
+                        NetPeer loser = lobby.GetOtherPlayerFromID(id).clientRef;
+
+                        SendMessageToPeer(winner, $"{Header.GAME_OVER}{0x01}");
+                        SendMessageToPeer(loser, $"{Header.GAME_OVER}{0x00}");
+
+                        //Now that the lobby is over, we want to remove it from the active games
+                        lobbies.Remove(lobby);
+                    }
+                    break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");
                     break;
@@ -154,7 +210,7 @@ namespace TowerDefenceServer
         {
             server = new(listener);
             server.Start(9050);
-            Console.WriteLine($"Server running {server.LocalPort}");
+            Console.WriteLine($"Server running on port {server.LocalPort}");
 
             tasks.Add(server.PollEvents);
             tasks.Add(TryToFindLobby);
@@ -175,7 +231,7 @@ namespace TowerDefenceServer
 
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
 
-            while (!Console.KeyAvailable)
+            while (true)
             {
                 foreach (ServerTask task in tasks)
                 {
@@ -183,8 +239,6 @@ namespace TowerDefenceServer
                     Thread.Sleep(15);
                 }
             }
-
-            server.Stop();
         }
     }
 }

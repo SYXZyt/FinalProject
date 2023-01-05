@@ -13,6 +13,8 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
+        private bool isWinner = false;
+
         private const int TileSize = 16;
         private readonly Vector2 GameSize = new(42, 48);
 
@@ -22,6 +24,9 @@ namespace TowerDefence.Scenes
         private Texture2D towerSelClick;
 
         private SwitchArray towers;
+
+        private ImageTextButton resumeButton;
+        private ImageTextButton disconnectButton;
 
         private Texture2D divider;
         private Texture2D menuFilter;
@@ -57,6 +62,49 @@ namespace TowerDefence.Scenes
 
         private Texture2D bkg;
         private bool placementIsOverplayfield;
+
+        private void HandleServer()
+        {
+            Client.Instance.PollEvents();
+
+            //If the server has sent nothing, there is no point in doing anything
+            if (Client.Instance.MessageCount == 0) return;
+
+            while (Client.Instance.MessageCount > 0)
+            {
+                ProcessServerMessage(Client.Instance.ReadLatestMessage());
+                Client.Instance.PollEvents();
+            }
+        }
+
+        private void ProcessServerMessage(string message)
+        {
+            //Read the header of the server and deal with it
+            byte header = (byte)message[0];
+            message = message[1..];
+
+            switch (header)
+            {
+                case (byte)Header.GAME_OVER:
+                    gameState = GameState.END;
+                    if ((byte)message[0] > 0) isWinner = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Disconnect this client from the game
+        /// </summary>
+        private static void Disconnect()
+        {
+            //Tell the server that the other player wins
+            Client.Instance.SendMessage($"{Header.GAME_OVER}{Client.Instance.EnemyID}");
+            Thread.Sleep(25);
+            Client.Instance.Disconnect();
+            SceneManager.Instance.LoadScene("mainMenu");
+        }
 
         /// <summary>
         /// Check if the mouse cursor is over the left side play area
@@ -220,6 +268,13 @@ namespace TowerDefence.Scenes
                 //If we are in the paused menu, we want to draw the paused buttons
                 pausedMenuUILayer.Draw(spriteBatch);
             }
+
+            //DEBUG CODE
+            if (gameState == GameState.END)
+            {
+                string msg = isWinner ? "WIN" : "LOSE";
+                spriteBatch.DrawString(AssetContainer.GetFont("fMain"), msg, new(100, 100), Color.White);
+            }
         }
 
         public override void LoadContent()
@@ -294,6 +349,16 @@ namespace TowerDefence.Scenes
 
             playFieldOffset = new(1920 / 2 + divider.Width, 96);
             enemyPlayFieldOffset = new(1920 / 2 - PlayfieldWidth - divider.Width, 96);
+
+            short bWidth = 310;
+            short bHeight = 72;
+            short bX = (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - bWidth / 2);
+            short bY = (short)(SceneManager.Instance.graphics.PreferredBackBufferHeight * 0.82);
+            resumeButton = new(new(bX, (short)(bY - bHeight), bWidth, bHeight), AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_MENU_PLAY"), 1.4f, AssetContainer.GetFont("fMain"));
+            disconnectButton = new(new(bX, bY, bWidth, bHeight), AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_MENU_EXIT"), 1.4f, AssetContainer.GetFont("fMain"));
+
+            pausedMenuUILayer.Add(resumeButton);
+            pausedMenuUILayer.Add(disconnectButton);
         }
 
         public override void UnloadContent()
@@ -304,6 +369,8 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            HandleServer();
+
             //Sometimes integer division is good, and this is one of them cases
             //This will lock the cursor to a 32x32 grid
             //Floating point division in this case would not have the desired locking effect, and you'd probably have to do some modulus instead
@@ -360,8 +427,16 @@ namespace TowerDefence.Scenes
             {
                 placementIsOverplayfield = IsCursorOnPlayField();
             }
+            else if (gameState == GameState.MENU)
+            {
+                pausedMenuUILayer.Update();
 
-            if (gameState != GameState.MENU) UIManager.Update();
+                //Check if buttons pressed
+                if (resumeButton.IsClicked()) gameState = GameState.PLAY;
+                if (disconnectButton.IsClicked()) Disconnect();
+            }
+
+            if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
             CheckForBuildMode();
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using TowerDefencePackets;
 using TowerDefence.Settings;
 
 namespace TowerDefence
@@ -68,13 +69,14 @@ namespace TowerDefence
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
                 messages.Add(dataReader.GetString());
-                Console.WriteLine($"We got: {messages[^1]}");
+                Console.WriteLine($"Received From Server: {messages[^1]}");
                 dataReader.Recycle();
             };
         }
 
         public void Disconnect()
         {
+            SendMessage($"{Header.DISCONNECT}{PlayerName}");
             client.Stop();
         }
 

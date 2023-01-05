@@ -44,5 +44,10 @@
         /// Pass a <see cref="long"/> to the server and returns the name associated with it
         /// </summary>
         public const char REQUEST_USERNAME_FROM_ID      = (char)0x07;
+
+        /// <summary>
+        /// Declares that a game is over. If the server receives this, it expects the id of the player who won. If the client receives this, it expects a byte. A non-zero bytes denotes that the client won
+        /// </summary>
+        public const char GAME_OVER                     = (char)0x08;
     }
 }

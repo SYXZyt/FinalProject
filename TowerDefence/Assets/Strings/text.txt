@@ -17,3 +17,5 @@ LBL_SET_APPLY||Apply
 LBL_SET_BACK||Back
 GM_MENU_PLAY||Resume
 GM_MENU_EXIT||Disconnect
+GM_END_WIN||You Win!
+GM_END_LOSE||You Lost

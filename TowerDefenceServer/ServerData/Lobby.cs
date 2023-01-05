@@ -13,9 +13,16 @@
 
         }
 
-        public void EndLobby(bool isPlayerAWinner)
+        public Player GetPlayerFromID(long id)
         {
+            if (pA.playerNumber == id) return pA;
+            return pB;
+        }
 
+        public Player GetOtherPlayerFromID(long id)
+        {
+            if (pA.playerNumber == id) return pB;
+            return pA;
         }
 
         public Lobby(Player pA, Player pB)

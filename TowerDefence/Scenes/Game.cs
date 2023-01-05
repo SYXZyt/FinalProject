@@ -341,6 +341,25 @@ namespace TowerDefence.Scenes
                 for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) oppPlayfield[x, y] = 0;
             }
 
+            void LoadMap()
+            {
+                //Wait til we get the correct message
+                while (Client.Instance.PeekLatest is null || Client.Instance.PeekLatest[0] != Header.RECEIVE_MAP_DATA) Client.Instance.PollEvents();
+
+                string mapData = Client.Instance.ReadLatestMessage()[1..];
+
+                if (mapData.Length != GameSize.X * GameSize.Y) throw new("Invalid map data read from server");
+
+                for (int y = 0; y < GameSize.Y; y++)
+                {
+                    for (int x = 0; x < GameSize.X; x++)
+                    {
+                        playfield[x, y] = byte.Parse(mapData[(int)(x * GameSize.X + y)].ToString());
+                        oppPlayfield[x, y] = playfield[x, y];
+                    }
+                }
+            }
+
             void SetUpUsernames()
             {
                 Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
@@ -367,6 +386,7 @@ namespace TowerDefence.Scenes
             LoadTextures();
             InitUI();
             InitPlayerField();
+            LoadMap();
             SetUpUsernames();
 
             uIManager.Add(towers);

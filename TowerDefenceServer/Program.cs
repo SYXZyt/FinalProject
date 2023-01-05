@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using System.Text;
 using LiteNetLib.Utils;
 using TowerDefencePackets;
 using TowerDefenceServer.ServerData;
@@ -7,6 +8,8 @@ namespace TowerDefenceServer
 {
     internal static class Program
     {
+        private static readonly Random rng = new();
+
         private static readonly EventBasedNetListener listener = new();
         private static NetManager server;
 
@@ -16,6 +19,8 @@ namespace TowerDefenceServer
         private static readonly List<Lobby> lobbies = new();
 
         private static readonly List<(long id, NetPeer client)> playersWaiting = new();
+
+        private static readonly List<Map> loadedMaps = new();
 
         private static string GetDateTime => $"[{DateTime.Now:T}]";
 
@@ -39,6 +44,9 @@ namespace TowerDefenceServer
         /// </summary>
         private static void UpdateLobbies()
         {
+            //Remove any lobby where the IsOver flag is true
+            lobbies.RemoveAll(l => l.IsOver);
+
             foreach (Lobby lobby in lobbies)
             {
                 lobby.Update();
@@ -49,12 +57,20 @@ namespace TowerDefenceServer
                     //Tell Player B they win
                     SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x01}");
                     SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x00}");
+
+                    lobby.PlayerA.clientRef.Disconnect();
+                    UsernameDB.RemoveUser(UsernameDB.GetNameFromId(lobby.PlayerA.playerNumber));
+                    lobby.IsOver = true;
                 }
                 else if (lobby.PlayerB.clientRef.TimeSinceLastPacket >= lobby.PlayerB.clientRef.NetManager.DisconnectTimeout)
                 {
                     //Same but if player b left this time
                     SendMessageToPeer(lobby.PlayerA.clientRef, $"{Header.GAME_OVER}{0x01}");
                     SendMessageToPeer(lobby.PlayerB.clientRef, $"{Header.GAME_OVER}{0x00}");
+
+                    lobby.PlayerB.clientRef.Disconnect();
+                    UsernameDB.RemoveUser(UsernameDB.GetNameFromId(lobby.PlayerB.playerNumber));
+                    lobby.IsOver = true;
                 }
             }
         }
@@ -91,6 +107,18 @@ namespace TowerDefenceServer
 
             Lobby lobby = new(a, b);
             lobbies.Add(lobby);
+
+            //Pick a map and send it to both players
+            Map map = loadedMaps[rng.Next(loadedMaps.Count)];
+
+            StringBuilder builder = new();
+            builder.Append(Header.RECEIVE_MAP_DATA);
+            foreach (byte bite in map.Serialise()) builder.Append(bite);
+            string mapData = builder.ToString();
+
+            Thread.Sleep(50);
+            SendMessageToPeer(playerA.client, mapData);
+            SendMessageToPeer(playerB.client, mapData);
 
             Console.WriteLine($"{GetDateTime} Found lobby with {playerA.id} and {playerB.id}");
         }
@@ -215,15 +243,20 @@ namespace TowerDefenceServer
 
             foreach (string map in mapPaths)
             {
+                Console.WriteLine($"Loaded {map}");
                 Map _map = Map.LoadFromDisk(map);
+                loadedMaps.Add(_map);
             }
         }
 
         private static void Main()
         {
+            LoadMaps();
             server = new(listener);
             server.Start(9050);
-            Console.WriteLine($"Server running on port {server.LocalPort}");
+            string title = $"Server running on port {server.LocalPort}";
+            Console.WriteLine(title);
+            Console.WriteLine(new string('~', title.Length));
 
             tasks.Add(server.PollEvents);
             tasks.Add(TryToFindLobby);
@@ -251,6 +284,8 @@ namespace TowerDefenceServer
                     task.Invoke();
                     Thread.Sleep(15);
                 }
+
+                Console.CursorVisible = false;
             }
         }
     }

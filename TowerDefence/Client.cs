@@ -23,6 +23,9 @@ namespace TowerDefence
 
         public long EnemyID { get; set; } = -1;
 
+        public string PeekOldest => messages.Count > 0 ? messages[0] : null;
+        public string PeekLatest => messages.Count > 0 ? messages[^1] : null;
+
         private void OnPeerConnect(NetPeer peer) => server = peer;
 
         public void WaitForNewMessage()

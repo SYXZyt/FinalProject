@@ -49,5 +49,10 @@
         /// Declares that a game is over. If the server receives this, it expects the id of the player who won. If the client receives this, it expects a byte. A non-zero bytes denotes that the client won
         /// </summary>
         public const char GAME_OVER                     = (char)0x08;
+        
+        /// <summary>
+        /// Sends a serialised version of the loaded map to the client
+        /// </summary>
+        public const char RECEIVE_MAP_DATA              = (char)0x09;
     }
 }

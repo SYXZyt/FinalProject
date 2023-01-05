@@ -19,4 +19,10 @@
     <Folder Include="Maps\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Maps\demo.map">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

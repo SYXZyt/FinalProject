@@ -5,6 +5,8 @@
         private readonly Player pA;
         private readonly Player pB;
 
+        public bool IsOver { get; set; } = false;
+
         public Player PlayerA => pA;
         public Player PlayerB => pB;
 

@@ -17,7 +17,7 @@
             {
                 for (int x = 0; x < MapWidth; x++)
                 {
-                    bytes[x * MapWidth + y] = this[x, y];
+                    bytes[x + MapWidth * y] = this[x, y];
                 }
             }
 
@@ -33,7 +33,8 @@
             using BinaryReader reader = new(File.OpenRead(filename));
             for (int i = 0; i < MapWidth * MapHeight; i++)
             {
-                map.mapData[i % MapWidth, i / MapWidth] = reader.ReadByte();
+                byte b = reader.ReadByte();
+                map.mapData[i % MapWidth, i / MapWidth] = b;
             }
 
             reader.Close();
@@ -45,7 +46,8 @@
             mapData = new byte[MapWidth, MapHeight];
         }
 
-        public Map(byte[,] mapData)        {
+        public Map(byte[,] mapData)
+        {
             this.mapData = mapData;
         }
     }

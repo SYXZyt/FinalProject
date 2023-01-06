@@ -124,7 +124,7 @@ namespace TowerDefence.Scenes
             {
                 case (byte)Header.GAME_OVER:
                     gameState = GameState.END;
-                    if ((byte)message[0] > 0) isWinner = true;
+                    if (byte.Parse(message[0].ToString()) > 0) isWinner = true;
                     gameOverLabel.SetLabelText(AssetContainer.ReadString(isWinner ? "GM_END_WIN" : "GM_END_LOSE"));
                     break;
                 default:

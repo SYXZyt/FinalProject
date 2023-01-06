@@ -106,6 +106,7 @@ namespace TowerDefence.Scenes
 
             client = new();
             client.Connect();
+            Thread.Sleep(30);
 
             textboxOffset = usernameBox.CalculateOriginOffset();
         }

@@ -75,7 +75,6 @@ namespace TowerDefence.Scenes
         {
             switch (gameState)
             {
-
                 case GameState.PLACEMENT:
                     placementIsOverplayfield = IsCursorOnPlayField();
                     break;
@@ -249,7 +248,11 @@ namespace TowerDefence.Scenes
 
                 vHealth = Convert.ToByte(iHealth);
             }
-            else if (cheat.cmd == CheatCommand.EXIT) SceneManager.Instance.Exit();
+            else if (cheat.cmd == CheatCommand.EXIT)
+            {
+                Disconnect();
+                SceneManager.Instance.Exit();
+            }
             else if (cheat.cmd == CheatCommand.DISPOSE)
             {
                 if (cheat.@params.Length == 0) return;
@@ -290,7 +293,21 @@ namespace TowerDefence.Scenes
             health.DrawWithShadow(spriteBatch);
 
             //Draw addition UI elements
-            if (gameState == GameState.PLACEMENT && placementIsOverplayfield) spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White);
+            if (gameState == GameState.PLACEMENT && placementIsOverplayfield)
+            {
+                //Check if the position that the mouse is over, is a ground tile
+                int pX = (int)((tmx - playFieldOffset.X) / TileSize);
+                int pY = (int)((tmy - playFieldOffset.Y) / TileSize);
+
+                if (playfield[pY, pX] == 0)
+                {
+                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White * 0.6f);
+                }
+                else
+                {
+                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
+                }
+            }
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
 
             //Draw the username of both players

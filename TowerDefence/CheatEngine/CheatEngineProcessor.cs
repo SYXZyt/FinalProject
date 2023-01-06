@@ -7,6 +7,8 @@
         SET_HEALTH,
         DISPOSE,
         EXIT,
+        FORCE_WIN,
+        FORCE_LOSE,
     }
 
     internal struct Param

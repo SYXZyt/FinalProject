@@ -57,6 +57,9 @@ namespace TowerDefence.Scenes
         private Vector2 playFieldOffset;
         private Vector2 enemyPlayFieldOffset;
 
+        private Label gameOverLabel;
+        private ImageTextButton gameOverExit;
+
         private int PlayfieldWidth => (int)(playfieldTextures[0].Width * GameSize.X);
         private int PlayfieldHeight => (int)(playfieldTextures[0].Height * GameSize.Y);
 
@@ -83,6 +86,14 @@ namespace TowerDefence.Scenes
                 case GameState.END:
                     gameOverOpacity += GameOverOpacitySpeed;
                     gameOverOpacity = Math.Clamp(gameOverOpacity, 0f, 1f);
+                    gameOverLabel.SetOpacity(gameOverOpacity);
+                    gameOverExit.Update();
+
+                    if (gameOverExit.IsClicked())
+                    {
+                        Client.Instance.Disconnect();
+                        SceneManager.Instance.LoadScene("mainMenu");
+                    }
                     break;
             }
         }
@@ -112,6 +123,7 @@ namespace TowerDefence.Scenes
                 case (byte)Header.GAME_OVER:
                     gameState = GameState.END;
                     if ((byte)message[0] > 0) isWinner = true;
+                    gameOverLabel.SetLabelText(AssetContainer.ReadString(isWinner ? "GM_END_WIN" : "GM_END_LOSE"));
                     break;
                 default:
                     break;
@@ -125,7 +137,7 @@ namespace TowerDefence.Scenes
         {
             //Tell the server that the other player wins
             Client.Instance.SendMessage($"{Header.GAME_OVER}{Client.Instance.EnemyID}");
-            Thread.Sleep(25);
+            Thread.Sleep(30);
             Client.Instance.Disconnect();
             SceneManager.Instance.LoadScene("mainMenu");
         }
@@ -293,11 +305,10 @@ namespace TowerDefence.Scenes
                 pausedMenuUILayer.Draw(spriteBatch);
             }
 
-            //DEBUG CODE
             if (gameState == GameState.END)
             {
-                string msg = isWinner ? "WIN" : "LOSE";
-                spriteBatch.DrawString(AssetContainer.GetFont("fMain"), msg, new(100, 100), Color.White * gameOverOpacity);
+                gameOverLabel.DrawWithShadow(spriteBatch);
+                gameOverExit.Draw(spriteBatch);
             }
         }
 
@@ -330,6 +341,8 @@ namespace TowerDefence.Scenes
                     money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
                     health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
                 }
+
+                gameOverLabel = new("", 4f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 100), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
             }
 
             void InitPlayerField()
@@ -400,6 +413,7 @@ namespace TowerDefence.Scenes
             short bY = (short)(SceneManager.Instance.graphics.PreferredBackBufferHeight * 0.82);
             resumeButton = new(new(bX, (short)(bY - bHeight), bWidth, bHeight), AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_MENU_PLAY"), 1.4f, AssetContainer.GetFont("fMain"));
             disconnectButton = new(new(bX, bY, bWidth, bHeight), AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_MENU_EXIT"), 1.4f, AssetContainer.GetFont("fMain"));
+            gameOverExit = new(new(bX, (short)(bY - bHeight), bWidth, bHeight), AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_MENU_EXIT"), 1.4f, AssetContainer.GetFont("fMain"));
 
             pausedMenuUILayer.Add(resumeButton);
             pausedMenuUILayer.Add(disconnectButton);

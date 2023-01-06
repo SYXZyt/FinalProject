@@ -80,7 +80,6 @@ namespace TowerDefence
         public void Disconnect()
         {
             SendMessage($"{Header.DISCONNECT}{PlayerName}");
-            client.Stop();
         }
 
         public void SendMessage(string message)

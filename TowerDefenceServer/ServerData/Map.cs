@@ -13,11 +13,12 @@
         {
             byte[] bytes = new byte[MapWidth * MapHeight];
 
+            int i = 0;
             for (int y = 0; y < MapHeight; y++)
             {
                 for (int x = 0; x < MapWidth; x++)
                 {
-                    bytes[x + MapWidth * y] = this[x, y];
+                    bytes[i++] = this[x, y];
                 }
             }
 
@@ -31,11 +32,15 @@
             if (!File.Exists(filename)) return null;
 
             using BinaryReader reader = new(File.OpenRead(filename));
-            for (int i = 0; i < MapWidth * MapHeight; i++)
+            for (int y = 0; y < MapHeight; y++)
             {
-                byte b = reader.ReadByte();
-                map.mapData[i % MapWidth, i / MapWidth] = b;
+                for (int x = 0; x < MapWidth; x++)
+                {
+                    byte b = reader.ReadByte();
+                    map.mapData[x, y] = b;
+                }
             }
+
 
             reader.Close();
             return map;

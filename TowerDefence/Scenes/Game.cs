@@ -13,12 +13,14 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
+        private readonly Random rng;
+
         private bool isWinner = false;
         private float gameOverOpacity = 0f;
         private const float GameOverOpacitySpeed = 0.01f;
 
         private const int TileSize = 16;
-        private readonly Vector2 GameSize = new(42, 48);
+        private readonly Vector2 GameSize = new(48, 42);
 
         private UIManager pausedMenuUILayer;
 
@@ -53,6 +55,7 @@ namespace TowerDefence.Scenes
 
         private byte[,] playfield;
         private byte[,] oppPlayfield;
+        private byte[,] textureOffsets;
 
         private Vector2 playFieldOffset;
         private Vector2 enemyPlayFieldOffset;
@@ -60,10 +63,10 @@ namespace TowerDefence.Scenes
         private Label gameOverLabel;
         private ImageTextButton gameOverExit;
 
-        private int PlayfieldWidth => (int)(playfieldTextures[0].Width * GameSize.X);
-        private int PlayfieldHeight => (int)(playfieldTextures[0].Height * GameSize.Y);
+        private int PlayfieldWidth => (int)(playfieldTextures[0][0].Width * GameSize.X);
+        private int PlayfieldHeight => (int)(playfieldTextures[0][0].Height * GameSize.Y);
 
-        private Texture2D[] playfieldTextures;
+        private TextureCollection[] playfieldTextures;
 
         private Texture2D bkg;
         private bool placementIsOverplayfield;
@@ -184,13 +187,13 @@ namespace TowerDefence.Scenes
             void DrawNonSpecificField(byte[,] field, Vector2 thisFieldOffset)
             {
                 Rectangle border = new((int)(thisFieldOffset.X - 5), (int)(thisFieldOffset.Y - 5), PlayfieldWidth + 10, PlayfieldHeight + 10);
-                spriteBatch.Draw(playfieldTextures[0], border, Color.Black);
+                spriteBatch.Draw(playfieldTextures[0][0], border, Color.Black);
 
                 for (int y = 0; y < GameSize.Y; y++)
                 {
                     for (int x = 0; x < GameSize.X; x++)
                     {
-                        Texture2D cell = playfieldTextures[field[x, y]];
+                        Texture2D cell = playfieldTextures[field[y, x]][textureOffsets[y, x]];
                         Vector2 v = new(thisFieldOffset.X + x * cell.Width, thisFieldOffset.Y + y * cell.Height);
                         cell.Draw(v, spriteBatch, Color.White);
                     }
@@ -323,9 +326,22 @@ namespace TowerDefence.Scenes
                 menuFilter = AssetContainer.ReadTexture("sMenuFilter");
                 statPanel = AssetContainer.ReadTexture("sStat");
 
-                playfieldTextures = new Texture2D[2];
-                playfieldTextures[0] = AssetContainer.ReadTexture("sFloor");
-                playfieldTextures[1] = AssetContainer.ReadTexture("sPath");
+                playfieldTextures = new TextureCollection[2];
+                for (int i = 0; i < playfieldTextures.Length; i++)
+                {
+                    playfieldTextures[i] = new();
+                    playfieldTextures[i].AddTexture(AssetContainer.ReadTexture($"map_{i}"));
+
+                    //Add the alt textures
+                    //There is probably a better way than hard-coding but fuck it
+                    if (i == 0)
+                    {
+                        for (int j = 0; j < 2; j++)
+                        {
+                            playfieldTextures[i].AddTexture(AssetContainer.ReadTexture($"map_{i}_{j}"));
+                        }
+                    }
+                }
             }
 
             void InitUI()
@@ -347,11 +363,11 @@ namespace TowerDefence.Scenes
 
             void InitPlayerField()
             {
-                playfield = new byte[(int)GameSize.X, (int)GameSize.Y];
-                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) playfield[x, y] = 0;
+                playfield = new byte[(int)GameSize.Y, (int)GameSize.X];
+                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) playfield[y, x] = 0;
 
-                oppPlayfield = new byte[(int)GameSize.X, (int)GameSize.Y];
-                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) oppPlayfield[x, y] = 0;
+                oppPlayfield = new byte[(int)GameSize.Y, (int)GameSize.X];
+                for (int y = 0; y < GameSize.Y; y++) for (int x = 0; x < GameSize.X; x++) oppPlayfield[y, x] = 0;
             }
 
             void LoadMap()
@@ -363,12 +379,26 @@ namespace TowerDefence.Scenes
 
                 if (mapData.Length != GameSize.X * GameSize.Y) throw new("Invalid map data read from server");
 
+                int i = 0;
                 for (int y = 0; y < GameSize.Y; y++)
                 {
                     for (int x = 0; x < GameSize.X; x++)
                     {
-                        playfield[x, y] = byte.Parse(mapData[(int)(x * GameSize.X + y)].ToString());
-                        oppPlayfield[x, y] = playfield[x, y];
+                        playfield[y, x] = byte.Parse(mapData[i++].ToString());
+                        oppPlayfield[y, x] = playfield[y, x];
+                    }
+                }
+
+                //Now we can load the random offsets
+                textureOffsets = new byte[(int)GameSize.Y, (int)GameSize.X];
+                for (int y = 0; y < GameSize.Y; y++)
+                {
+                    for (int x = 0; x < GameSize.X; x++)
+                    {
+                        if (playfield[y, x] == 0)
+                        {
+                            textureOffsets[y, x] = (byte)rng.Next(playfieldTextures[0].Count);
+                        }
                     }
                 }
             }
@@ -485,6 +515,11 @@ namespace TowerDefence.Scenes
 
             if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
             CheckForBuildMode();
+        }
+
+        public Game() : base()
+        {
+            rng = new();
         }
     }
 }

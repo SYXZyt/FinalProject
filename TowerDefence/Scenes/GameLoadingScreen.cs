@@ -163,8 +163,6 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonClicked.png", "sMenuButtonClicked"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonUnclicked.png", "sMenuButtonUnclicked"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\textbackground.png", "sTextboxBkg"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\gamemapPath.png", "sPath"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\gamemapFloor.png", "sFloor"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\cross.png", "sCross"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\tick.png", "sTick"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\tickDrop.png", "sTickDrop"));
@@ -176,6 +174,18 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\stats.png", "sStat"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\settingWindowed.png", "sSettingWindowed"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\settingFullscreen.png", "sSettingFullscreen"));
+
+            //Load the map textures
+            for (int i = 0; i < 2; i++)
+            {
+                LoadFile file = new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}.png", $"map_{i}");
+                filesToLoad.Enqueue(file);
+
+                if (i == 0)
+                {
+                    for (int j = 0; j < 2; j++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}_{j + 1}.png", $"map_{i}_{j}"));
+                }
+            }
         }
 
         private static void LoadSettings() => SettingFileHandler.LoadSettingsFile();

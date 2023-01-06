@@ -28,7 +28,8 @@ namespace TowerDefence.Scenes
         public override void LoadContent()
         {
             Console.WriteLine($"LOAD MainMenu");
-            
+            if (Client.Instance is not null) Client.Instance.PlayerName = ""; //If the client is not null, set the name to blank
+
             Vector2 pos = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 50);
             title = new(AssetContainer.ReadString("STR_GAME_NAME"), 2f, pos, Color.White, AssetContainer.GetFont("fMain"), Origin.MIDDLE_CENTRE, 0f);
 

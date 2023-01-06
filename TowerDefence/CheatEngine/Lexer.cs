@@ -33,11 +33,11 @@
 
                     tokens.Add(new(TokenType.INT, lexeme));
                 }
-                else if (char.IsLetterOrDigit(CurrentChar))
+                else if (char.IsLetterOrDigit(CurrentChar) || CurrentChar == '_')
                 {
                     string lexeme = "";
 
-                    while (char.IsLetterOrDigit(CurrentChar))
+                    while (char.IsLetterOrDigit(CurrentChar) || CurrentChar == '_')
                     {
                         lexeme += CurrentChar;
                         Advance();

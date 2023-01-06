@@ -30,6 +30,12 @@
                 case "dispose":
                     cheat.cmd = CheatCommand.DISPOSE;
                     break;
+                case "force_win":
+                    cheat.cmd = CheatCommand.FORCE_WIN;
+                    break;
+                case "force_lose":
+                    cheat.cmd = CheatCommand.FORCE_LOSE;
+                    break;
                 default:
                     return new();
             }

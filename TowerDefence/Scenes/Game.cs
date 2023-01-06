@@ -269,6 +269,14 @@ namespace TowerDefence.Scenes
                     AssetContainer.ReadTexture(texName).Dispose();
                 }
             }
+            else if (cheat.cmd == CheatCommand.FORCE_WIN)
+            {
+                Client.Instance.SendMessage($"{Header.GAME_OVER}{Client.Instance.PlayerID}");
+            }
+            else if (cheat.cmd == CheatCommand.FORCE_LOSE)
+            {
+                Client.Instance.SendMessage($"{Header.GAME_OVER}{Client.Instance.EnemyID}");
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)

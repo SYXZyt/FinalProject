@@ -176,7 +176,7 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\settingFullscreen.png", "sSettingFullscreen"));
 
             //Load the map textures
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 10; i++)
             {
                 LoadFile file = new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}.png", $"map_{i}");
                 filesToLoad.Enqueue(file);

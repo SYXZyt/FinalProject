@@ -146,7 +146,7 @@
             {
                 for (int x = 0; x < 48; x++)
                 {
-                    writer.Write(map[x, y]);
+                    writer.Write($"{map[x, y]},");
                 } writer.Write("\r\n");
             }
 
@@ -183,7 +183,7 @@
                 for (int i = 0; i < 42; i++)
                 {
                     string line = reader.ReadLine();
-                    char[] cs = line.ToCharArray();
+                    string[] cs = line.Split(",");
                     for (int j = 0; j < 48; j++) map[j, i] = int.Parse(cs[j].ToString());
                 }
 

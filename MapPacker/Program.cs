@@ -9,7 +9,7 @@
             while (!reader.EndOfStream)
             {
                 string line = reader.ReadLine();
-                char[] values = line.ToCharArray();
+                string[] values = line.Split(",")[0..^1];
                 byte[] row = new byte[values.Length];
                 for (int i = 0; i < values.Length; i++)
                 {
@@ -41,6 +41,7 @@
 
                 using StreamReader reader = new(File.OpenRead(csvFile));
                 byte[] bytes = ReadCSV(reader);
+                reader.Close();
                 WritePackedFile(bytes, Path.GetFileNameWithoutExtension(csvFile));
             }
         }

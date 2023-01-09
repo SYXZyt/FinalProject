@@ -113,7 +113,7 @@ namespace TowerDefenceServer
 
             StringBuilder builder = new();
             builder.Append(Header.RECEIVE_MAP_DATA);
-            foreach (byte bite in map.Serialise()) builder.Append(bite);
+            foreach (char bite in map.Serialise()) builder.Append(bite);
             string mapData = builder.ToString();
 
             Thread.Sleep(50);
@@ -246,6 +246,7 @@ namespace TowerDefenceServer
                 Console.WriteLine($"Loaded {map}");
                 Map _map = Map.LoadFromDisk(map);
                 loadedMaps.Add(_map);
+                _map.Serialise();
             }
         }
 

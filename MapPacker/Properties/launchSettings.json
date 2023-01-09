@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MapPacker": {
+      "commandName": "Project",
+      "commandLineArgs": "demo.map"
+    }
+  }
+}

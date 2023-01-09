@@ -2,6 +2,6 @@
 {
     internal interface ISerialisable
     {
-        public byte[] Serialise();
+        public char[] Serialise();
     }
 }

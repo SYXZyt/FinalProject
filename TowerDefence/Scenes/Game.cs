@@ -351,7 +351,7 @@ namespace TowerDefence.Scenes
                 menuFilter = AssetContainer.ReadTexture("sMenuFilter");
                 statPanel = AssetContainer.ReadTexture("sStat");
 
-                playfieldTextures = new TextureCollection[2];
+                playfieldTextures = new TextureCollection[14];
                 for (int i = 0; i < playfieldTextures.Length; i++)
                 {
                     playfieldTextures[i] = new();
@@ -409,7 +409,7 @@ namespace TowerDefence.Scenes
                 {
                     for (int x = 0; x < GameSize.X; x++)
                     {
-                        playfield[y, x] = byte.Parse(mapData[i++].ToString());
+                        playfield[y, x] = (byte)(mapData[i++] - 1);
                         oppPlayfield[y, x] = playfield[y, x];
                     }
                 }

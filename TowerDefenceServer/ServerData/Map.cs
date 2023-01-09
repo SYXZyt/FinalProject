@@ -9,16 +9,16 @@
 
         public byte this[int x, int y] => mapData[x, y];
 
-        public byte[] Serialise()
+        public char[] Serialise()
         {
-            byte[] bytes = new byte[MapWidth * MapHeight];
+            char[] bytes = new char[MapWidth * MapHeight];
 
             int i = 0;
             for (int y = 0; y < MapHeight; y++)
             {
                 for (int x = 0; x < MapWidth; x++)
                 {
-                    bytes[i++] = this[x, y];
+                    bytes[i++] = (char)(this[x, y] + 1); //Just to make sure we don't misinterpret the null character, we can increment
                 }
             }
 

@@ -9,6 +9,7 @@
         EXIT,
         FORCE_WIN,
         FORCE_LOSE,
+        DEBUG,
     }
 
     internal struct Param

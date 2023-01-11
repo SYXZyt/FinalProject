@@ -19,6 +19,7 @@ namespace TowerDefence
         private readonly List<string> messages;
 
         public NetManager NetManager => client;
+        public NetPeer Peer => server;
 
         public long PlayerID { get; set; } = -1;
         public string PlayerName { get; set; } = string.Empty;

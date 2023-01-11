@@ -36,6 +36,9 @@
                 case "force_lose":
                     cheat.cmd = CheatCommand.FORCE_LOSE;
                     break;
+                case "debug":
+                    cheat.cmd = CheatCommand.DEBUG;
+                    break;
                 default:
                     return new();
             }

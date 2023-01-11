@@ -1,7 +1,6 @@
 ﻿using UILibrary;
 using UILibrary.IO;
 using AssetStreamer;
-using LiteNetLib.Utils;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
 using TowerDefencePackets;
@@ -9,6 +8,8 @@ using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+
+using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Scenes
 {
@@ -39,6 +40,8 @@ namespace TowerDefence.Scenes
 
         private Label username;
         private Label otherUsername;
+
+        private bool showDebugStats;
 
         private int tmx;
         private int tmy;
@@ -108,6 +111,9 @@ namespace TowerDefence.Scenes
 
         private void SendSnapShot()
         {
+            //If we are in the end state, we don't need to send anything
+            if (gameState == GameState.END) return;
+
             Snapshot ss = new()
             {
                 ID = Client.Instance.PlayerID,
@@ -303,6 +309,10 @@ namespace TowerDefence.Scenes
             {
                 Client.Instance.SendMessage($"{Header.GAME_OVER}{Client.Instance.EnemyID}");
             }
+            else if (cheat.cmd == CheatCommand.DEBUG)
+            {
+                showDebugStats = !showDebugStats;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -367,10 +377,18 @@ namespace TowerDefence.Scenes
                 gameOverLabel.DrawWithShadow(spriteBatch);
                 gameOverExit.Draw(spriteBatch);
             }
+
+            if (showDebugStats)
+            {
+                string message = $"PING: {Client.Instance.Peer.Ping}ms";
+                spriteBatch.DrawString(AssetContainer.GetFont("fMain"), message, new Vector2(100, 100), Color.White);
+            }
         }
 
         public override void LoadContent()
         {
+            Console.WriteLine("LOAD Game");
+
             void LoadTextures()
             {
                 bkg = AssetContainer.ReadTexture("sMenu");
@@ -472,7 +490,7 @@ namespace TowerDefence.Scenes
                 otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
             }
 
-            Console.WriteLine("LOAD Game");
+            showDebugStats = false;
             pausedMenuUILayer = new();
             towers = new();
             showCheatPanel = false;

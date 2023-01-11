@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 
-namespace TowerDefence
+namespace TowerDefence.Visuals
 {
     internal class TextureCollection
     {

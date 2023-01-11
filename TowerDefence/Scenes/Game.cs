@@ -1,6 +1,7 @@
 ﻿using UILibrary;
 using UILibrary.IO;
 using AssetStreamer;
+using LiteNetLib.Utils;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
 using TowerDefencePackets;
@@ -47,6 +48,11 @@ namespace TowerDefence.Scenes
 
         private byte vHealth;
         private ushort vMoney;
+
+        private byte ovHealth;
+        private ushort ovMoney;
+        private Label oMoney;
+        private Label oHealth;
 
         private Textbox cheatPanel;
         private bool showCheatPanel;
@@ -100,6 +106,18 @@ namespace TowerDefence.Scenes
             }
         }
 
+        private void SendSnapShot()
+        {
+            Snapshot ss = new()
+            {
+                ID = Client.Instance.PlayerID,
+                Health = vHealth,
+                Money = vMoney,
+            };
+
+            Client.Instance.SendMessage($"{Header.SNAPSHOT}{ss.Serialize()}");
+        }
+
         private void HandleServer()
         {
             Client.Instance.PollEvents();
@@ -126,6 +144,14 @@ namespace TowerDefence.Scenes
                     gameState = GameState.END;
                     if (byte.Parse(message[0].ToString()) > 0) isWinner = true;
                     gameOverLabel.SetLabelText(AssetContainer.ReadString(isWinner ? "GM_END_WIN" : "GM_END_LOSE"));
+                    break;
+                case (byte)Header.SNAPSHOT:
+                    {
+                        Snapshot ss = new();
+                        ss.Deserialize(message);
+                        ovHealth = ss.Health;
+                        ovMoney = ss.Money;
+                    }
                     break;
                 default:
                     break;
@@ -297,8 +323,11 @@ namespace TowerDefence.Scenes
 
             //Draw the stat panel on the top right of the screen
             spriteBatch.Draw(statPanel, new Vector2(SceneManager.Instance.graphics.PreferredBackBufferWidth - statPanel.Width, 0), Color.White);
+            spriteBatch.Draw(statPanel, new Rectangle(0, 0, statPanel.Width, statPanel.Height), null, Color.White, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 0f);
             money.DrawWithShadow(spriteBatch);
             health.DrawWithShadow(spriteBatch);
+            oMoney.DrawWithShadow(spriteBatch);
+            oHealth.DrawWithShadow(spriteBatch);
 
             //Draw addition UI elements
             if (gameState == GameState.PLACEMENT && placementIsOverplayfield)
@@ -376,14 +405,16 @@ namespace TowerDefence.Scenes
                     AABB aabb = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
                     Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
                     towers.AddSwitch(s);
-
-                    Vector2 topRight = new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0);
-
-                    money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
-                    health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
                 }
 
+                Vector2 topRight = new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0);
+
+                money = new("NULL", 1.3f, topRight, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
+                health = new("NULL", 1.3f, topRight + new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_RIGHT, 0f);
                 gameOverLabel = new("", 4f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 100), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
+
+                oMoney = new("NULL", 1.3f, Vector2.Zero, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                oHealth = new("NULL", 1.3f, new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
             }
 
             void InitPlayerField()
@@ -449,6 +480,7 @@ namespace TowerDefence.Scenes
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
+
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
             LoadTextures();
@@ -483,6 +515,7 @@ namespace TowerDefence.Scenes
         public override void Update(GameTime gameTime)
         {
             HandleServer();
+            SendSnapShot();
 
             //Sometimes integer division is good, and this is one of them cases
             //This will lock the cursor to a 32x32 grid
@@ -492,6 +525,8 @@ namespace TowerDefence.Scenes
 
             money.SetLabelText($"{vMoney}$");
             health.SetLabelText($"{vHealth} HP");
+            oMoney.SetLabelText($"{ovMoney}$");
+            oHealth.SetLabelText($"{ovHealth} HP");
 
             //If the user presses escape, we need to do something different
             if (KeyboardController.IsPressed(Keys.Escape))

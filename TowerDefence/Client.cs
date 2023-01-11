@@ -18,6 +18,8 @@ namespace TowerDefence
 
         private readonly List<string> messages;
 
+        public NetManager NetManager => client;
+
         public long PlayerID { get; set; } = -1;
         public string PlayerName { get; set; } = string.Empty;
 
@@ -25,6 +27,10 @@ namespace TowerDefence
 
         public string PeekOldest => messages.Count > 0 ? messages[0] : null;
         public string PeekLatest => messages.Count > 0 ? messages[^1] : null;
+
+        public int MessageCount => messages.Count;
+
+        public bool IsConnected => server is not null;
 
         private void OnPeerConnect(NetPeer peer) => server = peer;
 
@@ -52,10 +58,6 @@ namespace TowerDefence
             }
             return null;
         }
-
-        public int MessageCount => messages.Count;
-
-        public bool IsConnected => server is not null;
 
         public IPAddress IP { get; set; } = GlobalSettings.ServerIP;
         public int Port { get; set; } = GlobalSettings.Port;

@@ -13,6 +13,8 @@ namespace TowerDefenceServer
         private static readonly EventBasedNetListener listener = new();
         private static NetManager server;
 
+        private static NetPacketProcessor packetProcessor;
+
         private delegate void ServerTask();
         private static readonly List<ServerTask> tasks = new();
 
@@ -146,6 +148,11 @@ namespace TowerDefenceServer
         {
             //Read the first byte as it will store what to do
             string data = reader.GetString();
+            if (data == "")
+            {
+                Console.WriteLine($"{GetDateTime} Empty Data");
+                return;
+            }
 
             byte op = (byte)data[0];
             data = data[1..];
@@ -225,6 +232,20 @@ namespace TowerDefenceServer
                         lobbies.Remove(lobby);
                     }
                     break;
+                case (byte)Header.SNAPSHOT:
+                    {
+                        Console.WriteLine($"Received Snapshot");
+                        Snapshot ss = new();
+                        ss.Deserialize(data);
+
+                        //Get the lobby that this player is in
+                        Lobby lobby = FindLobbyWithID(ss.ID);
+                        if (lobby is null) return; //If there is no game found, just stop
+
+                        //Pass the packet onto the other player
+                        SendMessageToPeer(lobby.GetOtherPlayerFromID(ss.ID).clientRef, $"{Header.SNAPSHOT}{data}");
+                    }
+                    break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");
                     break;
@@ -262,6 +283,20 @@ namespace TowerDefenceServer
             tasks.Add(server.PollEvents);
             tasks.Add(TryToFindLobby);
             tasks.Add(UpdateLobbies);
+
+            packetProcessor = new();
+            packetProcessor.SubscribeReusable<Snapshot>((snapshot) =>
+            {
+                Console.WriteLine($"Received game snapshot");
+
+                Lobby lobby = FindLobbyWithID(snapshot.ID);
+                if (lobby is not null)
+                {
+                    //Send the snapshot to the other player
+                    NetPeer other = lobby.GetOtherPlayerFromID(snapshot.ID).clientRef;
+                    packetProcessor.Send(other, new Snapshot() { Health = snapshot.Health, ID = snapshot.ID, Money = snapshot.Money }, DeliveryMethod.ReliableOrdered);
+                }
+            });
 
             listener.ConnectionRequestEvent += request =>
             {

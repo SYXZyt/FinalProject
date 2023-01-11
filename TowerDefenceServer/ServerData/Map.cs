@@ -1,4 +1,6 @@
-﻿namespace TowerDefenceServer.ServerData
+﻿using TowerDefencePackets;
+
+namespace TowerDefenceServer.ServerData
 {
     internal class Map : ISerialisable
     {

@@ -1,4 +1,6 @@
-﻿namespace MapEditor
+﻿using System.Text;
+
+namespace MapEditor
 {
     internal struct Vector2
     {
@@ -22,7 +24,7 @@
         private Vector2 cursorLast;
         private Vector2 cursor;
 
-        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '└', '┘', '┌', '┐' };
+        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '└', '┘', '┌', '┐', '▲', '☺' };
 
         private void InitDraw()
         {
@@ -48,6 +50,28 @@
             Console.BackgroundColor = ConsoleColor.White;
             Console.Write(tiles[map[cursor.x, cursor.y]]);
 
+            Console.ResetColor();
+            StringBuilder line = new();
+            for (int i = 0; i < tiles.Length * 2 + 1; i++) line.Append('─');
+            Console.SetCursorPosition(0, 45);
+            line[0] = '└';
+            line[^1] = '┘';
+            Console.Write(line.ToString());
+
+            line[0] = '┌';
+            line[^1] = '┐';
+            line[1] = 'T';
+            line[2] = 'i';
+            line[3] = 'l';
+            line[4] = 'e';
+            line[5] = 's';
+
+            Console.SetCursorPosition(0, 43);
+            Console.Write(line.ToString());
+
+            Console.SetCursorPosition(0, 44);
+            Console.Write('│');
+
             DrawTiles();
         }
 
@@ -65,7 +89,7 @@
 
         private void DrawTiles()
         {
-            Console.SetCursorPosition(0, 44);
+            Console.SetCursorPosition(1, 44);
             Console.ResetColor();
 
             foreach (char c in tiles)
@@ -80,11 +104,14 @@
                 Console.ResetColor();
                 Console.Write(' ');
             }
+
+            Console.SetCursorPosition(tiles.Length * 2, 44);
+            Console.Write('│');
         }
 
         private void UpdateInput()
         {
-            Console.SetCursorPosition(0, 45);
+            Console.SetCursorPosition(0, 46);
             Console.ForegroundColor = Console.BackgroundColor = ConsoleColor.Black;
 
             Console.CursorVisible = false;
@@ -141,16 +168,7 @@
 
         private void Save()
         {
-            using StreamWriter writer = new(fname);
-            for (int y = 0; y < 42; y++)
-            {
-                for (int x = 0; x < 48; x++)
-                {
-                    writer.Write($"{map[x, y]},");
-                } writer.Write("\r\n");
-            }
-
-            writer.Close();
+            Packer.PackData(fname, map);
         }
 
         public void Run()
@@ -168,26 +186,13 @@
             this.fname = fname;
             cursor = new();
 
-            Console.BufferWidth = Console.WindowWidth;
-            Console.BufferHeight = Console.WindowHeight;
-
             if (isNewFile)
             {
                 map = new int[48, 42];
             }
             else
             {
-                using StreamReader reader = new(fname);
-                map = new int[48, 42];
-
-                for (int i = 0; i < 42; i++)
-                {
-                    string line = reader.ReadLine();
-                    string[] cs = line.Split(",");
-                    for (int j = 0; j < 48; j++) map[j, i] = int.Parse(cs[j].ToString());
-                }
-
-                reader.Close();
+                map = Packer.UnpackData(fname);
             }
         }
     }

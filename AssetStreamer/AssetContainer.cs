@@ -37,7 +37,14 @@ namespace AssetStreamer
 
         public static Texture2D ReadTexture(string name)
         {
+            string finalName = name;
+
             if (!textures.ContainsKey(name))
+            {
+                finalName = string.Empty;
+            }
+
+            if (!textures.ContainsKey(finalName))
             {
                 DisplayError($"No texture with the name '{name}' has been loaded.");
                 Environment.Exit(1);

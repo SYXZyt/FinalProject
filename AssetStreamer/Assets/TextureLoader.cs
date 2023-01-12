@@ -16,7 +16,9 @@ namespace AssetStreamer.Assets
                 Environment.Exit(1);
             }
 
-            AssetContainer.AddTexture(textureName, Texture2D.FromFile(graphics, path));
+            LoadTexture(Texture2D.FromFile(graphics, path), textureName);
         }
+
+        public static void LoadTexture(Texture2D texture, string textureName) => AssetContainer.AddTexture(textureName, texture);
     }
 }

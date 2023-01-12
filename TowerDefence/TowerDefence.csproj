@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="unknown.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Properties\unknown.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LiteNetLib" Version="0.9.5.2" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="SpriteFontPlus" Version="0.9.2" />
@@ -33,6 +41,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\border.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\bullet.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\cross.png">
@@ -125,6 +136,9 @@
     <None Update="Assets\Textures\towerSelectionUnclicked.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="cfg\entity_bullet.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="MessageBox.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -132,10 +146,27 @@
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\" />
+    <Folder Include="Entities\GameObjects\Enemies\" />
+    <Folder Include="Entities\GameObjects\Towers\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TowerDefencePackets\TowerDefencePackets.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -4,10 +4,12 @@ using AssetStreamer;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
 using TowerDefencePackets;
+using TowerDefence.Entities;
 using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using TowerDefence.Entities.GameObjects;
 
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
@@ -79,6 +81,8 @@ namespace TowerDefence.Scenes
 
         private Texture2D bkg;
         private bool placementIsOverplayfield;
+
+        private List<Entity> entities;
 
         private void ProcessStateMachine()
         {
@@ -320,6 +324,8 @@ namespace TowerDefence.Scenes
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
 
             DrawPlayField(spriteBatch);
+
+            foreach (Entity e in entities) e.Draw(spriteBatch);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
@@ -490,6 +496,7 @@ namespace TowerDefence.Scenes
                 otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
             }
 
+            entities = new();
             showDebugStats = false;
             pausedMenuUILayer = new();
             towers = new();
@@ -498,6 +505,9 @@ namespace TowerDefence.Scenes
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
+
+            Bullet bullet = new(new(600, 600), 340);
+            entities.Add(bullet);
 
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
@@ -534,6 +544,9 @@ namespace TowerDefence.Scenes
         {
             HandleServer();
             SendSnapShot();
+
+            foreach (Entity e in entities) e.Update();
+            entities.RemoveAll(e => e.MarkForDeletion);
 
             //Sometimes integer division is good, and this is one of them cases
             //This will lock the cursor to a 32x32 grid

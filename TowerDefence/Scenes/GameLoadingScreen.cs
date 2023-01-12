@@ -1,12 +1,15 @@
 ﻿using UILibrary;
+using System.Xml;
 using UILibrary.Scenes;
 using System.Diagnostics;
 using AssetStreamer.Assets;
 using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TowerDefence.Entities.GameObjects;
 
 using Color = Microsoft.Xna.Framework.Color;
+using System.Reflection;
 
 namespace TowerDefence.Scenes
 {
@@ -61,6 +64,31 @@ namespace TowerDefence.Scenes
             }
         }
 
+        private static class ConfigLoader
+        {
+            private static void LoadBulletCfg()
+            {
+                if (!File.Exists(@"cfg\entity_bullet.xml")) throw new FileNotFoundException($"Could not find 'cfg\\entity_bullet.xml'", "entity_bullet.xml");
+
+                XmlDocument xmlDoc = new();
+                xmlDoc.Load(@"cfg\entity_bullet.xml");
+
+                XmlNode entityID = xmlDoc.SelectSingleNode("/entity/entity_id");
+                Bullet.ID = Convert.ToByte(entityID.InnerText);
+
+                XmlNode entityTexture = xmlDoc.SelectSingleNode("/entity/cfg_texture");
+                Bullet.TextureName = entityTexture.InnerText;
+
+                XmlNode entitySpeed = xmlDoc.SelectSingleNode("/entity/cfg_speed");
+                Bullet.BulletSpeed = (float)Convert.ToDouble(entitySpeed.InnerText);
+            }
+
+            public static void Load()
+            {
+                LoadBulletCfg();
+            }
+        }
+
         private ProgressBar progressBar;
 
         private readonly Stopwatch timer;
@@ -105,6 +133,13 @@ namespace TowerDefence.Scenes
             SceneManager.Instance.graphics.ApplyChanges();
             LoadSettings();
 
+            byte[] texture = Properties.Resources.unknown;
+            using (var stream = new MemoryStream(texture))
+            {
+                TextureLoader.LoadTexture(Texture2D.FromStream(GraphicsDevice, stream), string.Empty);
+            }
+
+
             //Get all of the asset files to load
             GetAssetsToLoad();
 
@@ -113,7 +148,9 @@ namespace TowerDefence.Scenes
             AABB progressBarBox = new(5, (short)(SceneManager.Instance.graphics.PreferredBackBufferHeight - 18), (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - 10), 6);
 
             loadTaskCount = filesToLoad.Count;
-            progressBar = new(CreateTexture(GraphicsDevice, 1, 4, c=>f), CreateTexture(GraphicsDevice, 1, 4, c=>u), progressBarBox, loadTaskCount);
+            progressBar = new(CreateTexture(GraphicsDevice, 1, 4, c => f), CreateTexture(GraphicsDevice, 1, 4, c => u), progressBarBox, loadTaskCount);
+
+            ConfigLoader.Load();
         }
 
         public override void UnloadContent()
@@ -157,8 +194,8 @@ namespace TowerDefence.Scenes
 
         private void GetAssetsToLoad()
         {
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXT,    @"Assets\Strings\text.txt"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.FONT,    @"Assets\Fonts\MilkyCoffee.ttf", "fMain"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXT, @"Assets\Strings\text.txt"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.FONT, @"Assets\Fonts\MilkyCoffee.ttf", "fMain"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menu.png", "sMenu"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonClicked.png", "sMenuButtonClicked"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonUnclicked.png", "sMenuButtonUnclicked"));
@@ -174,6 +211,7 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\stats.png", "sStat"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\settingWindowed.png", "sSettingWindowed"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\settingFullscreen.png", "sSettingFullscreen"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\bullet.png", "sBullet"));
 
             //Load the map textures
             for (int i = 0; i < 14; i++)

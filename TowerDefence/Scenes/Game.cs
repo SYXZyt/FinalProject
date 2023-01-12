@@ -545,7 +545,7 @@ namespace TowerDefence.Scenes
             HandleServer();
             SendSnapShot();
 
-            foreach (Entity e in entities) e.Update();
+            foreach (Entity e in entities) e.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
 
             //Sometimes integer division is good, and this is one of them cases

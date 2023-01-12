@@ -7,9 +7,9 @@ using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects;
+using TowerDefence.Entities.GameObjects.Towers;
 
 using Color = Microsoft.Xna.Framework.Color;
-using System.Reflection;
 
 namespace TowerDefence.Scenes
 {
@@ -83,9 +83,41 @@ namespace TowerDefence.Scenes
                 Bullet.BulletSpeed = (float)Convert.ToDouble(entitySpeed.InnerText);
             }
 
+            private static TowerData LoadTower(string path)
+            {
+                if (!File.Exists(path)) throw new FileNotFoundException($"Could not find '{path}'", path);
+
+                XmlDocument xml = new();
+                xml.Load(path);
+
+                TowerData towerData = new();
+
+                XmlNode towerId = xml.SelectSingleNode("/tower/tower_id");
+                towerData.id = Convert.ToByte(towerId.InnerText);
+
+                XmlNode towerName = xml.SelectSingleNode("/tower/tower_name");
+                towerData.name = towerName.InnerText;
+
+                XmlNode towerRange = xml.SelectSingleNode("/tower/range");
+                towerData.range = Convert.ToUInt16(towerRange.InnerText);
+
+                XmlNode towerCost = xml.SelectSingleNode("/tower/cost");
+                towerData.cost = Convert.ToUInt16(towerCost.InnerText);
+
+                XmlNode textureIdle = xml.SelectSingleNode("/tower/texture_idle");
+                towerData.texIdle = textureIdle.InnerText;
+
+                XmlNode towerRate = xml.SelectSingleNode("/tower/rate");
+                towerData.rate = Convert.ToUInt16(towerRate.InnerText);
+
+                return towerData;
+            }
+
             public static void Load()
             {
                 LoadBulletCfg();
+                TowerData debugTower = LoadTower(@"cfg\tower_dev.xml");
+                Tower.towerDatas.Add(debugTower.name, debugTower);
             }
         }
 

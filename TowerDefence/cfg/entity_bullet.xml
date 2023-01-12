@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <entity>
   <entity_id>1</entity_id>
-  <cfg_texture>bullet.png</cfg_texture>
-  <cfg_speed>4</cfg_speed>
+  <cfg_texture>sBullet</cfg_texture>
+  <cfg_speed>186</cfg_speed>
 </entity>

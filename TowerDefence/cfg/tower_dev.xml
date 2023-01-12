@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>0</tower_id>
+  <tower_name>Debug Tower</tower_name>
+  <range>20</range>
+  <cost>1</cost>
+  <texture_idle>map_0</texture_idle>
+  <rate>1000</rate>
+</tower>

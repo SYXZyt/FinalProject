@@ -27,7 +27,7 @@ namespace TowerDefence.Entities
         /// <returns>A vector storing the position</returns>
         public Vector2 GetPosition() => position;
 
-        public abstract void Update();
+        public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteBatch spriteBatch);
 
         /// <summary>

@@ -27,14 +27,14 @@ namespace TowerDefence.Entities.GameObjects
             throw new NotImplementedException();
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
             float d = direction;
             float x = position.X;
             float y = position.Y;
 
-            x += (float)(BulletSpeed * Math.Cos(d * Math.PI / -180f));
-            y += (float)(BulletSpeed * Math.Sin(d * Math.PI / 180f));
+            y -= (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Cos(d * Math.PI / 180f));
+            x += (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Sin(d * Math.PI / 180f));
 
             position = new(x, y);
         }

@@ -346,6 +346,20 @@ namespace TowerDefence.Scenes
                 int pX = (int)((tmx - playFieldOffset.X) / TileSize);
                 int pY = (int)((tmy - playFieldOffset.Y) / TileSize);
 
+                //Get all towers as we need to check if the current spot is free from them
+                List<Tower> activeTowers = entities.OfType<Tower>().ToList();
+
+                //Loop over each tower and if the current tile is occupied, do not place
+                foreach (Tower tower in activeTowers)
+                {
+                    if (tower.GetPosition().X == tmx && tower.GetPosition().Y == tmy)
+                    {
+                        Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                        entities.Add(popup);
+                        return;
+                    }
+                }
+
                 if (vMoney < Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost)
                 {
                     Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_POOR"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
@@ -360,6 +374,13 @@ namespace TowerDefence.Scenes
                 else
                 {
                     vMoney -= Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost;
+
+                    TextureCollection textures = new();
+                    textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towerNames[towers.GetActiveIndex()]].texIdle));
+
+                    Animation anim = new(textures, 0);
+                    Tower tower = new(towerNames[towers.GetActiveIndex()], new(tmx, tmy), anim);
+                    entities.Add(tower);
 
                     towers.Clear();
                     towers.Update();
@@ -423,13 +444,31 @@ namespace TowerDefence.Scenes
                 int pX = (int)((tmx - playFieldOffset.X) / TileSize);
                 int pY = (int)((tmy - playFieldOffset.Y) / TileSize);
 
+                //Get all towers as we need to check if the current spot is free from them
+                List<Tower> activeTowers = entities.OfType<Tower>().ToList();
+
+                //Loop over each tower and if the current tile is occupied, do not place
+
                 if (playfield[pY, pX] == 0)
                 {
                     spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White * 0.6f);
                 }
                 else
                 {
-                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
+                    bool anyTile = false;
+
+                    foreach (Tower tower in activeTowers)
+                    {
+                        if (tower.GetPosition().X == tmx && tower.GetPosition().Y == tmy)
+                        {
+                            spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
+                            anyTile = true;
+                            break;
+                        }
+                    }
+
+                    if (!anyTile)
+                        spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
                 }
             }
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);

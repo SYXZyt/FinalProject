@@ -67,7 +67,7 @@ namespace TowerDefence.Visuals
 
         public AnimationCollection()
         {
-            currentAnim = "";
+            currentAnim = null;
             loadedAnimations = new();
         }
     }

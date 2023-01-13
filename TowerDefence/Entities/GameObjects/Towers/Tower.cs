@@ -1,4 +1,5 @@
-﻿using TowerDefence.Visuals;
+﻿using UILibrary;
+using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,7 +9,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
     {
         private int rotation;
         private TowerData data;
-        private AnimationCollection anim;
+        private readonly AnimationCollection anim;
 
         public static Dictionary<string, TowerData> towerDatas;
 
@@ -22,7 +23,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            throw new NotImplementedException();
+            Texture2D texture = anim.GetCurrentTexture;
+            texture.Draw(position, spriteBatch, Color.White);
         }
 
         public override byte GetID() => data.id;
@@ -37,9 +39,14 @@ namespace TowerDefence.Entities.GameObjects.Towers
             //Loop over every enemy and check if any are within range
         }
 
-        public Tower(string name)
+        public Tower(string name, Vector2 position, Animation idleAnim)
         {
             rotation = 0;
+            this.position = position;
+
+            anim = new();
+            anim.AddAnimation("state_idle", idleAnim);
+            anim.SetCurrentAnimation("state_idle");
 
             if (!towerDatas.ContainsKey(name)) throw new($"No tower called '{name}' found");
             data = towerDatas[name];

@@ -107,6 +107,9 @@ namespace MapEditor
 
             Console.SetCursorPosition(tiles.Length * 2, 44);
             Console.Write('│');
+
+            Console.SetCursorPosition(0, 46);
+            Console.Write("Enter 'S' to save. Enter 'F' to fill");
         }
 
         private void FloodFill(int x, int y, int targetTile, int replacementTile)
@@ -141,7 +144,7 @@ namespace MapEditor
 
         private void UpdateInput()
         {
-            Console.SetCursorPosition(0, 46);
+            Console.SetCursorPosition(0, 47);
             Console.ForegroundColor = Console.BackgroundColor = ConsoleColor.Black;
 
             Console.CursorVisible = false;

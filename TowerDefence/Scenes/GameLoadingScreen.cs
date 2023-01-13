@@ -107,6 +107,9 @@ namespace TowerDefence.Scenes
                 XmlNode textureIdle = xml.SelectSingleNode("/tower/texture_idle");
                 towerData.texIdle = textureIdle.InnerText;
 
+                XmlNode textureButton = xml.SelectSingleNode("/tower/texture_button");
+                towerData.texButton = textureButton.InnerText;
+
                 XmlNode towerRate = xml.SelectSingleNode("/tower/rate");
                 towerData.rate = Convert.ToUInt16(towerRate.InnerText);
 

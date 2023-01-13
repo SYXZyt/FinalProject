@@ -368,7 +368,7 @@ namespace TowerDefence.Scenes
                 if (towerName == string.Empty) continue;
 
                 TowerData towerData = Tower.towerDatas[towerName];
-                Texture2D texture = AssetContainer.ReadTexture(towerData.texIdle);
+                Texture2D texture = AssetContainer.ReadTexture(towerData.texButton);
 
                 Switch swtch = towers[0];
                 texture.Draw(new(swtch.AABB.X + ((swtch.AABB.Width - texture.Width) / 2), swtch.AABB.Y + (swtch.AABB.Height - texture.Height) / 2), spriteBatch, Color.White);

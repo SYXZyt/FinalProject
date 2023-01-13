@@ -267,7 +267,6 @@ namespace TowerDefenceServer
                 Console.WriteLine($"Loaded {map}");
                 Map _map = Map.LoadFromDisk(map);
                 loadedMaps.Add(_map);
-                _map.Serialise();
             }
         }
 
@@ -292,7 +291,7 @@ namespace TowerDefenceServer
                 Lobby lobby = FindLobbyWithID(snapshot.ID);
                 if (lobby is not null)
                 {
-                    //Send the snapshot to the other player
+                        //Send the snapshot to the other player
                     NetPeer other = lobby.GetOtherPlayerFromID(snapshot.ID).clientRef;
                     packetProcessor.Send(other, new Snapshot() { Health = snapshot.Health, ID = snapshot.ID, Money = snapshot.Money }, DeliveryMethod.ReliableOrdered);
                 }

@@ -1,4 +1,5 @@
-﻿using TowerDefencePackets;
+﻿using System.Text;
+using TowerDefencePackets;
 
 namespace TowerDefenceServer.ServerData
 {
@@ -10,6 +11,8 @@ namespace TowerDefenceServer.ServerData
         private readonly byte[,] mapData;
 
         public byte this[int x, int y] => mapData[x, y];
+
+        public byte[,] MapData => mapData;
 
         public char[] Serialise()
         {
@@ -42,7 +45,6 @@ namespace TowerDefenceServer.ServerData
                     map.mapData[x, y] = b;
                 }
             }
-
 
             reader.Close();
             return map;

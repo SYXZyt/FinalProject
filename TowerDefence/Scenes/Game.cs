@@ -10,6 +10,7 @@ using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects;
+using TowerDefence.Entities.GameObjects.Towers;
 
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
@@ -20,7 +21,7 @@ namespace TowerDefence.Scenes
         private readonly Random rng;
 
         private bool isWinner = false;
-        private float gameOverOpacity = 0f;
+        private float gameOverOpacity;
         private const float GameOverOpacitySpeed = 0.01f;
 
         private const int TileSize = 16;
@@ -31,7 +32,9 @@ namespace TowerDefence.Scenes
         private Texture2D towerSelUnclick;
         private Texture2D towerSelClick;
 
+        private const int TowerCount = 10;
         private SwitchArray towers;
+        private readonly string[] towerNames = new string[TowerCount] { "Debug Tower", "", "", "", "", "", "", "", "", "" };
 
         private ImageTextButton resumeButton;
         private ImageTextButton disconnectButton;
@@ -42,6 +45,8 @@ namespace TowerDefence.Scenes
 
         private Label username;
         private Label otherUsername;
+
+        private Label selectedTower;
 
         private bool showDebugStats;
 
@@ -319,6 +324,37 @@ namespace TowerDefence.Scenes
             }
         }
 
+        private void CheckForTowerPlacement()
+        {
+            if (gameState != GameState.PLACEMENT) return;
+
+            //Check if any tower is held down, and if it is, place it and change state back to play
+            if (towers.GetActiveIndex() == -1) return;
+
+            //If the mouse is over the play-field and the user clicks, place the tower
+            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField())
+            {
+                towers.Clear();
+                towers.Update();
+                gameState = GameState.PLAY;
+            }
+        }
+
+        private void DrawTowerPictures(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < TowerCount; i++)
+            {
+                string towerName = towerNames[i];
+                if (towerName == string.Empty) continue;
+
+                TowerData towerData = Tower.towerDatas[towerName];
+                Texture2D texture = AssetContainer.ReadTexture(towerData.texIdle);
+
+                Switch swtch = towers[0];
+                texture.Draw(new(swtch.AABB.X + ((swtch.AABB.Width - texture.Width) / 2), swtch.AABB.Y + (swtch.AABB.Height - texture.Height) / 2), spriteBatch, Color.White);
+            }
+        }
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
@@ -330,6 +366,9 @@ namespace TowerDefence.Scenes
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            string x = $"State: {gameState}\nAct ID: {towers.GetActiveIndex()}";
+            spriteBatch.DrawString(AssetContainer.GetFont("fMain"), x, new Vector2(100, 100), Color.White);
+
             //Draw the divider over the centre of the screen
             int cX = SceneManager.Instance.graphics.PreferredBackBufferWidth / 2;
             for (int y = 0; y < SceneManager.Instance.graphics.PreferredBackBufferHeight; y += divider.Height)
@@ -368,6 +407,7 @@ namespace TowerDefence.Scenes
             otherUsername.DrawWithShadow(spriteBatch);
 
             UIManager.Draw(spriteBatch);
+            DrawTowerPictures(spriteBatch);
 
             //If the game is in the menu state, we need to draw an overlay over everything else
             if (gameState == GameState.MENU)
@@ -376,6 +416,11 @@ namespace TowerDefence.Scenes
 
                 //If we are in the paused menu, we want to draw the paused buttons
                 pausedMenuUILayer.Draw(spriteBatch);
+            }
+
+            if (gameState == GameState.PLACEMENT)
+            {
+                selectedTower.DrawWithShadow(spriteBatch);
             }
 
             if (gameState == GameState.END)
@@ -424,7 +469,7 @@ namespace TowerDefence.Scenes
 
             void InitUI()
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < TowerCount; i++)
                 {
                     AABB aabb = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
                     Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
@@ -439,6 +484,8 @@ namespace TowerDefence.Scenes
 
                 oMoney = new("NULL", 1.3f, Vector2.Zero, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
                 oHealth = new("NULL", 1.3f, new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+
+                selectedTower = new("NULL", 1.6f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
             }
 
             void InitPlayerField()
@@ -496,6 +543,7 @@ namespace TowerDefence.Scenes
                 otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
             }
 
+            gameOverOpacity = 0f;
             entities = new();
             showDebugStats = false;
             pausedMenuUILayer = new();
@@ -505,9 +553,6 @@ namespace TowerDefence.Scenes
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
-
-            Bullet bullet = new(new(600, 600), 340);
-            entities.Add(bullet);
 
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
@@ -544,6 +589,11 @@ namespace TowerDefence.Scenes
         {
             HandleServer();
             SendSnapShot();
+            CheckForTowerPlacement();
+            CheckForBuildMode();
+
+            string selectedTower = towers.GetActiveIndex() == -1 ? string.Empty : towerNames[towers.GetActiveIndex()];
+            this.selectedTower.SetLabelText(selectedTower);
 
             foreach (Entity e in entities) e.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
@@ -581,6 +631,7 @@ namespace TowerDefence.Scenes
 
             if (KeyboardController.IsPressed(Keys.Home))
             {
+                Disconnect();
                 SceneManager.Instance.LoadScene("mainMenu");
             }
 
@@ -605,7 +656,6 @@ namespace TowerDefence.Scenes
             ProcessStateMachine();
 
             if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
-            CheckForBuildMode();
         }
 
         public Game() : base()

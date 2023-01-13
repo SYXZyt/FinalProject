@@ -5,5 +5,6 @@
   <range>20</range>
   <cost>1</cost>
   <texture_idle>map_0</texture_idle>
+  <texture_button>map_0</texture_button>
   <rate>1000</rate>
 </tower>

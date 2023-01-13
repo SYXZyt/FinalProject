@@ -23,9 +23,9 @@ namespace MapEditor
 
         private Vector2 cursorLast;
         private Vector2 cursor;
-
-        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '└', '┘', '┌', '┐', '▲', '☺' };
-
+        
+        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '╘', '╛', '╒', '╕', '♠', '☺', '█', '├', '┌', '┬', '┐', '┤', '┘', '┴', '└', '▲', '►', '▼', '◄' };
+        
         private void InitDraw()
         {
             Console.ResetColor();
@@ -109,6 +109,36 @@ namespace MapEditor
             Console.Write('│');
         }
 
+        private void FloodFill(int x, int y, int targetTile, int replacementTile)
+        {
+            if (targetTile == replacementTile) return; //If we are trying to replace a tile with itself, don't do anything
+                
+            //Check we are within bounds
+            if (x < 0 || x >= 48 || y < 0 || y >= 42)
+            {
+                return;
+            }
+
+            //Don't do anything if this is the incorrect id
+            if (map[x, y] != targetTile)
+            {
+                return;
+            }
+
+            map[x, y] = replacementTile;
+
+            //Draw the tile
+            Console.ResetColor();
+            Console.SetCursorPosition(x, y);
+            Console.Write(tiles[replacementTile]);
+                
+            //Affect the surrounding tiles
+            FloodFill(x + 1, y, targetTile, replacementTile);
+            FloodFill(x - 1, y, targetTile, replacementTile);
+            FloodFill(x, y + 1, targetTile, replacementTile);
+            FloodFill(x, y - 1, targetTile, replacementTile);
+        }
+
         private void UpdateInput()
         {
             Console.SetCursorPosition(0, 46);
@@ -160,6 +190,15 @@ namespace MapEditor
                     break;
                 case ConsoleKey.Escape:
                     Environment.Exit(0);
+                    break;
+                case ConsoleKey.F:
+                    {
+                        int targetTile = map[cursor.x, cursor.y];
+                        int replacementTile = tileIndex;
+                        FloodFill(cursor.x, cursor.y, targetTile, replacementTile);
+
+                        CleanCursor();
+                    }
                     break;
                 default:
                     break;

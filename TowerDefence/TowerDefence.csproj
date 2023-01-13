@@ -79,6 +79,12 @@
     <None Update="Assets\Textures\maps\13.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\maps\14.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\maps\15.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\maps\2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

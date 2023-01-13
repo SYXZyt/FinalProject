@@ -472,7 +472,7 @@ namespace TowerDefence.Scenes
                 menuFilter = AssetContainer.ReadTexture("sMenuFilter");
                 statPanel = AssetContainer.ReadTexture("sStat");
 
-                playfieldTextures = new TextureCollection[14];
+                playfieldTextures = new TextureCollection[16];
                 for (int i = 0; i < playfieldTextures.Length; i++)
                 {
                     playfieldTextures[i] = new();

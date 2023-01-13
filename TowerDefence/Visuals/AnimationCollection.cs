@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TowerDefence.Visuals
 {
@@ -50,12 +51,12 @@ namespace TowerDefence.Visuals
         /// <summary>
         /// Update the animation currently playing
         /// </summary>
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             //If we do not have an anim, we don't have anything to update
             if (currentAnim is null) return;
 
-            CurrentAnim.Update();
+            CurrentAnim.Update(gameTime);
 
             //Check if the animation has ended
             if (CurrentAnim.HasEnded && loadedAnimations[currentAnim].animToPlayOnEnd is not null)

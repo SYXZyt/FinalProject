@@ -277,7 +277,7 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\bullet.png", "sBullet"));
 
             //Load the map textures
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 29; i++)
             {
                 LoadFile file = new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}.png", $"map_{i}");
                 filesToLoad.Enqueue(file);
@@ -285,6 +285,10 @@ namespace TowerDefence.Scenes
                 if (i == 0)
                 {
                     for (int j = 0; j < 2; j++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}_{j + 1}.png", $"map_{i}_{j}"));
+                }
+                else if (i == 16)
+                {
+                    for (int j = 0; j < 3; j++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}_{j + 1}.png", $"map_{i}_{j}"));
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace MapEditor
         private Vector2 cursorLast;
         private Vector2 cursor;
         
-        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '╘', '╛', '╒', '╕', '♠', '☺', '█', '├', '┌', '┬', '┐', '┤', '┘', '┴', '└', '▲', '►', '▼', '◄' };
+        private readonly char[] tiles = new char[] { '▓', '▒', '╠', '╔', '╦', '╗', '╣', '╝', '╩', '╚', '╘', '╛', '╒', '╕', '♠', '☺', '█', '├', '┌', '┬', '┐', '┤', '┘', '┴', '└', '╓', '╖', '╙', '╜' };
         
         private void InitDraw()
         {

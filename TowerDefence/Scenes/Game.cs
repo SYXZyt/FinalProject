@@ -4,6 +4,7 @@ using AssetStreamer;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
 using TowerDefencePackets;
+using TowerDefence.Visuals;
 using TowerDefence.Entities;
 using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
@@ -83,6 +84,7 @@ namespace TowerDefence.Scenes
         private int PlayfieldWidth => (int)(playfieldTextures[0][0].Width * GameSize.X);
         private int PlayfieldHeight => (int)(playfieldTextures[0][0].Height * GameSize.Y);
 
+        private Animation waterAnimation;
         private TextureCollection[] playfieldTextures;
 
         private Texture2D bkg;
@@ -235,6 +237,12 @@ namespace TowerDefence.Scenes
                     for (int x = 0; x < GameSize.X; x++)
                     {
                         Texture2D cell = playfieldTextures[field[y, x]][textureOffsets[y, x]];
+
+                        if (field[y, x] == 16)
+                        {
+                            cell = waterAnimation.GetActiveFrame();
+                        }
+
                         Vector2 v = new(thisFieldOffset.X + x * cell.Width, thisFieldOffset.Y + y * cell.Height);
                         cell.Draw(v, spriteBatch, Color.White);
                     }
@@ -472,7 +480,7 @@ namespace TowerDefence.Scenes
                 menuFilter = AssetContainer.ReadTexture("sMenuFilter");
                 statPanel = AssetContainer.ReadTexture("sStat");
 
-                playfieldTextures = new TextureCollection[16];
+                playfieldTextures = new TextureCollection[29];
                 for (int i = 0; i < playfieldTextures.Length; i++)
                 {
                     playfieldTextures[i] = new();
@@ -487,7 +495,15 @@ namespace TowerDefence.Scenes
                             playfieldTextures[i].AddTexture(AssetContainer.ReadTexture($"map_{i}_{j}"));
                         }
                     }
+                    else if (i == 16)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            playfieldTextures[i].AddTexture(AssetContainer.ReadTexture($"map_{i}_{j}"));
+                        }
+                    }
                 }
+                waterAnimation = new(playfieldTextures[16], 1, AnimationPlayType.LOOP);
             }
 
             void InitUI()
@@ -620,6 +636,8 @@ namespace TowerDefence.Scenes
 
             foreach (Entity e in entities) e.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
+
+            waterAnimation.Update(gameTime);
 
             //Sometimes integer division is good, and this is one of them cases
             //This will lock the cursor to a 32x32 grid

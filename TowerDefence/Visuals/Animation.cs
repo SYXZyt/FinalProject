@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TowerDefence.Visuals
 {
@@ -12,9 +13,8 @@ namespace TowerDefence.Visuals
     {
         private readonly TextureCollection frames;
         private int frame;
-        private readonly int animationSpeed; /*(in frames)*/
-        private readonly int globalFrameBegin;
-        private int tick;
+        private readonly float animationSpeed; /*(in seconds)*/
+        private float elapsedTime;
         private readonly AnimationPlayType playType;
         private bool freeze;
 
@@ -24,13 +24,19 @@ namespace TowerDefence.Visuals
 
         public void SetFreeze(bool freeze) => this.freeze = freeze;
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             //Check if we should update the animation
             if (frame == -1 || freeze) return; //If the animation has already ended, we don't need to do anything
 
+            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             //Check if we need to update the frame
-            if (globalFrameBegin + tick % animationSpeed == 0) frame++;
+            while (elapsedTime >= animationSpeed)
+            { 
+                elapsedTime -= animationSpeed;
+                frame++;
+            }
 
             //Check for end of animation
             if (frame >= frames.Count)
@@ -38,23 +44,20 @@ namespace TowerDefence.Visuals
                 if (playType == AnimationPlayType.PAUSE_AT_END) frame = -1;
                 else if (playType == AnimationPlayType.LOOP) frame = 0;
             }
-
-            tick++;
         }
 
         public void Reset()
         {
             frame = 0;
-            tick = 0;
+            elapsedTime = 0;
         }
 
-        public Animation(TextureCollection frames, int animationSpeed,  int currentGlobalFrame = 0, AnimationPlayType playType = AnimationPlayType.PAUSE_AT_END)
+        public Animation(TextureCollection frames, float animationSpeed, AnimationPlayType playType = AnimationPlayType.PAUSE_AT_END)
         {
-            tick = 0;
+            elapsedTime = 0;
             this.frames = frames;
             frame = 0;
             this.animationSpeed = animationSpeed;
-            globalFrameBegin = currentGlobalFrame;
             this.playType = playType;
         }
     }

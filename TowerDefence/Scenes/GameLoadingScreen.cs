@@ -113,9 +113,37 @@ namespace TowerDefence.Scenes
                 return towerData;
             }
 
+            private static void LoadColours()
+            {
+                if (!File.Exists(@"cfg\rgb.xml")) return;
+
+                XmlDocument xml = new();
+                xml.Load(@"cfg\rgb.xml");
+
+                XmlNode mainR = xml.SelectSingleNode("/color/text_main_r");
+                XmlNode mainB = xml.SelectSingleNode("/color/text_main_g");
+                XmlNode mainG = xml.SelectSingleNode("/color/text_main_b");
+                Color main = new(int.Parse(mainR.InnerText), int.Parse(mainG.InnerText), int.Parse(mainB.InnerText));
+
+                XmlNode errorR = xml.SelectSingleNode("/color/text_error_r");
+                XmlNode errorB = xml.SelectSingleNode("/color/text_error_g");
+                XmlNode errorG = xml.SelectSingleNode("/color/text_error_b");
+                Color error = new(int.Parse(errorR.InnerText), int.Parse(errorG.InnerText), int.Parse(errorB.InnerText));
+
+                XmlNode warningR = xml.SelectSingleNode("/color/text_warning_r");
+                XmlNode warningB = xml.SelectSingleNode("/color/text_warning_g");
+                XmlNode warningG = xml.SelectSingleNode("/color/text_warning_b");
+                Color warning = new(int.Parse(warningR.InnerText), int.Parse(warningG.InnerText), int.Parse(warningB.InnerText));
+
+                GlobalSettings.TextMain = main;
+                GlobalSettings.TextError = error;
+                GlobalSettings.TextWarning = warning;
+            }
+
             public static void Load()
             {
                 LoadBulletCfg();
+                LoadColours();
                 TowerData debugTower = LoadTower(@"cfg\tower_dev.xml");
                 Tower.towerDatas.Add(debugTower.name, debugTower);
             }

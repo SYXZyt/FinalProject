@@ -19,3 +19,5 @@ GM_MENU_PLAY||Resume
 GM_MENU_EXIT||Disconnect
 GM_END_WIN||You Win!
 GM_END_LOSE||You Lost
+POPUP_POOR||Cannot afford tower
+POPUP_INV_LOC||Cannot place here

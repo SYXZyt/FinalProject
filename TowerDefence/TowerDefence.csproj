@@ -136,6 +136,9 @@
     <None Update="Assets\Textures\towerSelectionUnclicked.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="cfg\rgb.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="cfg\entity_bullet.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

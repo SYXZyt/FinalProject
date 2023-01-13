@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<color>
+  <text_main_r>255</text_main_r>
+  <text_main_g>255</text_main_g>
+  <text_main_b>255</text_main_b>
+
+  <text_error_r>255</text_error_r>
+  <text_error_g>0</text_error_g>
+  <text_error_b>0</text_error_b>
+
+  <text_warning_r>255</text_warning_r>
+  <text_warning_g>170</text_warning_g>
+  <text_warning_b>0</text_warning_b>
+</color>

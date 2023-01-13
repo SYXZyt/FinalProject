@@ -5,6 +5,7 @@ using UILibrary.Scenes;
 using UILibrary.Buttons;
 using TowerDefencePackets;
 using TowerDefence.Entities;
+using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
@@ -334,9 +335,28 @@ namespace TowerDefence.Scenes
             //If the mouse is over the play-field and the user clicks, place the tower
             if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField())
             {
-                towers.Clear();
-                towers.Update();
-                gameState = GameState.PLAY;
+                int pX = (int)((tmx - playFieldOffset.X) / TileSize);
+                int pY = (int)((tmy - playFieldOffset.Y) / TileSize);
+
+                if (vMoney < Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost)
+                {
+                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_POOR"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                    entities.Add(popup);
+                }
+                //Check that the cursor is at a valid position
+                else if (playfield[pY, pX] != 0)
+                {
+                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                    entities.Add(popup);
+                }
+                else
+                {
+                    vMoney -= Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost;
+
+                    towers.Clear();
+                    towers.Update();
+                    gameState = GameState.PLAY;
+                }
             }
         }
 
@@ -361,6 +381,14 @@ namespace TowerDefence.Scenes
 
             DrawPlayField(spriteBatch);
 
+            //Draw the divider over the centre of the screen
+            int cX = SceneManager.Instance.graphics.PreferredBackBufferWidth / 2;
+            for (int y = 0; y < SceneManager.Instance.graphics.PreferredBackBufferHeight; y += divider.Height)
+            {
+                spriteBatch.Draw(divider, new Vector2(cX - divider.Width / 2, y), Color.White);
+            }
+
+            UIManager.Draw(spriteBatch);
             foreach (Entity e in entities) e.Draw(spriteBatch);
         }
 
@@ -369,12 +397,8 @@ namespace TowerDefence.Scenes
             string x = $"State: {gameState}\nAct ID: {towers.GetActiveIndex()}";
             spriteBatch.DrawString(AssetContainer.GetFont("fMain"), x, new Vector2(100, 100), Color.White);
 
-            //Draw the divider over the centre of the screen
-            int cX = SceneManager.Instance.graphics.PreferredBackBufferWidth / 2;
-            for (int y = 0; y < SceneManager.Instance.graphics.PreferredBackBufferHeight; y += divider.Height)
-            {
-                spriteBatch.Draw(divider, new Vector2(cX - divider.Width / 2, y), Color.White);
-            }
+            money.SetColour(vMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
+            oMoney.SetColour(ovMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
 
             //Draw the stat panel on the top right of the screen
             spriteBatch.Draw(statPanel, new Vector2(SceneManager.Instance.graphics.PreferredBackBufferWidth - statPanel.Width, 0), Color.White);
@@ -406,7 +430,6 @@ namespace TowerDefence.Scenes
             username.DrawWithShadow(spriteBatch);
             otherUsername.DrawWithShadow(spriteBatch);
 
-            UIManager.Draw(spriteBatch);
             DrawTowerPictures(spriteBatch);
 
             //If the game is in the menu state, we need to draw an overlay over everything else

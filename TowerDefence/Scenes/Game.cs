@@ -21,9 +21,12 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
-        private readonly Random rng;
-
+        /// <summary>
+        /// Is the game running in debug mode
+        /// </summary>
         public static bool IsDebugPlay { get; set; } = false;
+
+        private readonly Random rng;
 
         private bool isWinner = false;
         private float gameOverOpacity;
@@ -428,6 +431,9 @@ namespace TowerDefence.Scenes
             }
         }
 
+        /// <summary>
+        /// Build a new tower if the conditions are met
+        /// </summary>
         private void CheckForTowerPlacement()
         {
             if (gameState != GameState.PLACEMENT) return;
@@ -488,6 +494,10 @@ namespace TowerDefence.Scenes
             }
         }
 
+        /// <summary>
+        /// Draw the enemy entities that this client has created
+        /// </summary>
+        /// <param name="spriteBatch">SpriteBatch to draw with</param>
         private void DrawEnemyEntities(SpriteBatch spriteBatch)
         {
             foreach (ServerTowerData towerData in enemyTowers)
@@ -500,6 +510,10 @@ namespace TowerDefence.Scenes
             }
         }
 
+        /// <summary>
+        /// Draw tower icons onto the tower buttons
+        /// </summary>
+        /// <param name="spriteBatch">SpriteBatch to draw with</param>
         private void DrawTowerPictures(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < TowerCount; i++)

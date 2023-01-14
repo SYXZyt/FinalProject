@@ -16,14 +16,14 @@ using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
 
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
-using System.Globalization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
         private readonly Random rng;
+
+        public static bool IsDebugPlay { get; set; } = false;
 
         private bool isWinner = false;
         private float gameOverOpacity;
@@ -391,7 +391,7 @@ namespace TowerDefence.Scenes
                 //Loop over each tower and if the current tile is occupied, do not place
                 foreach (Tower tower in activeTowers)
                 {
-                    if (tower.GetPosition().X == tmx && tower.GetPosition().Y == tmy)
+                    if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
                     {
                         Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
                         entities.Add(popup);
@@ -628,20 +628,23 @@ namespace TowerDefence.Scenes
 
             void LoadMap()
             {
-                //Wait til we get the correct message
-                while (Client.Instance.PeekLatest is null || Client.Instance.PeekLatest[0] != Header.RECEIVE_MAP_DATA) Client.Instance.PollEvents();
-
-                string mapData = Client.Instance.ReadLatestMessage()[1..];
-
-                if (mapData.Length != GameSize.X * GameSize.Y) throw new("Invalid map data read from server");
-
-                int i = 0;
-                for (int y = 0; y < GameSize.Y; y++)
+                if (!IsDebugPlay)
                 {
-                    for (int x = 0; x < GameSize.X; x++)
+                    //Wait til we get the correct message
+                    while (Client.Instance.PeekLatest is null || Client.Instance.PeekLatest[0] != Header.RECEIVE_MAP_DATA) Client.Instance.PollEvents();
+
+                    string mapData = Client.Instance.ReadLatestMessage()[1..];
+
+                    if (mapData.Length != GameSize.X * GameSize.Y) throw new("Invalid map data read from server");
+
+                    int i = 0;
+                    for (int y = 0; y < GameSize.Y; y++)
                     {
-                        playfield[y, x] = (byte)(mapData[i++] - 1);
-                        oppPlayfield[y, x] = playfield[y, x];
+                        for (int x = 0; x < GameSize.X; x++)
+                        {
+                            playfield[y, x] = (byte)(mapData[i++] - 1);
+                            oppPlayfield[y, x] = playfield[y, x];
+                        }
                     }
                 }
 
@@ -666,10 +669,18 @@ namespace TowerDefence.Scenes
                 Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
                 username = new(Client.Instance.PlayerName, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
 
-                Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
-                Client.Instance.WaitForNewMessage();
-                string enemyUsername = Client.Instance.ReadLatestMessage();
-                otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                if (!IsDebugPlay)
+                {
+                    Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
+                    Client.Instance.WaitForNewMessage();
+                    string enemyUsername = Client.Instance.ReadLatestMessage();
+                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                }
+                else
+                {
+                    string enemyUsername = "null";
+                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                }
             }
 
             gameOverOpacity = 0f;

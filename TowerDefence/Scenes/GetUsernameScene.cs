@@ -75,6 +75,7 @@ namespace TowerDefence.Scenes
         public override void LoadContent()
         {
             lastName = "";
+            TowerDefence.Scenes.Game.IsDebugPlay = false;
 
             Console.WriteLine("LOAD GetUsernameScene");
 

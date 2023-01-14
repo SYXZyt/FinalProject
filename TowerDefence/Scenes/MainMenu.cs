@@ -14,6 +14,10 @@ namespace TowerDefence.Scenes
         private ImageTextButton playButton;
         private ImageTextButton settingsButton;
 
+#if DEBUG
+        private ImageTextButton debugPlayButton;
+#endif
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             spriteBatch.Draw(AssetContainer.ReadTexture("sMenu"), Vector2.Zero, Color.White);
@@ -55,6 +59,14 @@ namespace TowerDefence.Scenes
                 settingsButton = new(buttonBoundingBox, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("STR_BTN_CFG"), 1.4f, AssetContainer.GetFont("fMain"));
                 uIManager.Add(settingsButton);
             }
+
+#if DEBUG
+            {
+                AABB buttonBoundingBox = new(bX, (short)(bY - bHeight*3), bWidth, bHeight);
+                debugPlayButton = new(buttonBoundingBox, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), "__DEBUG_PLAY__", 1.4f, AssetContainer.GetFont("fMain"));
+                uIManager.Add(debugPlayButton);
+            }
+#endif
         }
 
         public override void UnloadContent()
@@ -68,6 +80,14 @@ namespace TowerDefence.Scenes
 
             if (playButton.IsClicked()) SceneManager.Instance.LoadScene("getUsername");
             if (settingsButton.IsClicked()) SceneManager.Instance.LoadScene("settings");
+
+#if DEBUG
+            if (debugPlayButton.IsClicked()) SceneManager.Instance.LoadScene("mainGame");
+            Client c = new();
+            c.Connect();
+            Game.IsDebugPlay = true;
+            c.PlayerName = "__DEBUG_PLAYER__";
+#endif
         }
 
         public MainMenu()

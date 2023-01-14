@@ -99,6 +99,35 @@ namespace TowerDefence.Scenes
 
         private void ProcessStateMachine()
         {
+            if (gameState is GameState.PLAY or GameState.PLACEMENT)
+            {
+                //Use keyboard to select tower
+                const int MONOGAME_KEY_OFFSET = 48;
+                for (int i = 0; i < 10; i++)
+                {
+                    Keys keyToCheck = (Keys)MONOGAME_KEY_OFFSET + i;
+
+                    //If this key is down, we need to toggle the state the of the switch
+                    if (KeyboardController.IsPressed(keyToCheck))
+                    {
+                        //MonoGame key-codes encodes 0 as first, so we need to do a quick check if we are on index 0
+                        int offset = i == 0 ? 9 : i - 1;
+
+                        //If the tower is selected already, then just deselect it
+                        towers.Clear();
+
+                        if (!towers[offset].State)
+                        {
+                            towers.SetActiveIndex(offset);
+                        }
+                        else
+                        {
+                            gameState = GameState.PLAY;
+                        }
+                    }
+                }
+            }
+
             switch (gameState)
             {
                 case GameState.PLACEMENT:

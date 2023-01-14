@@ -18,7 +18,7 @@ namespace TowerDefence.Entities
         public abstract byte GetID();
 
         public AnimationCollection Textures { get => textures; protected set => textures = value; }
-        public bool MarkForDeletion { get => markForDeletion; protected set => markForDeletion = value; }
+        public bool MarkForDeletion { get => markForDeletion; set => markForDeletion = value; }
         public AABB AABB => aabb;
 
         /// <summary>

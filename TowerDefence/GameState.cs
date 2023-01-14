@@ -6,5 +6,6 @@
         PLACEMENT,
         MENU,
         END,
+        SELL,
     }
 }

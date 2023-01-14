@@ -166,6 +166,12 @@
     <None Update="Assets\Textures\menuButtonUnclicked.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\sellChecked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\sellUnchecked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\settingFullscreen.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

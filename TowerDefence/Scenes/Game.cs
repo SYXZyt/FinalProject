@@ -72,6 +72,8 @@ namespace TowerDefence.Scenes
         private Textbox cheatPanel;
         private bool showCheatPanel;
 
+        private Switch sellButton;
+
         private GameState gameState;
 
         private byte[,] playfield;
@@ -97,9 +99,12 @@ namespace TowerDefence.Scenes
 
         private List<ServerTowerData> enemyTowers;
 
+        /// <summary>
+        /// Update the game based on the current state
+        /// </summary>
         private void ProcessStateMachine()
         {
-            if (gameState is GameState.PLAY or GameState.PLACEMENT)
+            if (gameState is GameState.PLAY or GameState.PLACEMENT or GameState.SELL)
             {
                 //Use keyboard to select tower
                 const int MONOGAME_KEY_OFFSET = 48;
@@ -110,6 +115,12 @@ namespace TowerDefence.Scenes
                     //If this key is down, we need to toggle the state the of the switch
                     if (KeyboardController.IsPressed(keyToCheck))
                     {
+                        if (gameState == GameState.SELL)
+                        {
+                            gameState = GameState.PLACEMENT;
+                            sellButton.SetState(false);
+                        }
+
                         //MonoGame key-codes encodes 0 as first, so we need to do a quick check if we are on index 0
                         int offset = i == 0 ? 9 : i - 1;
 
@@ -131,6 +142,7 @@ namespace TowerDefence.Scenes
             switch (gameState)
             {
                 case GameState.PLACEMENT:
+                case GameState.SELL:
                     placementIsOverplayfield = IsCursorOnPlayField();
                     break;
                 case GameState.MENU:
@@ -155,6 +167,9 @@ namespace TowerDefence.Scenes
             }
         }
 
+        /// <summary>
+        /// Send a snapshot of the game to the other player
+        /// </summary>
         private void SendSnapShot()
         {
             //If we are in the end state, we don't need to send anything
@@ -182,6 +197,9 @@ namespace TowerDefence.Scenes
             Client.Instance.SendMessage(builder.ToString());
         }
 
+        /// <summary>
+        /// Handle all messages from the server
+        /// </summary>
         private void HandleServer()
         {
             Client.Instance.PollEvents();
@@ -196,6 +214,10 @@ namespace TowerDefence.Scenes
             }
         }
 
+        /// <summary>
+        /// Process a specific message from the server
+        /// </summary>
+        /// <param name="message">The message to process</param>
         private void ProcessServerMessage(string message)
         {
             //Read the header of the server and deal with it
@@ -285,8 +307,13 @@ namespace TowerDefence.Scenes
             if (towers.GetActiveIndex() != -1)
             {
                 gameState = GameState.PLACEMENT;
+                sellButton.SetState(false);
             }
-            else if (gameState == GameState.PLACEMENT) gameState = GameState.PLAY; //If we are in the placement state and we deselect a tower, we need to go back into the game mode
+            else if (gameState == GameState.PLACEMENT)
+            {
+                gameState = GameState.PLAY; //If we are in the placement state and we deselect a tower, we need to go back into the game mode
+                sellButton.SetState(false);
+            }
         }
 
         /// <summary>
@@ -439,13 +466,14 @@ namespace TowerDefence.Scenes
                     Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
                     entities.Add(popup);
                 }
-                else
+                else //Tower placement is okay
                 {
+                    //Remove the money from the user
                     vMoney -= Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost;
 
+                    //Create the tower object and add it to the entities
                     TextureCollection textures = new();
                     textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towerNames[towers.GetActiveIndex()]].texIdle));
-
                     Animation anim = new(textures, 0);
                     Tower tower = new(towerNames[towers.GetActiveIndex()], new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset);
                     entities.Add(tower);
@@ -453,6 +481,9 @@ namespace TowerDefence.Scenes
                     towers.Clear();
                     towers.Update();
                     gameState = GameState.PLAY;
+
+                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), $"+${tower.Data.cost}", 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                    entities.Add(popup);
                 }
             }
         }
@@ -519,7 +550,7 @@ namespace TowerDefence.Scenes
             oHealth.DrawWithShadow(spriteBatch);
 
             //Draw addition UI elements
-            if (gameState == GameState.PLACEMENT && placementIsOverplayfield)
+            if ((gameState is GameState.PLACEMENT or GameState.SELL) && placementIsOverplayfield)
             {
                 //Check if the position that the mouse is over, is a ground tile
                 int pX = (int)((tmx - playFieldOffset.X) / TileSize);
@@ -528,27 +559,39 @@ namespace TowerDefence.Scenes
                 //Get all towers as we need to check if the current spot is free from them
                 List<Tower> activeTowers = entities.OfType<Tower>().ToList();
 
-                //Loop over each tower and if the current tile is occupied, do not place
-                if (playfield[pY, pX] == 0)
+                if (
+                    (pX >= 0 && pX < 48) &&
+                    (pY >= 0 && pY < 42)
+                    )
                 {
-                    bool foundTower = false;
-
-                    foreach (Tower tower in activeTowers)
+                    //Loop over each tower and if the current tile is occupied, do not place
+                    if (playfield[pY, pX] == 0)
                     {
-                        if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
+                        bool foundTower = false;
+
+                        foreach (Tower tower in activeTowers)
                         {
-                            spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
-                            foundTower = true;
-                            break;
+                            if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
+                            {
+                                Color col = gameState == GameState.SELL ? Color.White : Color.Red;
+
+                                spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), col * 0.6f);
+                                foundTower = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundTower)
+                        {
+                            Color col = gameState == GameState.SELL ? Color.Red : Color.White;
+                            spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), col * 0.6f);
                         }
                     }
-
-                    if (!foundTower)
-                        spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White * 0.6f);
-                }
-                else
-                {
-                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
+                    else
+                    {
+                        Color col = gameState == GameState.SELL ? Color.White : Color.Red;
+                        spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), col * 0.6f);
+                    }
                 }
             }
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
@@ -644,6 +687,9 @@ namespace TowerDefence.Scenes
                 oHealth = new("NULL", 1.3f, new Vector2(0, 48), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
 
                 selectedTower = new("NULL", 1.6f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
+
+                sellButton = new(new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)(towerSelClick.Height * 3 + towerSelClick.Height * TowerCount), 64, 32), AssetContainer.ReadTexture("sSellUnlick"), AssetContainer.ReadTexture("sSellClick"));
+                uIManager.Add(sellButton);
             }
 
             void InitPlayerField()
@@ -761,6 +807,40 @@ namespace TowerDefence.Scenes
             SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
+
+            if (sellButton.IsClicked())
+            {
+                gameState = GameState.SELL;
+                towers.Clear();
+            }
+            else if (gameState == GameState.SELL && !sellButton.State)
+            {
+                gameState = GameState.PLAY;
+            }
+            
+            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && gameState == GameState.SELL && placementIsOverplayfield)
+            {
+                //Check each tower and check if there is one here
+                foreach (Tower t in entities.OfType<Tower>().ToList())
+                {
+                    if (t.GetPosition().X + playFieldOffset.X == tmx && t.GetPosition().Y + playFieldOffset.Y == tmy)
+                    {
+                        //Delete the tower, and refund the player
+                        int refundAmount = (int)(t.Data.cost * 0.6f);
+                        if (refundAmount == 0) refundAmount = 1;
+
+                        //Add the funds, but make sure we do not overflow the total money count
+                        if (vMoney + refundAmount > ushort.MaxValue) vMoney = ushort.MaxValue;
+                        else vMoney += (ushort)refundAmount;
+
+                        t.MarkForDeletion = true;
+
+                        //Create a pop-up informing how much money the player made
+                        Popup popup = new(new(tmx, tmy), $"+${refundAmount}", 1f, GlobalSettings.TextMain, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9));
+                        entities.Add(popup);
+                    }
+                }
+            }
 
             string selectedTower = towers.GetActiveIndex() == -1 ? string.Empty : towerNames[towers.GetActiveIndex()];
             this.selectedTower.SetLabelText(selectedTower);

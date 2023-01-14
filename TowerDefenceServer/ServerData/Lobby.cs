@@ -4,11 +4,14 @@
     {
         private readonly Player pA;
         private readonly Player pB;
+        private readonly Map map;
 
         public bool IsOver { get; set; } = false;
 
         public Player PlayerA => pA;
         public Player PlayerB => pB;
+
+        public Map Map => map;
 
         public void Update()
         {
@@ -27,10 +30,11 @@
             return pA;
         }
 
-        public Lobby(Player pA, Player pB)
+        public Lobby(Player pA, Player pB, Map map)
         {
             this.pA = pA;
             this.pB = pB;
+            this.map = map;
         }
     }
 }

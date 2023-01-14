@@ -59,5 +59,10 @@
         /// Sends a snapshot of an on-going game. Use <see cref="Snapshot"/> to serialise the data
         /// </summary>
         public const char SNAPSHOT                      = (char)0x0a;
+
+        /// <summary>
+        /// Requests the server if a lobby has been found. There is a slight server bug where the client isn't informed they have found a game, so ping the server with this to force an update
+        /// </summary>
+        public const char HAS_LOBBY                     = (char)0xab;
     }
 }

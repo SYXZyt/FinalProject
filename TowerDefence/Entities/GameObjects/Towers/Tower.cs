@@ -2,6 +2,7 @@
 using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace TowerDefence.Entities.GameObjects.Towers
 {
@@ -10,6 +11,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
         private int rotation;
         private TowerData data;
         private readonly AnimationCollection anim;
+        private readonly Vector2 drawOffset;
 
         public static Dictionary<string, TowerData> towerDatas;
 
@@ -24,14 +26,14 @@ namespace TowerDefence.Entities.GameObjects.Towers
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D texture = anim.GetCurrentTexture;
-            texture.Draw(position, spriteBatch, Color.White);
+            texture.Draw(position + drawOffset, spriteBatch, Color.White);
         }
 
         public override byte GetID() => data.id;
 
         public override string Serialise()
         {
-            throw new NotImplementedException();
+            return $"|0,{position.X},{position.Y},{rotation},{data.id}";
         }
 
         public override void Update(GameTime gameTime)
@@ -39,7 +41,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
             //Loop over every enemy and check if any are within range
         }
 
-        public Tower(string name, Vector2 position, Animation idleAnim)
+        public Tower(string name, Vector2 position, Animation idleAnim, Vector2 drawOffset)
         {
             rotation = 0;
             this.position = position;
@@ -50,6 +52,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
             if (!towerDatas.ContainsKey(name)) throw new($"No tower called '{name}' found");
             data = towerDatas[name];
+            this.drawOffset = drawOffset;
         }
 
         static Tower()

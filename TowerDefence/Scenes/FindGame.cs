@@ -11,6 +11,7 @@ namespace TowerDefence.Scenes
     {
         private Texture2D bkg;
         private Label searchingLabel;
+        private ulong tick;
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -31,6 +32,7 @@ namespace TowerDefence.Scenes
             searchingLabel = new(AssetContainer.ReadString("LBL_FINDING_GAME"), 1.4f, c, Color.White, AssetContainer.GetFont("fMain"), Origin.MIDDLE_CENTRE, 0f);
 
             Client.Instance.SendMessage($"{Header.REQUEST_LOBBY}{Client.Instance.PlayerID}");
+            tick = 0;
         }
 
         public override void UnloadContent()
@@ -47,7 +49,7 @@ namespace TowerDefence.Scenes
                 string packet = Client.Instance.ReadLatestMessage();
                 byte op = (byte)packet[0];
                 packet = packet[1..];
-                
+
                 if (op == (byte)Header.CONNECT_LOBBY)
                 {
                     Console.WriteLine("Found enemy");
@@ -60,6 +62,11 @@ namespace TowerDefence.Scenes
             }
 
             Client.Instance.PollEvents();
+
+            if ((++tick) % (60 * 5) == 0)
+            {
+                Client.Instance.SendMessage($"{Header.HAS_LOBBY}{Client.Instance.PlayerName}");
+            }
         }
     }
 }

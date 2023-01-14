@@ -95,6 +95,8 @@ namespace TowerDefenceServer
             SendMessageToPeer(playerA.client, $"{Header.CONNECT_LOBBY}{playerB.id}");
             SendMessageToPeer(playerB.client, $"{Header.CONNECT_LOBBY}{playerA.id}");
 
+            Thread.Sleep(20);
+
             Player a = new()
             {
                 clientRef = playerA.client,
@@ -107,11 +109,12 @@ namespace TowerDefenceServer
                 playerNumber = playerB.id,
             };
 
-            Lobby lobby = new(a, b);
-            lobbies.Add(lobby);
 
             //Pick a map and send it to both players
             Map map = loadedMaps[rng.Next(loadedMaps.Count)];
+
+            Lobby lobby = new(a, b, map);
+            lobbies.Add(lobby);
 
             StringBuilder builder = new();
             builder.Append(Header.RECEIVE_MAP_DATA);
@@ -244,6 +247,40 @@ namespace TowerDefenceServer
 
                         //Pass the packet onto the other player
                         SendMessageToPeer(lobby.GetOtherPlayerFromID(ss.ID).clientRef, $"{Header.SNAPSHOT}{data}");
+                    }
+                    break;
+                case (byte)Header.HAS_LOBBY:
+                    {
+                        Console.WriteLine("Received lobby search update");
+
+                        //Check each lobby and see if the username is found. If it is, send the game data
+                        foreach (Lobby lobby in lobbies)
+                        {
+                            if (data == UsernameDB.GetNameFromId(lobby.PlayerA.playerNumber))
+                            {
+                                SendMessageToPeer(peer, $"{Header.CONNECT_LOBBY}{lobby.PlayerB.playerNumber}");
+
+                                StringBuilder builder = new();
+                                builder.Append(Header.RECEIVE_MAP_DATA);
+                                foreach (char bite in lobby.Map.Serialise()) builder.Append(bite);
+                                string mapData = builder.ToString();
+
+                                Thread.Sleep(100);
+                                SendMessageToPeer(peer, $"{Header.RECEIVE_MAP_DATA}{mapData}");
+                            }
+                            else if (data == UsernameDB.GetNameFromId(lobby.PlayerB.playerNumber))
+                            {
+                                SendMessageToPeer(peer, $"{Header.CONNECT_LOBBY}{lobby.PlayerA.playerNumber}");
+
+                                StringBuilder builder = new();
+                                builder.Append(Header.RECEIVE_MAP_DATA);
+                                foreach (char bite in lobby.Map.Serialise()) builder.Append(bite);
+                                string mapData = builder.ToString();
+
+                                Thread.Sleep(100);
+                                SendMessageToPeer(peer, $"{Header.RECEIVE_MAP_DATA}{mapData}");
+                            }
+                        }
                     }
                     break;
                 default:

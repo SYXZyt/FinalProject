@@ -1,4 +1,5 @@
 ﻿using UILibrary;
+using System.Text;
 using UILibrary.IO;
 using AssetStreamer;
 using UILibrary.Scenes;
@@ -15,6 +16,8 @@ using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
 
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
+using System.Globalization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace TowerDefence.Scenes
 {
@@ -92,6 +95,8 @@ namespace TowerDefence.Scenes
 
         private List<Entity> entities;
 
+        private List<ServerTowerData> enemyTowers;
+
         private void ProcessStateMachine()
         {
             switch (gameState)
@@ -133,7 +138,19 @@ namespace TowerDefence.Scenes
                 Money = vMoney,
             };
 
-            Client.Instance.SendMessage($"{Header.SNAPSHOT}{ss.Serialize()}");
+            StringBuilder builder = new();
+            builder.Append($"{Header.SNAPSHOT}{ss.Serialize()}");
+
+            foreach (Entity e in entities)
+            {
+                if (e is Tower)
+                {
+                    Tower t = e as Tower;
+                    builder.Append(t.Serialise());
+                }
+            }
+
+            Client.Instance.SendMessage(builder.ToString());
         }
 
         private void HandleServer()
@@ -169,6 +186,28 @@ namespace TowerDefence.Scenes
                         ss.Deserialize(message);
                         ovHealth = ss.Health;
                         ovMoney = ss.Money;
+
+                        int offset = 27;
+                        if (message.Length <= offset) break;
+                        message = message[27..^1];
+
+                        enemyTowers.Clear();
+
+                        //Get the data to parse
+                        string[] entities = message.Split('|');
+                        foreach (string data in entities)
+                        {
+                            string[] csvData = data.Split(',');
+
+                            if (csvData[0] == "0")
+                            {
+                                if (!int.TryParse(csvData[1], out int x)) x = 0;
+                                if (!int.TryParse(csvData[2], out int y)) y = 0;
+                                if (!int.TryParse(csvData[3], out int rot)) rot = 0;
+                                if (!int.TryParse(csvData[4], out int id)) id = 0;
+                                enemyTowers.Add(new() { x = x, y = y, rot = rot, id = id });
+                            }
+                        }
                     }
                     break;
                 default:
@@ -379,13 +418,25 @@ namespace TowerDefence.Scenes
                     textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towerNames[towers.GetActiveIndex()]].texIdle));
 
                     Animation anim = new(textures, 0);
-                    Tower tower = new(towerNames[towers.GetActiveIndex()], new(tmx, tmy), anim);
+                    Tower tower = new(towerNames[towers.GetActiveIndex()], new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset);
                     entities.Add(tower);
 
                     towers.Clear();
                     towers.Update();
                     gameState = GameState.PLAY;
                 }
+            }
+        }
+
+        private void DrawEnemyEntities(SpriteBatch spriteBatch)
+        {
+            foreach (ServerTowerData towerData in enemyTowers)
+            {
+                string towerName = towerNames[towerData.id];
+                Texture2D texture = AssetContainer.ReadTexture(Tower.towerDatas[towerName].texIdle);
+
+                Vector2 pos = new(towerData.x, towerData.y);
+                texture.Draw(pos + enemyPlayFieldOffset, spriteBatch, Color.White);
             }
         }
 
@@ -419,12 +470,13 @@ namespace TowerDefence.Scenes
 
             UIManager.Draw(spriteBatch);
             foreach (Entity e in entities) e.Draw(spriteBatch);
+            DrawEnemyEntities(spriteBatch);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
             string x = $"State: {gameState}\nAct ID: {towers.GetActiveIndex()}";
-            spriteBatch.DrawString(AssetContainer.GetFont("fMain"), x, new Vector2(100, 100), Color.White);
+            spriteBatch.DrawString(AssetContainer.GetFont("fMain"), x, new Vector2(0, 200), Color.White);
 
             money.SetColour(vMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
             oMoney.SetColour(ovMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
@@ -448,27 +500,26 @@ namespace TowerDefence.Scenes
                 List<Tower> activeTowers = entities.OfType<Tower>().ToList();
 
                 //Loop over each tower and if the current tile is occupied, do not place
-
                 if (playfield[pY, pX] == 0)
                 {
-                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White * 0.6f);
-                }
-                else
-                {
-                    bool anyTile = false;
+                    bool foundTower = false;
 
                     foreach (Tower tower in activeTowers)
                     {
-                        if (tower.GetPosition().X == tmx && tower.GetPosition().Y == tmy)
+                        if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
                         {
                             spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
-                            anyTile = true;
+                            foundTower = true;
                             break;
                         }
                     }
 
-                    if (!anyTile)
-                        spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
+                    if (!foundTower)
+                        spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.White * 0.6f);
+                }
+                else
+                {
+                    spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), Color.Red * 0.6f);
                 }
             }
             if (showCheatPanel) cheatPanel.Draw(spriteBatch);
@@ -631,6 +682,7 @@ namespace TowerDefence.Scenes
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
+            enemyTowers = new();
 
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 

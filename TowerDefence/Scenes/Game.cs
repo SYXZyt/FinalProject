@@ -136,7 +136,7 @@ namespace TowerDefence.Scenes
         /// </summary>
         private void ProcessStateMachine()
         {
-            if (gameState is GameState.PLAY or GameState.PLACEMENT or GameState.SELL)
+            if (gameState is GameState.PLAY or GameState.PLACEMENT or GameState.SELL && !showCheatPanel)
             {
                 //Use keyboard to select tower
                 const int MONOGAME_KEY_OFFSET = 48;
@@ -471,7 +471,7 @@ namespace TowerDefence.Scenes
             if (towers.GetActiveIndex() == -1) return;
 
             //If the mouse is over the play-field and the user clicks, place the tower
-            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField() && !showCheatPanel)
+            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField())
             {
                 int pX = (int)((tmx - playFieldOffset.X) / TileSize);
                 int pY = (int)((tmy - playFieldOffset.Y) / TileSize);

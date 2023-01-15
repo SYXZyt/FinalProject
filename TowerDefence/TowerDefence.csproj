@@ -215,7 +215,6 @@
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\" />
-    <Folder Include="Entities\GameObjects\Enemies\" />
   </ItemGroup>
 
   <ItemGroup>

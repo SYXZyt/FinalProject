@@ -572,7 +572,7 @@ namespace TowerDefence.Scenes
             }
 
             UIManager.Draw(spriteBatch);
-            foreach (Entity e in entities) e.Draw(spriteBatch);
+            foreach (Entity e in entities) if (e is not Popup) e.Draw(spriteBatch);
             DrawEnemyEntities(spriteBatch);
         }
 
@@ -646,7 +646,7 @@ namespace TowerDefence.Scenes
                         TowerData data = Tower.towerDatas[towerNames[towers.GetActiveIndex()]];
 
                         Texture2D range = CreateCircleText(data.range, canPlace ? Color.White : Color.Red);
-                        range.Draw(new Vector2(tmx - range.Width / 2, tmy - range.Height / 2), spriteBatch, Color.White * 0.2f);
+                        range.Draw(new Vector2(tmx - range.Width / 2 + TileSize / 2, tmy - range.Height / 2 + TileSize / 2), spriteBatch, Color.White * 0.2f);
                     }
                 }
             }
@@ -683,6 +683,8 @@ namespace TowerDefence.Scenes
                 string message = $"PING: {Client.Instance.Peer.Ping}ms";
                 spriteBatch.DrawString(AssetContainer.GetFont("fMain"), message, new Vector2(100, 100), Color.White);
             }
+
+            foreach (Popup popup in entities.OfType<Popup>()) popup.Draw(spriteBatch);
         }
 
         public override void LoadContent()

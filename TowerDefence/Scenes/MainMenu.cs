@@ -82,11 +82,14 @@ namespace TowerDefence.Scenes
             if (settingsButton.IsClicked()) SceneManager.Instance.LoadScene("settings");
 
 #if DEBUG
-            if (debugPlayButton.IsClicked()) SceneManager.Instance.LoadScene("mainGame");
-            Client c = new();
-            c.Connect();
-            Game.IsDebugPlay = true;
-            c.PlayerName = "__DEBUG_PLAYER__";
+            if (debugPlayButton.IsClicked())
+            {
+                Client c = new();
+                c.Connect();
+                Game.IsDebugPlay = true;
+                c.PlayerName = "__DEBUG_PLAYER__";
+                SceneManager.Instance.LoadScene("mainGame");
+            }
 #endif
         }
 

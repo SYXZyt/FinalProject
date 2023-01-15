@@ -2,7 +2,7 @@
 <tower>
   <tower_id>0</tower_id>
   <tower_name>Debug Tower</tower_name>
-  <range>20</range>
+  <range>200</range>
   <cost>1</cost>
   <texture_idle></texture_idle>
   <texture_button>map_0</texture_button>

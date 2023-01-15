@@ -102,6 +102,35 @@ namespace TowerDefence.Scenes
 
         private List<ServerTowerData> enemyTowers;
 
+        private Texture2D CreateCircleText(int diameter, Color colour)
+        {
+            Texture2D texture = new(GraphicsDevice, diameter, diameter);
+            Color[] colorData = new Color[diameter * diameter];
+
+            float radius = diameter / 2f;
+            float radiusSq = radius * radius;
+
+            for (int x = 0; x < diameter; x++)
+            {
+                for (int y = 0; y < diameter; y++)
+                {
+                    int index = x * diameter + y;
+                    Vector2 pos = new(x - radius, y - radius);
+                    if (pos.LengthSquared() <= radiusSq)
+                    {
+                        colorData[index] = colour;
+                    }
+                    else
+                    {
+                        colorData[index] = Color.Transparent;
+                    }
+                }
+            }
+
+            texture.SetData(colorData);
+            return texture;
+        }
+
         /// <summary>
         /// Update the game based on the current state
         /// </summary>
@@ -578,6 +607,8 @@ namespace TowerDefence.Scenes
                     (pY >= 0 && pY < 42)
                     )
                 {
+                    bool canPlace = true;
+
                     //Loop over each tower and if the current tile is occupied, do not place
                     if (playfield[pY, pX] == 0)
                     {
@@ -587,6 +618,7 @@ namespace TowerDefence.Scenes
                         {
                             if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
                             {
+                                canPlace = false;
                                 Color col = gameState == GameState.SELL ? Color.White : Color.Red;
 
                                 spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), col * 0.6f);
@@ -603,8 +635,18 @@ namespace TowerDefence.Scenes
                     }
                     else
                     {
+                        canPlace = false;
                         Color col = gameState == GameState.SELL ? Color.White : Color.Red;
                         spriteBatch.Draw(statPanel, new Rectangle(tmx, tmy, TileSize, TileSize), col * 0.6f);
+                    }
+
+                    //If we are placing a tower, draw the range
+                    if (gameState == GameState.PLACEMENT)
+                    {
+                        TowerData data = Tower.towerDatas[towerNames[towers.GetActiveIndex()]];
+
+                        Texture2D range = CreateCircleText(data.range, canPlace ? Color.White : Color.Red);
+                        range.Draw(new Vector2(tmx - range.Width / 2, tmy - range.Height / 2), spriteBatch, Color.White * 0.2f);
                     }
                 }
             }

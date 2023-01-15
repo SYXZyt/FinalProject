@@ -471,7 +471,7 @@ namespace TowerDefence.Scenes
             if (towers.GetActiveIndex() == -1) return;
 
             //If the mouse is over the play-field and the user clicks, place the tower
-            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField())
+            if (MouseController.IsPressed(MouseController.MouseButton.LEFT) && IsCursorOnPlayField() && !showCheatPanel)
             {
                 int pX = (int)((tmx - playFieldOffset.X) / TileSize);
                 int pY = (int)((tmy - playFieldOffset.Y) / TileSize);

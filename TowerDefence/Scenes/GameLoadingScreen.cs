@@ -138,6 +138,9 @@ namespace TowerDefence.Scenes
                 XmlNode unitHealth = xml.SelectSingleNode("/unit/unit_hitpoints");
                 enemyData.health = int.Parse(unitHealth.InnerText);
 
+                XmlNode unitDmg = xml.SelectSingleNode("/unit/unit_damage");
+                enemyData.damage = int.Parse(unitDmg.InnerText);
+
                 return enemyData;
             }
 

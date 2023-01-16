@@ -90,7 +90,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                         {
                             //If we are moving up, we need to check if there is a 1 tile above
                             //If we are at y 0 already, then we will delete this entity
-                            if (position.Y <= 1)
+                            if (position.Y < 1)
                             {
                                 markForDeletion = true;
                                 break;
@@ -99,13 +99,21 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                             //Check for blockage
                             if (mapData[(int)(position.Y - 1), (int)position.X] != 1)
                             {
+                                //Check for HQ
+                                if (mapData[(int)(position.Y - 1), (int)position.X] == 15)
+                                {
+                                    markForDeletion = true;
+                                    Game.Instance.DamagePlayer(data.damage);
+                                    break;
+                                }
+
                                 //Check the left
-                                if (position.X >= 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                                if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
                                 {
                                     dir = 3;
                                 }
                                 //Check the right
-                                else if (position.X <= 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                                else if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
                                 {
                                     dir = 1;
                                 }
@@ -119,7 +127,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                         break;
                     case 1:
                         {
-                            if (position.X >= 47)
+                            if (position.X > 47)
                             {
                                 markForDeletion = true;
                                 break;
@@ -127,13 +135,21 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
                             if (mapData[(int)position.Y, (int)(position.X + 1)] != 1)
                             {
+                                //Check for HQ
+                                if (mapData[(int)position.Y, (int)(position.X + 1)] == 15)
+                                {
+                                    markForDeletion = true;
+                                    Game.Instance.DamagePlayer(data.damage);
+                                    break;
+                                }
+
                                 //Check up
-                                if (position.Y >= 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                                if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
                                 {
                                     dir = 0;
                                 }
                                 //Check down
-                                else if (position.Y <= 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                                else if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
                                 {
                                     dir = 2;
                                 }
@@ -146,7 +162,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                         break;
                     case 2:
                         {
-                            if (position.Y >= 41)
+                            if (position.Y > 41)
                             {
                                 markForDeletion = true;
                                 break;
@@ -154,13 +170,21 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
                             if (mapData[(int)(position.Y + 1), (int)position.X] != 1)
                             {
+                                //Check for HQ
+                                if(mapData[(int)(position.Y + 1), (int)position.X] == 15)
+                                {
+                                    markForDeletion = true;
+                                    Game.Instance.DamagePlayer(data.damage);
+                                    break;
+                                }
+
                                 //Check left
-                                if (position.X >= 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                                if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
                                 {
                                     dir = 3;
                                 }
                                 //Check right
-                                else if (position.X <= 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                                else if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
                                 {
                                     dir = 1;
                                 }
@@ -173,7 +197,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                         break;
                     case 3:
                         {
-                            if (position.X <= 1)
+                            if (position.X < 1)
                             {
                                 markForDeletion = true;
                                 break;
@@ -181,13 +205,21 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
                             if (mapData[(int)position.Y, (int)(position.X - 1)] != 1)
                             {
+                                //Check for HQ
+                                if (mapData[(int)position.Y, (int)(position.X - 1)] == 15)
+                                {
+                                    markForDeletion = true;
+                                    Game.Instance.DamagePlayer(data.damage);
+                                    break;
+                                }
+
                                 //Check up
-                                if (position.Y >= 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                                if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
                                 {
                                     dir = 0;
                                 }
                                 //Check down
-                                else if (position.Y <= 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                                else if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
                                 {
                                     dir = 2;
                                 }

@@ -877,19 +877,19 @@ namespace TowerDefence.Scenes
                 Vector2 centre = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0);
                 Vector2 leftQ = new(centre.X / 2, 0);
                 Vector2 rghtQ = new(centre.X + (centre.X / 2), 0);
-                username = new(Client.Instance.PlayerName, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                username = new(Client.Instance.PlayerName, 1.1f, rghtQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
 
                 if (!IsDebugPlay)
                 {
                     Client.Instance.SendMessage($"{Header.REQUEST_USERNAME_FROM_ID}{Client.Instance.EnemyID}");
                     Client.Instance.WaitForNewMessage();
                     string enemyUsername = Client.Instance.ReadLatestMessage();
-                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
                 }
                 else
                 {
                     string enemyUsername = "null";
-                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT, 0f);
+                    otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
                 }
             }
 

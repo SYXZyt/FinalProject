@@ -787,6 +787,20 @@ namespace TowerDefence.Scenes
 
                 sellButton = new(new(buttonsX, (short)(towerSelClick.Height * 3 + towerSelClick.Height * TowerCount), 64, 32), AssetContainer.ReadTexture("sSellUnlick"), AssetContainer.ReadTexture("sSellClick"));
                 uIManager.Add(sellButton);
+
+                //Swap stats if needed
+                if (!GlobalSettings.PlayerOnRight)
+                {
+                    money.MoveLabel(Vector2.Zero);
+                    health.MoveLabel(new(0, 48));
+                    money.ChangeOrigin(Origin.TOP_LEFT);
+                    health.ChangeOrigin(Origin.TOP_LEFT);
+
+                    oMoney.MoveLabel(topRight);
+                    oHealth.MoveLabel(topRight + new Vector2(0, 48));
+                    oMoney.ChangeOrigin(Origin.TOP_RIGHT);
+                    oHealth.ChangeOrigin(Origin.TOP_RIGHT);
+                }
             }
 
             void InitPlayerField()
@@ -919,6 +933,14 @@ namespace TowerDefence.Scenes
                     string enemyUsername = "null";
                     otherUsername = new(enemyUsername, 1.1f, leftQ, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
                 }
+
+                //Swap the locations if needed
+                if (!GlobalSettings.PlayerOnRight)
+                {
+                    username.MoveLabel(leftQ);
+                    otherUsername.MoveLabel(rghtQ);
+                }
+
             }
 
             vignetteOpac = 0.0f;
@@ -947,6 +969,13 @@ namespace TowerDefence.Scenes
 
             playFieldOffset = new(1920 / 2 + divider.Width, 96);
             enemyPlayFieldOffset = new(1920 / 2 - PlayfieldWidth - divider.Width, 96);
+
+            //If the player is on the left, swap the offsets
+            if (!GlobalSettings.PlayerOnRight)
+            {
+                //This will swap the variables. The compiler told me to do it this way. Less readable IMO but oh well, it shuts the compiler up
+                (enemyPlayFieldOffset, playFieldOffset) = (playFieldOffset, enemyPlayFieldOffset);
+            }
 
             short bWidth = 310;
             short bHeight = 72;

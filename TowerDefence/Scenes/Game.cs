@@ -28,6 +28,8 @@ namespace TowerDefence.Scenes
 
         private readonly Random rng;
 
+        private List<Vector2> enemySpawnPositions = new();
+
         private bool isWinner = false;
         private float gameOverOpacity;
         private const float GameOverOpacitySpeed = 0.01f;
@@ -846,8 +848,14 @@ namespace TowerDefence.Scenes
                             Enemy.HQLocations.Add(new(x, y));
                         }
 
+                        //Load spawn positions
+                        else if (playfield[y, x] == 14)
+                        {
+                            enemySpawnPositions.Add(new(x, y));
+                        }
+
                         //Load random grass offset
-                        if (playfield[y, x] == 0)
+                        else if (playfield[y, x] == 0)
                         {
                             textureOffsets[y, x] = (byte)rng.Next(playfieldTextures[0].Count);
                         }
@@ -925,6 +933,21 @@ namespace TowerDefence.Scenes
             SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
+
+            //Debug stuff
+            if (KeyboardController.IsPressed(Keys.NumPad0))
+            {
+                string name = "Debug Unit";
+                TextureCollection textureCollection = new();
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnitDev_0"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnitDev_1"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnitDev_2"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnitDev_3"));
+                Animation animation = new(textureCollection, 0);
+                Vector2 pos = enemySpawnPositions[0];
+                Enemy enemy = new(name, playFieldOffset + (pos * TileSize), pos, playFieldOffset, animation);
+                entities.Add(enemy);
+            } //Console.WriteLine(entities.OfType<Enemy>().Count());
 
             if (sellButton.IsClicked())
             {

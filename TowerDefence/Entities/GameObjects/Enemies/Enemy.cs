@@ -16,9 +16,11 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         private readonly Animation frames;
         private readonly EnemyData data;
-        private Vector2 offset;
         private readonly Vector2 drawOffset;
+        private Vector2 absolutePosition;
         private int dir; //0 - up, 1 - right, 2 - down, 3 - left,
+
+        private float elapsedTime;
 
         public override Entity Deserialise(string serialised)
         {
@@ -28,8 +30,10 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D frame = frames.GetFrame(dir);
+            Texture2D demo = AssetStreamer.AssetContainer.ReadTexture("");
 
-            frame.Draw(position + drawOffset + offset, spriteBatch, Color.White);
+            demo.Draw(position * Game.TileSize + drawOffset, spriteBatch, Color.White);
+            frame.Draw(absolutePosition + drawOffset, spriteBatch, Color.White);
         }
 
         public override byte GetID() => data.id;
@@ -50,16 +54,28 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 _ => Vector2.Zero,
             };
 
-            offset += vec;
+            absolutePosition += vec;
+        }
+
+        private void MovePosition()
+        {
+            Vector2 vec = dir switch
+            {
+                0 => new(0, -1),
+                1 => new(1, 0),
+                2 => new(0, 1),
+                3 => new(-1, 0),
+                _ => Vector2.Zero,
+            };
+
+            position += vec;
         }
 
         public override void Update(GameTime gameTime)
         {
-            //Check whether to move the object
-            Vector2 actualLoc = position + offset;
-            if (actualLoc.X % Game.TileSize == 0 && actualLoc.Y % Game.TileSize == 0)
+            if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0)
             {
-                position = actualLoc;
+                MovePosition();
 
                 //Check the next direction
                 switch (dir)
@@ -95,19 +111,25 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                         break;
                 }
             }
-            else Move();
 
-            textures.Update(gameTime);
+            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (elapsedTime * data.speed >= 1)
+            {
+                Move();
+                elapsedTime = 0;
+            }
         }
 
-        public Enemy(string name, Vector2 position, Vector2 drawOffset, Animation textures)
+        public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, Animation textures)
         {
-            this.position = position;
+            absolutePosition = screenPosition;
+            position = gridPosition;
             frames = textures;
             this.drawOffset = drawOffset;
             if (!enemyDatas.ContainsKey(name)) throw new($"No unit called '{name}' found");
             data = enemyDatas[name];
             frames.SetFreeze(true);
+            elapsedTime = 0;
         }
     }
 }

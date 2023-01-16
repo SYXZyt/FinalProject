@@ -2,7 +2,6 @@
 using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace TowerDefence.Entities.GameObjects.Towers
 {

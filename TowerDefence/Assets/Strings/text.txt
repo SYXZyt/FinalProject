@@ -8,6 +8,7 @@ LBL_SET_SCREEN_MODE||Fullscreen
 LBL_SET_SCREEN_MODE_SPLASH||(May take a minute and may require a room change to take affect)
 LBL_SET_SERVER||Server IP
 LBL_SET_PORT||Server Port
+LBL_SET_PLAYER_SIDE||Player On Left
 LBL_USERNAME||Username
 LBL_NO_SERVER||Could not connect to server {}
 LBL_USERNAME_TAKEN||Username '{}' cannot be used

@@ -1,4 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <SpawnGroup0>
-  <e0>0</e0>
+  <id>0</id>
+  <count>1</count>
+  <delay>10</delay>
 </SpawnGroup0>

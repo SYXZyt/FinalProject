@@ -14,6 +14,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public static Dictionary<string, EnemyData> enemyDatas = new();
         public static byte[,] mapData;
 
+        private bool checkForPosMovement = false;
         private readonly Animation frames;
         private readonly EnemyData data;
         private readonly Vector2 drawOffset;
@@ -33,7 +34,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             Texture2D demo = AssetStreamer.AssetContainer.ReadTexture("");
 
             demo.Draw(position * Game.TileSize + drawOffset, spriteBatch, Color.White);
-            frame.Draw(absolutePosition + drawOffset, spriteBatch, Color.White);
+            frame.Draw(absolutePosition, spriteBatch, Color.White);
         }
 
         public override byte GetID() => data.id;
@@ -73,8 +74,10 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override void Update(GameTime gameTime)
         {
-            if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0)
+            if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0 && checkForPosMovement)
             {
+                checkForPosMovement = false;
+
                 MovePosition();
 
                 //Check the next direction
@@ -117,6 +120,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             {
                 Move();
                 elapsedTime = 0;
+                checkForPosMovement = true;
             }
         }
 
@@ -130,6 +134,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             data = enemyDatas[name];
             frames.SetFreeze(true);
             elapsedTime = 0;
+            checkForPosMovement = false;
         }
     }
 }

@@ -945,9 +945,10 @@ namespace TowerDefence.Scenes
                 textureCollection.AddTexture(AssetContainer.ReadTexture("sUnitDev_3"));
                 Animation animation = new(textureCollection, 0);
                 Vector2 pos = enemySpawnPositions[0];
-                Enemy enemy = new(name, playFieldOffset + (pos * TileSize), pos, playFieldOffset, animation);
+                Vector2 absPos = playFieldOffset + (pos * TileSize);
+                Enemy enemy = new(name, absPos, pos, playFieldOffset, animation);
                 entities.Add(enemy);
-            } //Console.WriteLine(entities.OfType<Enemy>().Count());
+            }
 
             if (sellButton.IsClicked())
             {

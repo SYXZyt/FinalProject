@@ -31,6 +31,15 @@
                         Advance();
                     }
 
+                    try
+                    {
+                        int x = int.Parse(lexeme);
+                    }
+                    catch
+                    {
+                        lexeme = "0";
+                    }
+
                     tokens.Add(new(TokenType.INT, lexeme));
                 }
                 else if (char.IsLetterOrDigit(CurrentChar) || CurrentChar == '_')

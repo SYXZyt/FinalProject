@@ -21,11 +21,6 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
-        /// <summary>
-        /// Is the game running in debug mode
-        /// </summary>
-        public static bool IsDebugPlay { get; set; } = false;
-
         private readonly Random rng;
 
         private List<Vector2> enemySpawnPositions = new();
@@ -103,6 +98,20 @@ namespace TowerDefence.Scenes
         private List<Entity> entities;
 
         private List<ServerTowerData> enemyTowers;
+
+        public static Game Instance { get; private set; }
+
+        public Random RNG => rng;
+
+        /// <summary>
+        /// Is the game running in debug mode
+        /// </summary>
+        public static bool IsDebugPlay { get; set; } = false;
+
+        public void DamagePlayer(int amount)
+        {
+            vHealth = (byte)Math.Max(0, vHealth - amount);
+        }
 
         private Texture2D CreateCircleText(int diameter, Color colour)
         {
@@ -1055,6 +1064,7 @@ namespace TowerDefence.Scenes
         public Game() : base()
         {
             rng = new();
+            Instance = this;
         }
     }
 }

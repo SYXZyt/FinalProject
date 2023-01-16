@@ -72,6 +72,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             position += vec;
         }
 
+
+
         public override void Update(GameTime gameTime)
         {
             if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0 && checkForPosMovement)
@@ -81,13 +83,14 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 MovePosition();
 
                 //Check the next direction
+                //Most of this code is fairly repetitive. If you understand one case, you will understand the rest
                 switch (dir)
                 {
                     case 0:
                         {
                             //If we are moving up, we need to check if there is a 1 tile above
                             //If we are at y 0 already, then we will delete this entity
-                            if (position.Y == 0)
+                            if (position.Y <= 1)
                             {
                                 markForDeletion = true;
                                 break;
@@ -101,9 +104,92 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                                 {
                                     dir = 3;
                                 }
+                                //Check the right
                                 else if (position.X <= 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
                                 {
                                     dir = 1;
+                                }
+                                //Remember that we cannot travel backwards
+                                else
+                                {
+                                    throw new Exception("entity got stuck");
+                                }
+                            }
+                        }
+                        break;
+                    case 1:
+                        {
+                            if (position.X >= 47)
+                            {
+                                markForDeletion = true;
+                                break;
+                            }
+
+                            if (mapData[(int)position.Y, (int)(position.X + 1)] != 1)
+                            {
+                                //Check up
+                                if (position.Y >= 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                                {
+                                    dir = 0;
+                                }
+                                //Check down
+                                else if (position.Y <= 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                                {
+                                    dir = 2;
+                                }
+                                else
+                                {
+                                    throw new Exception("entity got stuck");
+                                }
+                            }
+                        }
+                        break;
+                    case 2:
+                        {
+                            if (position.Y >= 41)
+                            {
+                                markForDeletion = true;
+                                break;
+                            }
+
+                            if (mapData[(int)(position.Y + 1), (int)position.X] != 1)
+                            {
+                                //Check left
+                                if (position.X >= 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                                {
+                                    dir = 3;
+                                }
+                                //Check right
+                                else if (position.X <= 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                                {
+                                    dir = 1;
+                                }
+                                else
+                                {
+                                    throw new Exception("entity got stuck");
+                                }
+                            }
+                        }
+                        break;
+                    case 3:
+                        {
+                            if (position.X <= 1)
+                            {
+                                markForDeletion = true;
+                                break;
+                            }
+
+                            if (mapData[(int)position.Y, (int)(position.X - 1)] != 1)
+                            {
+                                //Check up
+                                if (position.Y >= 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                                {
+                                    dir = 0;
+                                }
+                                //Check down
+                                else if (position.Y <= 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                                {
+                                    dir = 2;
                                 }
                                 else
                                 {

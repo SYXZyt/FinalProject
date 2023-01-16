@@ -92,6 +92,10 @@ namespace TowerDefence.Scenes
         private Animation waterAnimation;
         private TextureCollection[] playfieldTextures;
 
+        private Texture2D vignette;
+        private float vignetteOpac;
+        private const float vignetteSpeed = 1.0f;
+
         private Texture2D bkg;
         private bool placementIsOverplayfield;
 
@@ -111,6 +115,7 @@ namespace TowerDefence.Scenes
         public void DamagePlayer(int amount)
         {
             vHealth = (byte)Math.Max(0, vHealth - amount);
+            vignetteOpac = 1.0f;
         }
 
         private Texture2D CreateCircleText(int diameter, Color colour)
@@ -589,8 +594,7 @@ namespace TowerDefence.Scenes
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            string x = $"State: {gameState}\nAct ID: {towers.GetActiveIndex()}";
-            spriteBatch.DrawString(AssetContainer.GetFont("fMain"), x, new Vector2(0, 200), Color.White);
+            spriteBatch.Draw(vignette, Vector2.Zero, Color.White * vignetteOpac);
 
             money.SetColour(vMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
             oMoney.SetColour(ovMoney == 0 ? GlobalSettings.TextError : GlobalSettings.TextMain);
@@ -705,6 +709,7 @@ namespace TowerDefence.Scenes
             void LoadTextures()
             {
                 bkg = AssetContainer.ReadTexture("sMenu");
+                vignette = AssetContainer.ReadTexture("sVignette");
                 divider = AssetContainer.ReadTexture("sBorder");
                 towerSelUnclick = AssetContainer.ReadTexture("sTowerSelUnclick");
                 towerSelClick = AssetContainer.ReadTexture("sTowerSelClick");
@@ -893,6 +898,7 @@ namespace TowerDefence.Scenes
                 }
             }
 
+            vignetteOpac = 0.0f;
             gameOverOpacity = 0f;
             entities = new();
             showDebugStats = false;
@@ -942,6 +948,9 @@ namespace TowerDefence.Scenes
             SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
+
+            //Adjust the vignette opacity
+            vignetteOpac = (float)Math.Max(0, vignetteOpac - vignetteSpeed * gameTime.ElapsedGameTime.TotalSeconds);
 
             //Debug stuff
             if (KeyboardController.IsPressed(Keys.NumPad0))

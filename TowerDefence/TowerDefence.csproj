@@ -212,6 +212,9 @@
     <None Update="Assets\Textures\units\dev_3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\vig.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="cfg\rgb.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

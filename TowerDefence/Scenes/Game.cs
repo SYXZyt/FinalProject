@@ -285,12 +285,12 @@ namespace TowerDefence.Scenes
                         ovHealth = ss.Health;
                         ovMoney = ss.Money;
 
+                        enemyTowers.Clear();
+                        enemyUnits.Clear();
+
                         int offset = 27;
                         if (message.Length <= offset) break;
                         message = message[27..^1];
-
-                        enemyTowers.Clear();
-                        enemyUnits.Clear();
 
                         //Get the data to parse
                         string[] entities = message.Split('|');

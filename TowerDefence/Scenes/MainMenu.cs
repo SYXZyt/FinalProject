@@ -72,6 +72,7 @@ namespace TowerDefence.Scenes
         public override void UnloadContent()
         {
             Console.WriteLine($"UNLOAD MainMenu");
+            UIManager.Clear();
         }
 
         public override void Update(GameTime gameTime)

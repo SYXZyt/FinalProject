@@ -251,6 +251,7 @@ namespace TowerDefence.Scenes
         public override void UnloadContent()
         {
             Console.WriteLine($"UNLOAD GameLoadingScreen");
+            UIManager.Clear();
         }
 
         public override void Update(GameTime gameTime)

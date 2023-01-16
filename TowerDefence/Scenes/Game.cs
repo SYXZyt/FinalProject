@@ -765,9 +765,11 @@ namespace TowerDefence.Scenes
 
             void InitUI()
             {
+                short buttonsX = GlobalSettings.PlayerOnRight ? (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width) : (short)0;
+
                 for (int i = 0; i < TowerCount; i++)
                 {
-                    AABB aabb = new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
+                    AABB aabb = new(buttonsX, (short)((towerSelClick.Height * 3) + towerSelClick.Height * i), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
                     Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
                     towers.AddSwitch(s);
                 }
@@ -783,7 +785,7 @@ namespace TowerDefence.Scenes
 
                 selectedTower = new("NULL", 1.6f, new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 0), Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
 
-                sellButton = new(new((short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width), (short)(towerSelClick.Height * 3 + towerSelClick.Height * TowerCount), 64, 32), AssetContainer.ReadTexture("sSellUnlick"), AssetContainer.ReadTexture("sSellClick"));
+                sellButton = new(new(buttonsX, (short)(towerSelClick.Height * 3 + towerSelClick.Height * TowerCount), 64, 32), AssetContainer.ReadTexture("sSellUnlick"), AssetContainer.ReadTexture("sSellClick"));
                 uIManager.Add(sellButton);
             }
 
@@ -962,6 +964,7 @@ namespace TowerDefence.Scenes
         {
             Console.WriteLine($"UNLOAD Game");
             SceneManager.Instance.ManagedUIManager = true; //Pass control back to the SceneManager
+            UIManager.Clear();
         }
 
         public override void Update(GameTime gameTime)

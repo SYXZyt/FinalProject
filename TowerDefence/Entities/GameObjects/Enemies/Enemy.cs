@@ -39,10 +39,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override byte GetID() => data.id;
 
-        public override string Serialise()
-        {
-            throw new NotImplementedException();
-        }
+        public override string Serialise() => $"|1,{absolutePosition.X - drawOffset.X},{absolutePosition.Y - drawOffset.Y},{dir},{data.id}";
 
         private void Move()
         {
@@ -71,8 +68,6 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
             position += vec;
         }
-
-
 
         public override void Update(GameTime gameTime)
         {

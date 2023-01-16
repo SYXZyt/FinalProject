@@ -309,10 +309,10 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\bullet.png", "sBullet"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellChecked.png", "sSellClick"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellUnchecked.png", "sSellUnlick"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_0.png", "sUnitDev_0"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_1.png", "sUnitDev_1"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnitDev_2"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnitDev_3"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_0.png", "sUnit_0_0"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_1.png", "sUnit_0_1"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnit_0_2"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnit_0_3"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\vig.png", "sVignette"));
 
             //Load the map textures

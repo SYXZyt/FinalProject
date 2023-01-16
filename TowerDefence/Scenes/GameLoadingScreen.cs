@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
+using TowerDefence.Entities.GameObjects.Enemies;
 
 using Color = Microsoft.Xna.Framework.Color;
 
@@ -116,6 +117,30 @@ namespace TowerDefence.Scenes
                 return towerData;
             }
 
+            private static EnemyData LoadEnemy(string path)
+            {
+                if (!File.Exists(path)) throw new FileNotFoundException($"Could not find '{path}'", path);
+
+                XmlDocument xml = new();
+                xml.Load(path);
+
+                EnemyData enemyData = new();
+
+                XmlNode unitId = xml.SelectSingleNode("/unit/unit_id");
+                enemyData.id = byte.Parse(unitId.InnerText);
+
+                XmlNode unitName = xml.SelectSingleNode("/unit/unit_name");
+                enemyData.name = unitName.InnerText;
+
+                XmlNode unitSpeed = xml.SelectSingleNode("/unit/unit_speed");
+                enemyData.speed = int.Parse(unitSpeed.InnerText);
+
+                XmlNode unitHealth = xml.SelectSingleNode("/unit/unit_hitpoints");
+                enemyData.health = int.Parse(unitHealth.InnerText);
+
+                return enemyData;
+            }
+
             private static void LoadColours()
             {
                 if (!File.Exists(@"cfg\rgb.xml")) return;
@@ -147,8 +172,12 @@ namespace TowerDefence.Scenes
             {
                 LoadBulletCfg();
                 LoadColours();
+                
                 TowerData debugTower = LoadTower(@"cfg\tower_dev.xml");
                 Tower.towerDatas.Add(debugTower.name, debugTower);
+
+                EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
+                Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
             }
         }
 
@@ -277,6 +306,10 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\bullet.png", "sBullet"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellChecked.png", "sSellClick"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellUnchecked.png", "sSellUnlick"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_0.png", "sUnitDev_0"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_1.png", "sUnitDev_1"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnitDev_2"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnitDev_3"));
 
             //Load the map textures
             for (int i = 0; i < 29; i++)

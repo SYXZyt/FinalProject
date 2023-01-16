@@ -12,8 +12,8 @@ using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
+using TowerDefence.Entities.GameObjects.Enemies;
 
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
@@ -32,7 +32,7 @@ namespace TowerDefence.Scenes
         private float gameOverOpacity;
         private const float GameOverOpacitySpeed = 0.01f;
 
-        private const int TileSize = 16;
+        public const int TileSize = 16;
         private readonly Vector2 GameSize = new(48, 42);
 
         private UIManager pausedMenuUILayer;
@@ -484,7 +484,7 @@ namespace TowerDefence.Scenes
                 {
                     if (tower.GetPosition().X + playFieldOffset.X == tmx && tower.GetPosition().Y + playFieldOffset.Y == tmy)
                     {
-                        Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                        Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_INV_LOC"), 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
                         entities.Add(popup);
                         return;
                     }
@@ -831,12 +831,22 @@ namespace TowerDefence.Scenes
                 }
 #endif
 
+                Enemy.mapData = playfield;
+
                 //Now we can load the random offsets
+                //But while we are here, we can save another loop and load tower locations into the enemies
                 textureOffsets = new byte[(int)GameSize.Y, (int)GameSize.X];
                 for (int y = 0; y < GameSize.Y; y++)
                 {
                     for (int x = 0; x < GameSize.X; x++)
                     {
+                        //Load HQ position
+                        if (playfield[y, x] == 15)
+                        {
+                            Enemy.HQLocations.Add(new(x, y));
+                        }
+
+                        //Load random grass offset
                         if (playfield[y, x] == 0)
                         {
                             textureOffsets[y, x] = (byte)rng.Next(playfieldTextures[0].Count);

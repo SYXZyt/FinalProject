@@ -20,6 +20,8 @@ namespace TowerDefence.Visuals
 
         public bool HasEnded => frame == -1;
 
+        public Texture2D GetFrame(int frame) => frames[frame];
+
         public Texture2D GetActiveFrame() => frames[frame == -1 ? frames.Count - 1 : frame];
 
         public void SetFreeze(bool freeze) => this.freeze = freeze;

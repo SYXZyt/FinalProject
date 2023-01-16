@@ -1,6 +1,4 @@
-﻿using TowerDefence.Entities.GameObjects.Enemies;
-
-namespace TowerDefence.Entities.GameObjects
+﻿namespace TowerDefence.Entities.GameObjects.Enemies
 {
     internal class SpawnGroup
     {

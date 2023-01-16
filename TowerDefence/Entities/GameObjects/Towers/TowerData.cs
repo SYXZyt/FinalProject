@@ -1,4 +1,4 @@
-﻿namespace TowerDefence.Entities.GameObjects
+﻿namespace TowerDefence.Entities.GameObjects.Towers
 {
     internal struct TowerData
     {

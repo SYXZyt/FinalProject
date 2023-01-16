@@ -1,6 +1,9 @@
 ﻿using UILibrary;
+using TowerDefence.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using Game = TowerDefence.Scenes.Game;
 
 namespace TowerDefence.Entities
 {
@@ -60,8 +63,11 @@ namespace TowerDefence.Entities
             label.MoveLabel(position);
         }
 
-        public Popup(Vector2 position, string message, float size, Color textColour, SpriteFont font, float lifetime, Vector2 movementVector) : base(position, null)
+        public Popup(Vector2 position, string message, float size, Color textColour, SpriteFont font, float lifetime, Vector2 movementVector)
         {
+            Vector2 rng = new(Game.Instance.RNG.Next(-8, 9), Game.Instance.RNG.Next(-4, 5));
+            this.position = position + rng;
+
             this.movementVector = movementVector;
             this.lifetime = lifetime;
             opacity = 1;

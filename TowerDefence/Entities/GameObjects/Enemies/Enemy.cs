@@ -31,9 +31,9 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D frame = frames.GetFrame(dir);
-            Texture2D demo = AssetStreamer.AssetContainer.ReadTexture("");
+            //Texture2D demo = AssetStreamer.AssetContainer.ReadTexture("");
 
-            demo.Draw(position * Game.TileSize + drawOffset, spriteBatch, Color.White);
+            //demo.Draw(position * Game.TileSize + drawOffset, spriteBatch, Color.White);
             frame.Draw(absolutePosition, spriteBatch, Color.White);
         }
 

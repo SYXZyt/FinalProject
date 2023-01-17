@@ -77,6 +77,9 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
                 MovePosition();
 
+                List<int> moves = new();
+                bool dontMove = false;
+
                 //Check the next direction
                 //Most of this code is fairly repetitive. If you understand one case, you will understand the rest
                 switch (dir)
@@ -88,35 +91,33 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                             if (position.Y < 1)
                             {
                                 markForDeletion = true;
+                                dontMove = true;
                                 break;
                             }
 
-                            //Check for blockage
-                            if (mapData[(int)(position.Y - 1), (int)position.X] != 1)
+                            //Check for HQ
+                            if (mapData[(int)(position.Y - 1), (int)position.X] == 15)
                             {
-                                //Check for HQ
-                                if (mapData[(int)(position.Y - 1), (int)position.X] == 15)
-                                {
-                                    markForDeletion = true;
-                                    Game.Instance.DamagePlayer(data.damage);
-                                    break;
-                                }
+                                markForDeletion = true;
+                                Game.Instance.DamagePlayer(data.damage);
+                                dontMove = true;
+                                break;
+                            }
 
-                                //Check the left
-                                if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
-                                {
-                                    dir = 3;
-                                }
-                                //Check the right
-                                else if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
-                                {
-                                    dir = 1;
-                                }
-                                //Remember that we cannot travel backwards
-                                else
-                                {
-                                    throw new Exception("entity got stuck");
-                                }
+                            //Check the up
+                            if (mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                            {
+                                moves.Add(0);
+                            }
+                            //Check the left
+                            if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                            {
+                                moves.Add(3);
+                            }
+                            //Check the right
+                            if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                            {
+                                moves.Add(1);
                             }
                         }
                         break;
@@ -125,33 +126,33 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                             if (position.X > 47)
                             {
                                 markForDeletion = true;
+                                dontMove = true;
                                 break;
                             }
 
-                            if (mapData[(int)position.Y, (int)(position.X + 1)] != 1)
+                            //Check for HQ
+                            if (mapData[(int)position.Y, (int)(position.X + 1)] == 15)
                             {
-                                //Check for HQ
-                                if (mapData[(int)position.Y, (int)(position.X + 1)] == 15)
-                                {
-                                    markForDeletion = true;
-                                    Game.Instance.DamagePlayer(data.damage);
-                                    break;
-                                }
+                                markForDeletion = true;
+                                Game.Instance.DamagePlayer(data.damage);
+                                dontMove = true;
+                                break;
+                            }
 
-                                //Check up
-                                if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
-                                {
-                                    dir = 0;
-                                }
-                                //Check down
-                                else if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
-                                {
-                                    dir = 2;
-                                }
-                                else
-                                {
-                                    throw new Exception("entity got stuck");
-                                }
+                            //Check right
+                            if (mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                            {
+                                moves.Add(1);
+                            }
+                            //Check up
+                            if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                            {
+                                moves.Add(0);
+                            }
+                            //Check down
+                            if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                            {
+                                moves.Add(2);
                             }
                         }
                         break;
@@ -160,33 +161,33 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                             if (position.Y > 41)
                             {
                                 markForDeletion = true;
+                                dontMove = true;
                                 break;
                             }
 
-                            if (mapData[(int)(position.Y + 1), (int)position.X] != 1)
+                            //Check for HQ
+                            if (mapData[(int)(position.Y + 1), (int)position.X] == 15)
                             {
-                                //Check for HQ
-                                if(mapData[(int)(position.Y + 1), (int)position.X] == 15)
-                                {
-                                    markForDeletion = true;
-                                    Game.Instance.DamagePlayer(data.damage);
-                                    break;
-                                }
+                                markForDeletion = true;
+                                Game.Instance.DamagePlayer(data.damage);
+                                dontMove = true;
+                                break;
+                            }
 
-                                //Check left
-                                if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
-                                {
-                                    dir = 3;
-                                }
-                                //Check right
-                                else if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
-                                {
-                                    dir = 1;
-                                }
-                                else
-                                {
-                                    throw new Exception("entity got stuck");
-                                }
+                            //Check down
+                            if (mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                            {
+                                moves.Add(2);
+                            }
+                            //Check left
+                            if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                            {
+                                moves.Add(3);
+                            }
+                            //Check right
+                            if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
+                            {
+                                moves.Add(1);
                             }
                         }
                         break;
@@ -195,36 +196,42 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                             if (position.X < 1)
                             {
                                 markForDeletion = true;
+                                dontMove = true;
                                 break;
                             }
 
-                            if (mapData[(int)position.Y, (int)(position.X - 1)] != 1)
+                            //Check for HQ
+                            if (mapData[(int)position.Y, (int)(position.X - 1)] == 15)
                             {
-                                //Check for HQ
-                                if (mapData[(int)position.Y, (int)(position.X - 1)] == 15)
-                                {
-                                    markForDeletion = true;
-                                    Game.Instance.DamagePlayer(data.damage);
-                                    break;
-                                }
+                                markForDeletion = true;
+                                Game.Instance.DamagePlayer(data.damage);
+                                dontMove = true;
+                                break;
+                            }
 
-                                //Check up
-                                if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
-                                {
-                                    dir = 0;
-                                }
-                                //Check down
-                                else if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
-                                {
-                                    dir = 2;
-                                }
-                                else
-                                {
-                                    throw new Exception("entity got stuck");
-                                }
+                            //Check right
+                            if (mapData[(int)position.Y, (int)(position.X - 1)] == 1)
+                            {
+                                moves.Add(3);
+                            }
+                            //Check up
+                            if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
+                            {
+                                moves.Add(0);
+                            }
+                            //Check down
+                            if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
+                            {
+                                moves.Add(2);
                             }
                         }
                         break;
+                }
+
+                if (!dontMove)
+                {
+                    if (moves.Count == 0) throw new("Entity stuck");
+                    dir = moves[Game.Instance.RNG.Next(0, moves.Count)];
                 }
             }
 

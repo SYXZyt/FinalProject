@@ -63,6 +63,11 @@
         /// <summary>
         /// Requests the server if a lobby has been found. There is a slight server bug where the client isn't informed they have found a game, so ping the server with this to force an update
         /// </summary>
-        public const char HAS_LOBBY                     = (char)0xab;
+        public const char HAS_LOBBY                     = (char)0x0b;
+
+        /// <summary>
+        /// Tell the server that the client is ready for the round to begin. Expects a player id of one of the players in the lobby
+        /// </summary>
+        public const char READY_FOR_WAVE                = (char)0x0c;
     }
 }

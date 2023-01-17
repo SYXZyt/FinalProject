@@ -1,12 +1,21 @@
 ﻿namespace TowerDefenceServer.ServerData
 {
+    internal enum GameState
+    {
+        IN_PROGRESS,
+        WAITING,
+    }
+
     internal sealed class Lobby : IUpdatable
     {
         private readonly Player pA;
         private readonly Player pB;
         private readonly Map map;
+        private GameState gameState;
 
         public bool IsOver { get; set; } = false;
+
+        public GameState  GameState { get => gameState; set => gameState = value; }
 
         public Player PlayerA => pA;
         public Player PlayerB => pB;
@@ -35,6 +44,7 @@
             this.pA = pA;
             this.pB = pB;
             this.map = map;
+            gameState = GameState.WAITING;
         }
     }
 }

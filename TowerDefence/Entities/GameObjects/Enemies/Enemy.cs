@@ -77,161 +77,10 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
                 MovePosition();
 
-                List<int> moves = new();
-                bool dontMove = false;
-
-                //Check the next direction
-                //Most of this code is fairly repetitive. If you understand one case, you will understand the rest
-                switch (dir)
+                List<int> moves = CheckNextDirection();
+                if (moves.Count > 0)
                 {
-                    case 0:
-                        {
-                            //If we are moving up, we need to check if there is a 1 tile above
-                            //If we are at y 0 already, then we will delete this entity
-                            if (position.Y < 1)
-                            {
-                                markForDeletion = true;
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check for HQ
-                            if (mapData[(int)(position.Y - 1), (int)position.X] == 15)
-                            {
-                                markForDeletion = true;
-                                Game.Instance.DamagePlayer(data.damage);
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check the up
-                            if (mapData[(int)(position.Y - 1), (int)position.X] == 1)
-                            {
-                                moves.Add(0);
-                            }
-                            //Check the left
-                            if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
-                            {
-                                moves.Add(3);
-                            }
-                            //Check the right
-                            if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
-                            {
-                                moves.Add(1);
-                            }
-                        }
-                        break;
-                    case 1:
-                        {
-                            if (position.X > 47)
-                            {
-                                markForDeletion = true;
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check for HQ
-                            if (mapData[(int)position.Y, (int)(position.X + 1)] == 15)
-                            {
-                                markForDeletion = true;
-                                Game.Instance.DamagePlayer(data.damage);
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check right
-                            if (mapData[(int)position.Y, (int)(position.X + 1)] == 1)
-                            {
-                                moves.Add(1);
-                            }
-                            //Check up
-                            if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
-                            {
-                                moves.Add(0);
-                            }
-                            //Check down
-                            if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
-                            {
-                                moves.Add(2);
-                            }
-                        }
-                        break;
-                    case 2:
-                        {
-                            if (position.Y > 41)
-                            {
-                                markForDeletion = true;
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check for HQ
-                            if (mapData[(int)(position.Y + 1), (int)position.X] == 15)
-                            {
-                                markForDeletion = true;
-                                Game.Instance.DamagePlayer(data.damage);
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check down
-                            if (mapData[(int)(position.Y + 1), (int)position.X] == 1)
-                            {
-                                moves.Add(2);
-                            }
-                            //Check left
-                            if (position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1)
-                            {
-                                moves.Add(3);
-                            }
-                            //Check right
-                            if (position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1)
-                            {
-                                moves.Add(1);
-                            }
-                        }
-                        break;
-                    case 3:
-                        {
-                            if (position.X < 1)
-                            {
-                                markForDeletion = true;
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check for HQ
-                            if (mapData[(int)position.Y, (int)(position.X - 1)] == 15)
-                            {
-                                markForDeletion = true;
-                                Game.Instance.DamagePlayer(data.damage);
-                                dontMove = true;
-                                break;
-                            }
-
-                            //Check right
-                            if (mapData[(int)position.Y, (int)(position.X - 1)] == 1)
-                            {
-                                moves.Add(3);
-                            }
-                            //Check up
-                            if (position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1)
-                            {
-                                moves.Add(0);
-                            }
-                            //Check down
-                            if (position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1)
-                            {
-                                moves.Add(2);
-                            }
-                        }
-                        break;
-                }
-
-                if (!dontMove)
-                {
-                    if (moves.Count == 0) throw new("Entity stuck");
-                    dir = moves[Game.Instance.RNG.Next(0, moves.Count)];
+                    dir = moves[Game.Instance.RNG.Next(moves.Count)];
                 }
             }
 
@@ -243,6 +92,76 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 checkForPosMovement = true;
             }
         }
+
+        private List<int> CheckNextDirection()
+        {
+            List<int> moves = new List<int>();
+            //Check for out of bounds
+            if (IsOutOfBounds())
+            {
+                markForDeletion = true;
+                return moves;
+            }
+
+            //Check for HQ
+            if (IsHeadquarters())
+            {
+                markForDeletion = true;
+                Game.Instance.DamagePlayer(data.damage);
+                return moves;
+            }
+
+            //Check the up
+            if (dir != 2 && IsNotBlocked(0))
+            {
+                moves.Add(0);
+            }
+            //Check the right
+            if (dir != 3 && IsNotBlocked(1))
+            {
+                moves.Add(1);
+            }
+            //Check the down
+            if (dir != 0 && IsNotBlocked(2))
+            {
+                moves.Add(2);
+            }
+            //Check the left
+            if (dir != 1 && IsNotBlocked(3))
+            {
+                moves.Add(3);
+            }
+            return moves;
+        }
+
+        private bool IsOutOfBounds() =>
+            dir switch
+            {
+                0 => position.Y < 1,
+                1 => position.X > 47,
+                2 => position.Y > 41,
+                3 => position.X < 1,
+                _ => false,
+            };
+        private bool IsHeadquarters() =>
+            dir switch
+            {
+                0 => mapData[(int)(position.Y - 1), (int)position.X] == 15,
+                1 => mapData[(int)position.Y, (int)(position.X + 1)] == 15,
+                2 => mapData[(int)(position.Y + 1), (int)position.X] == 15,
+                3 => mapData[(int)position.Y, (int)(position.X - 1)] == 15,
+                _ => false,
+            };
+
+        private bool IsNotBlocked(int direction) =>
+            direction switch
+            {
+                0 => position.Y > 1 && mapData[(int)(position.Y - 1), (int)position.X] == 1,
+                1 => position.X < 47 && mapData[(int)position.Y, (int)(position.X + 1)] == 1,
+                2 => position.Y < 41 && mapData[(int)(position.Y + 1), (int)position.X] == 1,
+                3 => position.X > 1 && mapData[(int)position.Y, (int)(position.X - 1)] == 1,
+                _ => false,
+            };
 
         public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, Animation textures)
         {

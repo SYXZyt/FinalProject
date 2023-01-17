@@ -108,6 +108,8 @@ namespace TowerDefence.Scenes
 
         public static Game Instance { get; private set; }
 
+        public List<Entity> Entities => entities;
+
         public Random RNG => rng;
 
         /// <summary>
@@ -123,34 +125,44 @@ namespace TowerDefence.Scenes
             vignetteOpac = 1.0f;
         }
 
-        private Texture2D CreateCircleText(int diameter, Color colour)
+        private static Texture2D CreateCircleTexture(int radius, Color color)
         {
-            Texture2D texture = new(GraphicsDevice, diameter, diameter);
-            Color[] colorData = new Color[diameter * diameter];
+            // Create a new texture with the same width and height as the radius
+            Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
 
-            float radius = diameter / 2f;
-            float radiusSq = radius * radius;
+            // Create an array to hold the texture color data
+            Color[] colorData = new Color[radius * radius];
 
-            for (int x = 0; x < diameter; x++)
+            // Set the center of the circle
+            Vector2 center = new(radius / 2f, radius / 2f);
+
+            // Fill the color data array with the circle color
+            for (int x = 0; x < radius; x++)
             {
-                for (int y = 0; y < diameter; y++)
+                for (int y = 0; y < radius; y++)
                 {
-                    int index = x * diameter + y;
-                    Vector2 pos = new(x - radius, y - radius);
-                    if (pos.LengthSquared() <= radiusSq)
+                    // Calculate the distance between the current pixel and the center of the circle
+                    float distance = Vector2.Distance(center, new Vector2(x, y));
+
+                    // If the distance is less than or equal to the radius, color the pixel
+                    if (distance <= radius / 2f)
                     {
-                        colorData[index] = colour;
+                        colorData[x + y * radius] = color;
                     }
                     else
                     {
-                        colorData[index] = Color.Transparent;
+                        colorData[x + y * radius] = Color.Transparent;
                     }
                 }
             }
 
-            texture.SetData(colorData);
-            return texture;
+            // Set the color data on the texture
+            circleTexture.SetData(colorData);
+
+            // Return the generated texture
+            return circleTexture;
         }
+
 
         /// <summary>
         /// Update the game based on the current state
@@ -680,7 +692,7 @@ namespace TowerDefence.Scenes
                     {
                         TowerData data = Tower.towerDatas[towers.GetActiveIndex()];
 
-                        Texture2D range = CreateCircleText(data.range, canPlace ? Color.White : Color.Red);
+                        Texture2D range = CreateCircleTexture(data.range, canPlace ? Color.White : Color.Red);
                         range.Draw(new Vector2(tmx - range.Width / 2 + TileSize / 2, tmy - range.Height / 2 + TileSize / 2), spriteBatch, Color.White * 0.2f);
                     }
                 }

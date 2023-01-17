@@ -37,6 +37,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             frame.Draw(absolutePosition, spriteBatch, Color.White);
         }
 
+        public Vector2 GetScreenPosition() => absolutePosition;
+
         public override byte GetID() => data.id;
 
         public override string Serialise() => $"|1,{absolutePosition.X - drawOffset.X},{absolutePosition.Y - drawOffset.Y},{dir},{data.id}";

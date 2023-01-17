@@ -267,6 +267,8 @@ namespace TowerDefence.Scenes
         /// <param name="message">The message to process</param>
         private void ProcessServerMessage(string message)
         {
+            if (message == string.Empty) return;
+
             //Read the header of the server and deal with it
             byte header = (byte)message[0];
             message = message[1..];

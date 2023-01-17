@@ -193,12 +193,11 @@ namespace TowerDefence.Scenes
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            progressBar.Draw(spriteBatch);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
-
+            progressBar.Draw(spriteBatch);
         }
 
         public override void LoadContent()
@@ -315,6 +314,9 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnit_0_2"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnit_0_3"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\vig.png", "sVignette"));
+
+            //Load loading texture
+            for (int i = 0; i < 8; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @$"Assets\Textures\load_{i}.png", $"sLoad_{i}"));
 
             //Load the map textures
             for (int i = 0; i < 29; i++)

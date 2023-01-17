@@ -2,8 +2,11 @@
 using AssetStreamer;
 using UILibrary.Scenes;
 using TowerDefencePackets;
+using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Scenes
 {
@@ -12,11 +15,15 @@ namespace TowerDefence.Scenes
         private Texture2D bkg;
         private Label searchingLabel;
         private ulong tick;
+        private Animation searchAnim;
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
             searchingLabel.DrawWithShadow(spriteBatch);
+
+            Texture2D activeFrame = searchAnim.GetActiveFrame();
+            activeFrame.Draw(new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2 - activeFrame.Width / 2, 330), spriteBatch, Color.White);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
@@ -33,6 +40,10 @@ namespace TowerDefence.Scenes
 
             Client.Instance.SendMessage($"{Header.REQUEST_LOBBY}{Client.Instance.PlayerID}");
             tick = 0;
+
+            TextureCollection textures = new();
+            for (int i = 0; i < 8; i++) textures.AddTexture(AssetContainer.ReadTexture($"sLoad_{i}"));
+            searchAnim = new(textures, 3, AnimationPlayType.LOOP);
         }
 
         public override void UnloadContent()
@@ -42,6 +53,8 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            searchAnim.Update(gameTime);
+
             //Check if we have a newest message
             if (Client.Instance.MessageCount > 0)
             {

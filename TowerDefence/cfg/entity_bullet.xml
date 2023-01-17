@@ -2,5 +2,5 @@
 <entity>
   <entity_id>1</entity_id>
   <cfg_texture>sBullet</cfg_texture>
-  <cfg_speed>186</cfg_speed>
+  <cfg_speed>600</cfg_speed>
 </entity>

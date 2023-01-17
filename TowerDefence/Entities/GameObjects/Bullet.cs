@@ -8,7 +8,7 @@ namespace TowerDefence.Entities.GameObjects
 {
     internal class Bullet : Entity
     {
-        private readonly ushort direction;
+        private readonly double direction;
         private readonly Texture2D texture;
 
         public static float BulletSpeed = 3f;
@@ -29,20 +29,24 @@ namespace TowerDefence.Entities.GameObjects
 
         public override void Update(GameTime gameTime)
         {
-            float d = direction;
-            float x = position.X;
-            float y = position.Y;
+            double d = direction;
+            float x = position.X + texture.Width / 2;
+            float y = position.Y + texture.Width / 2;
 
-            y -= (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Cos(d * Math.PI / 180f));
-            x += (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Sin(d * Math.PI / 180f));
+            y -= (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Cos(d));
+            x += (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Sin(d));
 
             position = new(x, y);
         }
 
-        public override void Draw(SpriteBatch spriteBatch) => texture.Draw(position, spriteBatch, Color.White);
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Vector2 offset = new(texture.Width / 2, texture.Height / 2);
+            texture.Draw(position + offset, spriteBatch, Color.White);
+        }
 
         [SuppressMessage("Style", "IDE0002")]
-        public Bullet(Vector2 position, ushort direction) : base()
+        public Bullet(Vector2 position, double direction) : base()
         {
             base.position = position;
             base.textures = new();

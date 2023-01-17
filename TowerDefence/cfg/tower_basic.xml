@@ -6,5 +6,5 @@
   <cost>150</cost>
   <texture_idle>tower_basic</texture_idle>
   <texture_button>map_0</texture_button>
-  <rate>50</rate>
+  <rate>0.5</rate>
 </tower>

@@ -14,12 +14,14 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public static Dictionary<string, EnemyData> enemyDatas = new();
         public static byte[,] mapData;
 
+        private int health;
         private bool checkForPosMovement = false;
         private readonly Animation frames;
         private readonly EnemyData data;
         private readonly Vector2 drawOffset;
         private Vector2 absolutePosition;
         private int dir; //0 - up, 1 - right, 2 - down, 3 - left,
+        private bool damagedThisFrame = false;
 
         private float elapsedTime;
 
@@ -28,12 +30,18 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             throw new NotImplementedException();
         }
 
+        public void Damage()
+        {
+            if (!damagedThisFrame)
+            {
+                health--;
+                damagedThisFrame = true;
+            }
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D frame = frames.GetFrame(dir);
-            //Texture2D demo = AssetStreamer.AssetContainer.ReadTexture("");
-
-            //demo.Draw(position * Game.TileSize + drawOffset, spriteBatch, Color.White);
             frame.Draw(absolutePosition, spriteBatch, Color.White);
         }
 
@@ -73,6 +81,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override void Update(GameTime gameTime)
         {
+            if (health <= 0) markForDeletion = true;
+
             if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0 && checkForPosMovement)
             {
                 checkForPosMovement = false;
@@ -93,11 +103,14 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 elapsedTime = 0;
                 checkForPosMovement = true;
             }
+
+            damagedThisFrame = false;
         }
 
         private List<int> CheckNextDirection()
         {
-            List<int> moves = new List<int>();
+            List<int> moves = new();
+
             //Check for out of bounds
             if (IsOutOfBounds())
             {
@@ -176,6 +189,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             frames.SetFreeze(true);
             elapsedTime = 0;
             checkForPosMovement = false;
+            health = data.health;
         }
     }
 }

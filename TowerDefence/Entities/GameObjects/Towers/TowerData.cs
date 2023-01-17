@@ -8,6 +8,6 @@
         public ushort cost;
         public string texIdle;
         public string texButton;
-        public ushort rate;
+        public float rate;
     }
 }

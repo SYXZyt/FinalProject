@@ -112,7 +112,7 @@ namespace TowerDefence.Scenes
                 towerData.texButton = textureButton.InnerText;
 
                 XmlNode towerRate = xml.SelectSingleNode("/tower/rate");
-                towerData.rate = Convert.ToUInt16(towerRate.InnerText);
+                towerData.rate = (float)Convert.ToDouble(towerRate.InnerText);
 
                 return towerData;
             }

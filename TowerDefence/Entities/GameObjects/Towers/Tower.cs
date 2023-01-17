@@ -11,16 +11,18 @@ namespace TowerDefence.Entities.GameObjects.Towers
 {
     internal sealed class Tower : Entity
     {
-        private float rotation;
+        private double rotation;
         private TowerData data;
         private readonly AnimationCollection anim;
         private readonly Vector2 drawOffset;
+
+        private float elapsedTime;
 
         private readonly List<(Enemy enemyObj, float dist)> enemiesInRange;
 
         public static Dictionary<int, TowerData> towerDatas;
 
-        public float Rotation => rotation;
+        public double Rotation => rotation;
         public TowerData Data => data;
 
         public override Entity Deserialise(string serialised)
@@ -31,8 +33,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D texture = anim.GetCurrentTexture;
-            Vector2 originOff = new(8);
-            spriteBatch.Draw(texture, position + drawOffset + originOff, null, Color.White, rotation, new(8, 8), Vector2.One, SpriteEffects.None, 0f);
+            Vector2 originOffset = new(8);
+            spriteBatch.Draw(texture, position + drawOffset + originOffset, null, Color.White, (float)rotation, originOffset, Vector2.One, SpriteEffects.None, 0f);
         }
 
         public override byte GetID() => data.id;
@@ -66,16 +68,32 @@ namespace TowerDefence.Entities.GameObjects.Towers
             if (enemiesInRange.Count > 0)
             {
                 Enemy closest = enemiesInRange.OrderBy(x => x.dist).ToArray()[0].enemyObj;
-                float x1 = position.X + drawOffset.X;
-                float y1 = position.Y + drawOffset.Y;
 
-                float x2 = closest.GetScreenPosition().X + 8;
-                float y2 = closest.GetScreenPosition().Y + 8;
+                //Calculate positions and stuff
+                Vector2 originOffset = new(8);
+                Vector2 towerPos = position + drawOffset + originOffset;
+                Vector2 enemyPos = closest.GetScreenPosition() + originOffset;
 
-                float radAng = (float)Math.Atan2(y1 - y2, x1 - x2);
-                rotation = radAng - 90f; //Adjust the offset since 0 degrees in radians would be east
+                Vector2 v = Vector2.Normalize(enemyPos - towerPos);
+                double angle = Math.Acos(Vector2.Dot(v, Vector2.UnitY));
+                if (towerPos.X < enemyPos.X) angle = -angle;
+                angle += MathHelper.Pi; //The tower has a 180 degree offset so we need to offset it by PI (PI = 180 degrees in radians)
+
+                rotation = angle;
+
+                //Fire at enemy
+                if (elapsedTime * data.rate >= 1)
+                {
+                    //Bullets use degrees where as the tower uses radians, so we need to convert
+                    Bullet bullet = new(position + drawOffset, rotation);
+                    Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
+                    elapsedTime = 0;
+                }
             }
+
+            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
+
 
         public Tower(int id, Vector2 position, Animation idleAnim, Vector2 drawOffset)
         {
@@ -90,6 +108,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
             if (!towerDatas.ContainsKey(id)) throw new($"No tower called with id {id} found");
             data = towerDatas[id];
             this.drawOffset = drawOffset;
+            elapsedTime = 0;
         }
 
         static Tower()

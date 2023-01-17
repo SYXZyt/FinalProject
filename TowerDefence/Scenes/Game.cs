@@ -110,6 +110,10 @@ namespace TowerDefence.Scenes
 
         public List<Entity> Entities => entities;
 
+        private Stack<Entity> entityBuffer = new();
+
+        public void AddEntity(Entity entity) => entityBuffer.Push(entity);
+
         public Random RNG => rng;
 
         /// <summary>
@@ -1010,6 +1014,8 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
+
             HandleServer();
             SendSnapShot();
             CheckForTowerPlacement();

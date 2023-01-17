@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <tower>
-  <tower_id>999</tower_id>
+  <tower_id>255</tower_id>
   <tower_name>Debug Tower</tower_name>
   <range>200</range>
   <cost>1</cost>

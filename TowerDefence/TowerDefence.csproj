@@ -224,7 +224,7 @@
     <None Update="Assets\Textures\towerSelectionUnclicked.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Textures\tower\tower_0.png">
+    <None Update="Assets\Textures\towers\tower_0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\units\dev_0.png">

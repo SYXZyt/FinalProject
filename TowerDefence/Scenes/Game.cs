@@ -1062,7 +1062,7 @@ namespace TowerDefence.Scenes
                 }
             }
 
-            if (!Tower.towerDatas.ContainsKey(towers.GetActiveIndex()))
+            if (!Tower.towerDatas.ContainsKey(towers.GetActiveIndex()) && gameState == GameState.PLACEMENT && towers.GetActiveIndex() != -1)
             {
                 int selectedTower = towers.GetActiveIndex();
                 this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);

@@ -315,7 +315,7 @@ namespace TowerDefence.Scenes
                             {
                                 if (!int.TryParse(csvData[1], out int x)) x = 0;
                                 if (!int.TryParse(csvData[2], out int y)) y = 0;
-                                if (!int.TryParse(csvData[3], out int rot)) rot = 0;
+                                if (!float.TryParse(csvData[3], out float rot)) rot = 0;
                                 if (!int.TryParse(csvData[4], out int id)) id = 0;
                                 enemyTowers.Add(new() { x = x, y = y, rot = rot, id = id });
                             }
@@ -570,8 +570,9 @@ namespace TowerDefence.Scenes
             {
                 Texture2D texture = AssetContainer.ReadTexture(Tower.towerDatas[towerData.id].texIdle);
 
+                Vector2 originOffset = new(8, 8);
                 Vector2 pos = new(towerData.x, towerData.y);
-                texture.Draw(pos + enemyPlayFieldOffset, spriteBatch, Color.White);
+                spriteBatch.Draw(texture, pos, null, Color.White, towerData.rot, originOffset, Vector2.One, SpriteEffects.None, 0f);
             }
         }
 

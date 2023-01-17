@@ -4,7 +4,7 @@
     {
         public int x;
         public int y;
-        public int rot;
+        public float rot;
         public int id;
     }
 }

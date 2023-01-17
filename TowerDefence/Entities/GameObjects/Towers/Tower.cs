@@ -20,7 +20,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public static Dictionary<int, TowerData> towerDatas;
 
-        public int Rotation => (int)rotation;
+        public float Rotation => rotation;
         public TowerData Data => data;
 
         public override Entity Deserialise(string serialised)
@@ -47,8 +47,6 @@ namespace TowerDefence.Entities.GameObjects.Towers
             //Loop over every enemy and check if any are within range
             Enemy[] allEnemies = Game.Instance.Entities.OfType<Enemy>().ToArray();
             enemiesInRange.Clear();
-
-            Console.WriteLine(enemiesInRange.Count);
 
             foreach (Enemy e in allEnemies)
             {

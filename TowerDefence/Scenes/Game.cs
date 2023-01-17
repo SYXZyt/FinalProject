@@ -572,7 +572,7 @@ namespace TowerDefence.Scenes
 
                 Vector2 originOffset = new(8, 8);
                 Vector2 pos = new(towerData.x, towerData.y);
-                spriteBatch.Draw(texture, pos, null, Color.White, towerData.rot, originOffset, Vector2.One, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, pos + originOffset + enemyPlayFieldOffset, null, Color.White, towerData.rot, originOffset, Vector2.One, SpriteEffects.None, 0f);
             }
         }
 

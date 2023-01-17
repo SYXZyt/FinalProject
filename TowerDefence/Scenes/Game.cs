@@ -39,7 +39,6 @@ namespace TowerDefence.Scenes
 
         private const int TowerCount = 10;
         private SwitchArray towers;
-        private readonly string[] towerNames = new string[TowerCount] { "Debug Tower", "", "", "", "", "", "", "", "", "" };
         private readonly string[] unitNames = new string[1] { "Debug Unit" };
 
         private ImageTextButton resumeButton;
@@ -516,7 +515,7 @@ namespace TowerDefence.Scenes
                     }
                 }
 
-                if (vMoney < Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost)
+                if (vMoney < Tower.towerDatas[towers.GetActiveIndex()].cost)
                 {
                     Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), AssetContainer.ReadString("POPUP_POOR"), 1f, GlobalSettings.TextWarning, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
                     entities.Add(popup);
@@ -530,13 +529,13 @@ namespace TowerDefence.Scenes
                 else //Tower placement is okay
                 {
                     //Remove the money from the user
-                    vMoney -= Tower.towerDatas[towerNames[towers.GetActiveIndex()]].cost;
+                    vMoney -= Tower.towerDatas[towers.GetActiveIndex()].cost;
 
                     //Create the tower object and add it to the entities
                     TextureCollection textures = new();
-                    textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towerNames[towers.GetActiveIndex()]].texIdle));
+                    textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towers.GetActiveIndex()].texIdle));
                     Animation anim = new(textures, 0);
-                    Tower tower = new(towerNames[towers.GetActiveIndex()], new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset);
+                    Tower tower = new(towers.GetActiveIndex(), new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset);
                     entities.Add(tower);
 
                     towers.Clear();
@@ -557,8 +556,7 @@ namespace TowerDefence.Scenes
         {
             foreach (ServerTowerData towerData in enemyTowers)
             {
-                string towerName = towerNames[towerData.id];
-                Texture2D texture = AssetContainer.ReadTexture(Tower.towerDatas[towerName].texIdle);
+                Texture2D texture = AssetContainer.ReadTexture(Tower.towerDatas[towerData.id].texIdle);
 
                 Vector2 pos = new(towerData.x, towerData.y);
                 texture.Draw(pos + enemyPlayFieldOffset, spriteBatch, Color.White);
@@ -585,10 +583,9 @@ namespace TowerDefence.Scenes
         {
             for (int i = 0; i < TowerCount; i++)
             {
-                string towerName = towerNames[i];
-                if (towerName == string.Empty) continue;
+                if (!Tower.towerDatas.ContainsKey(i)) continue;
 
-                TowerData towerData = Tower.towerDatas[towerName];
+                TowerData towerData = Tower.towerDatas[i];
                 Texture2D texture = AssetContainer.ReadTexture(towerData.texButton);
 
                 Switch swtch = towers[0];
@@ -681,7 +678,7 @@ namespace TowerDefence.Scenes
                     //If we are placing a tower, draw the range
                     if (gameState == GameState.PLACEMENT)
                     {
-                        TowerData data = Tower.towerDatas[towerNames[towers.GetActiveIndex()]];
+                        TowerData data = Tower.towerDatas[towers.GetActiveIndex()];
 
                         Texture2D range = CreateCircleText(data.range, canPlace ? Color.White : Color.Red);
                         range.Draw(new Vector2(tmx - range.Width / 2 + TileSize / 2, tmy - range.Height / 2 + TileSize / 2), spriteBatch, Color.White * 0.2f);
@@ -1065,8 +1062,11 @@ namespace TowerDefence.Scenes
                 }
             }
 
-            string selectedTower = towers.GetActiveIndex() == -1 ? string.Empty : towerNames[towers.GetActiveIndex()];
-            this.selectedTower.SetLabelText(selectedTower);
+            if (!Tower.towerDatas.ContainsKey(towers.GetActiveIndex()))
+            {
+                int selectedTower = towers.GetActiveIndex();
+                this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);
+            }
 
             foreach (Entity e in entities) e.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);

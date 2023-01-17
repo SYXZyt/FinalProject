@@ -12,7 +12,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
         private readonly AnimationCollection anim;
         private readonly Vector2 drawOffset;
 
-        public static Dictionary<string, TowerData> towerDatas;
+        public static Dictionary<int, TowerData> towerDatas;
 
         public int Rotation => rotation;
         public TowerData Data => data;
@@ -40,7 +40,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
             //Loop over every enemy and check if any are within range
         }
 
-        public Tower(string name, Vector2 position, Animation idleAnim, Vector2 drawOffset)
+        public Tower(int id, Vector2 position, Animation idleAnim, Vector2 drawOffset)
         {
             rotation = 0;
             this.position = position;
@@ -49,8 +49,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
             anim.AddAnimation("state_idle", idleAnim);
             anim.SetCurrentAnimation("state_idle");
 
-            if (!towerDatas.ContainsKey(name)) throw new($"No tower called '{name}' found");
-            data = towerDatas[name];
+            if (!towerDatas.ContainsKey(id)) throw new($"No tower called with id {id} found");
+            data = towerDatas[id];
             this.drawOffset = drawOffset;
         }
 

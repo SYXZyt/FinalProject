@@ -1,0 +1,10 @@
+﻿0: Basic Cannon
+1: Double Cannon
+2: Mini-Gun
+3: Super Gun
+4: Flamethrower
+5: Rocket Launcher
+6: Sniper
+7: Nuke
+8: Super Sniper
+9: Crusher

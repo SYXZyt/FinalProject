@@ -177,7 +177,10 @@ namespace TowerDefence.Scenes
                 LoadColours();
                 
                 TowerData debugTower = LoadTower(@"cfg\tower_dev.xml");
-                Tower.towerDatas.Add(debugTower.name, debugTower);
+                Tower.towerDatas.Add(debugTower.id, debugTower);
+
+                TowerData basicTower = LoadTower(@"cfg\tower_basic.xml");
+                Tower.towerDatas.Add(basicTower.id, basicTower);
 
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
@@ -227,6 +230,7 @@ namespace TowerDefence.Scenes
             SceneManager.Instance.graphics.ApplyChanges();
             LoadSettings();
 
+            //Load the hard-coded unknown texture
             byte[] texture = Properties.Resources.unknown;
             using (var stream = new MemoryStream(texture))
             {
@@ -314,6 +318,7 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnit_0_2"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnit_0_3"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\vig.png", "sVignette"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_0.png", "tower_basic"));
 
             //Load loading texture
             for (int i = 0; i < 8; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @$"Assets\Textures\load_{i}.png", $"sLoad_{i}"));

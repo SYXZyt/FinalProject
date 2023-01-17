@@ -31,12 +31,11 @@ namespace TowerDefence.Visuals
             //Check if we should update the animation
             if (frame == -1 || freeze) return; //If the animation has already ended, we don't need to do anything
 
-            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             //Check if we need to update the frame
-            while (elapsedTime >= animationSpeed)
-            { 
-                elapsedTime -= animationSpeed;
+            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (elapsedTime * animationSpeed >= 1)
+            {
+                elapsedTime = 0;
                 frame++;
             }
 

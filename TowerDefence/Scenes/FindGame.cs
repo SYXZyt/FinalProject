@@ -43,7 +43,7 @@ namespace TowerDefence.Scenes
 
             TextureCollection textures = new();
             for (int i = 0; i < 8; i++) textures.AddTexture(AssetContainer.ReadTexture($"sLoad_{i}"));
-            searchAnim = new(textures, 3, AnimationPlayType.LOOP);
+            searchAnim = new(textures, 7, AnimationPlayType.LOOP);
         }
 
         public override void UnloadContent()

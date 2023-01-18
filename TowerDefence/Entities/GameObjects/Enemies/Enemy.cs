@@ -63,6 +63,9 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             };
 
             absolutePosition += vec;
+            Vector2 hitBoxPos = (Vector2)aabb;
+
+            aabb.Move(hitBoxPos + vec);
         }
 
         private void MovePosition()
@@ -190,6 +193,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             elapsedTime = 0;
             checkForPosMovement = false;
             health = data.health;
+            aabb = new((short)screenPosition.X, (short)screenPosition.Y, 16, 16);
         }
     }
 }

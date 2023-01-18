@@ -44,6 +44,7 @@ namespace TowerDefence.Scenes
         private ImageTextButton resumeButton;
         private ImageTextButton disconnectButton;
 
+        private Texture2D platformTexture;
         private Texture2D divider;
         private Texture2D menuFilter;
         private Texture2D statPanel;
@@ -110,7 +111,7 @@ namespace TowerDefence.Scenes
 
         public List<Entity> Entities => entities;
 
-        private Stack<Entity> entityBuffer = new();
+        private readonly Stack<Entity> entityBuffer = new();
 
         public void AddEntity(Entity entity) => entityBuffer.Push(entity);
 
@@ -610,6 +611,15 @@ namespace TowerDefence.Scenes
             }
         }
 
+        private void DrawTowers(SpriteBatch spriteBatch)
+        {
+            foreach (Tower t in entities.OfType<Tower>())
+            {
+                platformTexture.Draw(t.GetPosition() + playFieldOffset, spriteBatch, Color.White);
+                t.Draw(spriteBatch);
+            }
+        }
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
@@ -624,7 +634,8 @@ namespace TowerDefence.Scenes
             }
 
             UIManager.Draw(spriteBatch);
-            foreach (Entity e in entities) if (e is not Popup) e.Draw(spriteBatch);
+            foreach (Entity e in entities) if (e is not Popup and not Tower) e.Draw(spriteBatch);
+            DrawTowers(spriteBatch);
             DrawEnemyEntities(spriteBatch);
             DrawEnemyUnits(spriteBatch);
         }
@@ -752,6 +763,7 @@ namespace TowerDefence.Scenes
                 towerSelClick = AssetContainer.ReadTexture("sTowerSelClick");
                 menuFilter = AssetContainer.ReadTexture("sMenuFilter");
                 statPanel = AssetContainer.ReadTexture("sStat");
+                platformTexture = AssetContainer.ReadTexture("sPlatform");
 
                 playfieldTextures = new TextureCollection[29];
                 for (int i = 0; i < playfieldTextures.Length; i++)

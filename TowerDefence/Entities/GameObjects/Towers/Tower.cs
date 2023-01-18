@@ -54,11 +54,11 @@ namespace TowerDefence.Entities.GameObjects.Towers
             {
                 //Check if this object is within range
                 //Here we want screen coords so we need to use some offsets
-                float xDiff = position.X + drawOffset.X - (e.GetScreenPosition().X + 8);
-                float yDiff = position.Y + drawOffset.Y - (e.GetScreenPosition().Y + 8);
+                Vector2 originOffset = new(8);
+                Vector2 towerPos = position + drawOffset + originOffset;
+                Vector2 enemyPos = e.GetScreenPosition() + originOffset;
 
-                //Perform some single Pythagoras to calculate the distance
-                float dist = (float)Math.Sqrt((xDiff * xDiff) + (yDiff * yDiff));
+                float dist = Vector2.Distance(towerPos, enemyPos);
 
                 //If the object is within range, add it to the list
                 if (dist <= data.range) enemiesInRange.Add((e, dist));

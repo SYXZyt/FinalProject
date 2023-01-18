@@ -230,6 +230,9 @@
     <None Update="Assets\Textures\towers_render\tower_0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\tower_platform.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\units\dev_0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

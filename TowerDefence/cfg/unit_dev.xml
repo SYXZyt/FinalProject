@@ -3,6 +3,6 @@
   <unit_id>0</unit_id>
   <unit_name>Debug Unit</unit_name>
   <unit_speed>96</unit_speed>
-  <unit_hitpoints>3</unit_hitpoints>
+  <unit_hitpoints>1</unit_hitpoints>
   <unit_damage>1</unit_damage>
 </unit>

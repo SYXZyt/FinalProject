@@ -37,6 +37,20 @@ namespace TowerDefence.Entities.GameObjects
             x += (float)(BulletSpeed * gameTime.ElapsedGameTime.TotalSeconds * Math.Sin(d));
 
             position = new(x, y);
+
+            //Update the hitbox
+            aabb.Move(new(x, y));
+
+            //Get all enemies and check for collision
+            foreach (Enemies.Enemy e in Scenes.Game.Instance.Entities.OfType<Enemies.Enemy>())
+            {
+                if (aabb.CollisionCheck(e.AABB))
+                {
+                    e.Damage();
+                    markForDeletion = true;
+                    break;
+                }
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -53,6 +67,7 @@ namespace TowerDefence.Entities.GameObjects
 
             texture = AssetContainer.ReadTexture(TextureName);
             this.direction = direction;
+            aabb = new((short)position.X, (short)position.Y, (short)(texture.Width*1.2), (short)(texture.Height*1.2));
         }
     }
 }

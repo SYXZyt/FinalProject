@@ -18,7 +18,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         private float elapsedTime;
 
-        private readonly List<(Enemy enemyObj, float dist)> enemiesInRange;
+        private readonly List<Enemy> enemiesInRange;
 
         public static Dictionary<int, TowerData> towerDatas;
 
@@ -61,13 +61,13 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 float dist = Vector2.Distance(towerPos, enemyPos);
 
                 //If the object is within range, add it to the list
-                if (dist <= data.range) enemiesInRange.Add((e, dist));
+                if (dist <= data.range) enemiesInRange.Add(e);
             }
 
             //Now if we are have an enemy in range, we then need to get the closest and perform some trigonometry to get the angle to the object
             if (enemiesInRange.Count > 0)
             {
-                Enemy closest = enemiesInRange.OrderBy(x => x.dist).ToArray()[0].enemyObj;
+                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
 
                 //Calculate positions and stuff
                 Vector2 originOffset = new(8);

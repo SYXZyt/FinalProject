@@ -14,6 +14,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public static Dictionary<string, EnemyData> enemyDatas = new();
         public static byte[,] mapData;
 
+        private ulong distanceTravelled;
         private int health;
         private bool checkForPosMovement = false;
         private readonly Animation frames;
@@ -24,6 +25,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         private bool damagedThisFrame = false;
 
         private float elapsedTime;
+
+        public ulong TotalDistance => distanceTravelled;
 
         public override Entity Deserialise(string serialised)
         {
@@ -65,6 +68,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             absolutePosition += vec;
             Vector2 hitBoxPos = (Vector2)aabb;
 
+            distanceTravelled++;
             aabb.Move(hitBoxPos + vec);
         }
 
@@ -194,6 +198,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             checkForPosMovement = false;
             health = data.health;
             aabb = new((short)screenPosition.X, (short)screenPosition.Y, 16, 16);
+            distanceTravelled = 0;
         }
     }
 }

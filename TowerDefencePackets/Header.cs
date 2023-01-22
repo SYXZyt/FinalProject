@@ -69,5 +69,13 @@
         /// Tell the server that the client is ready for the round to begin. Expects a player id of one of the players in the lobby
         /// </summary>
         public const char READY_FOR_WAVE                = (char)0x0c;
+
+        #region Anti-cheat Stuff
+        public const char SPEND_MONEY                   = (char)0x0d;
+        public const char ADD_MONEY                     = (char)0x0e;
+        public const char TAKE_HEALTH                   = (char)0x0f;
+        public const char ADD_HEALTH                    = (char)0x10;
+        public const char SYNC                          = (char)0x11;
+        #endregion
     }
 }

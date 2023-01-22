@@ -60,8 +60,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
                 float dist = Vector2.Distance(towerPos, enemyPos);
 
-                //If the object is within range, add it to the list
-                if (dist <= data.range) enemiesInRange.Add(e);
+                //If the object is within range, add it to the list and if it is our players enemy
+                if (dist <= data.range && e.Ownership == ownership) enemiesInRange.Add(e);
             }
 
             //Now if we are have an enemy in range, we then need to get the closest and perform some trigonometry to get the angle to the object
@@ -95,7 +95,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
         }
 
 
-        public Tower(int id, Vector2 position, Animation idleAnim, Vector2 drawOffset)
+        public Tower(int id, Vector2 position, Animation idleAnim, Vector2 drawOffset, bool ownership)
         {
             rotation = 0;
             this.position = position;
@@ -109,6 +109,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
             data = towerDatas[id];
             this.drawOffset = drawOffset;
             elapsedTime = 0;
+            base.ownership = ownership;
         }
 
         static Tower()

@@ -8,8 +8,8 @@
 
     internal sealed class Lobby : IUpdatable
     {
-        private readonly Player pA;
-        private readonly Player pB;
+        private Player pA;
+        private Player pB;
         private readonly Map map;
         private GameState gameState;
 
@@ -25,6 +25,12 @@
         public void Update()
         {
 
+        }
+
+        public void UpdatePlayer(long id, Player player)
+        {
+            if (pA.playerNumber == id) pA = player;
+            else pB = player;
         }
 
         public Player GetPlayerFromID(long id)

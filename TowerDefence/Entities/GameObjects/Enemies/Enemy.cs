@@ -88,7 +88,11 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override void Update(GameTime gameTime)
         {
-            if (health <= 0) markForDeletion = true;
+            if (health <= 0)
+            {
+                Game.Instance.AddMoneyThisFrame(1);
+                markForDeletion = true;
+            }
 
             if (absolutePosition.X % Game.TileSize == 0 && absolutePosition.Y % Game.TileSize == 0 && checkForPosMovement)
             {
@@ -129,7 +133,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             if (IsHeadquarters())
             {
                 markForDeletion = true;
-                Game.Instance.DamagePlayer(data.damage);
+                Game.Instance.DamagePlayer(data.damage, ownership);
                 return moves;
             }
 
@@ -185,7 +189,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 _ => false,
             };
 
-        public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, Animation textures)
+        public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, Animation textures, bool ownership)
         {
             absolutePosition = screenPosition;
             position = gridPosition;
@@ -199,6 +203,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             health = data.health;
             aabb = new((short)screenPosition.X, (short)screenPosition.Y, 16, 16);
             distanceTravelled = 0;
+            base.ownership = ownership;
         }
     }
 }

@@ -14,12 +14,14 @@ namespace TowerDefence.Entities
         protected Vector2 position;
         protected AnimationCollection textures;
         protected bool markForDeletion;
+        protected bool ownership;
 
         public abstract byte GetID();
 
         public AnimationCollection Textures { get => textures; protected set => textures = value; }
         public bool MarkForDeletion { get => markForDeletion; set => markForDeletion = value; }
         public AABB AABB => aabb;
+        public bool Ownership => ownership;
 
         /// <summary>
         /// Get the current position of the entity

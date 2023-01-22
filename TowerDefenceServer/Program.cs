@@ -138,7 +138,7 @@ namespace TowerDefenceServer
         {
             NetDataWriter writer = new();
             writer.Put(message);
-            peer.Send(writer, deliveryMethod);
+            peer?.Send(writer, deliveryMethod);
         }
 
         /// <summary>
@@ -237,7 +237,9 @@ namespace TowerDefenceServer
                     break;
                 case (byte)Header.SNAPSHOT:
                     {
-                        Console.WriteLine($"Received Snapshot");
+                        Console.Write($"Received Snapshot ");
+
+                        Console.WriteLine(data);
                         Snapshot ss = new();
                         ss.Deserialize(data);
 
@@ -247,6 +249,9 @@ namespace TowerDefenceServer
 
                         //Pass the packet onto the other player
                         SendMessageToPeer(lobby.GetOtherPlayerFromID(ss.ID).clientRef, $"{Header.SNAPSHOT}{data}");
+
+                        //Now sync the player who sent the packet
+                        SendMessageToPeer(lobby.GetPlayerFromID(ss.ID).clientRef, $"{Header.SYNC}{lobby.GetPlayerFromID(ss.ID).GenerateSync()}");
                     }
                     break;
                 case (byte)Header.HAS_LOBBY:
@@ -281,6 +286,20 @@ namespace TowerDefenceServer
                                 SendMessageToPeer(peer, $"{Header.RECEIVE_MAP_DATA}{mapData}");
                             }
                         }
+                    }
+                    break;
+                case (byte)Header.ADD_MONEY:
+                    {
+                        string[] split = data.Split(",");
+                        long playerId = long.Parse(split[0]);
+                        ushort amountToAdd = ushort.Parse(split[1]);
+
+                        Lobby lobby = FindLobbyWithID(playerId);
+                        if (lobby is null) break;
+
+                        Player player = lobby.GetPlayerFromID(playerId);
+                        player.money += amountToAdd;
+                        lobby.UpdatePlayer(playerId, player);
                     }
                     break;
                 default:

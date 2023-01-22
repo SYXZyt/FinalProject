@@ -44,7 +44,7 @@ namespace TowerDefence.Entities.GameObjects
             //Get all enemies and check for collision
             foreach (Enemies.Enemy e in Scenes.Game.Instance.Entities.OfType<Enemies.Enemy>())
             {
-                if (aabb.CollisionCheck(e.AABB))
+                if (aabb.CollisionCheck(e.AABB) && !e.MarkForDeletion)
                 {
                     e.Damage();
                     markForDeletion = true;

@@ -23,8 +23,10 @@ namespace TowerDefence.Scenes
     {
         private readonly Random rng;
 
-        private List<Vector2> enemySpawnPositions = new();
+        private readonly Stack<ushort> moneyMadeThisFrame = new();
+        private readonly List<Vector2> enemySpawnPositions = new();
 
+        private ulong tick = 0;
         private bool isWinner = false;
         private float gameOverOpacity;
         private const float GameOverOpacitySpeed = 0.01f;
@@ -39,7 +41,6 @@ namespace TowerDefence.Scenes
 
         private const int TowerCount = 10;
         private SwitchArray towers;
-        private readonly string[] unitNames = new string[1] { "Debug Unit" };
 
         private ImageTextButton resumeButton;
         private ImageTextButton disconnectButton;
@@ -115,6 +116,8 @@ namespace TowerDefence.Scenes
 
         public void AddEntity(Entity entity) => entityBuffer.Push(entity);
 
+        public void AddMoneyThisFrame(ushort amount) => moneyMadeThisFrame.Push(amount);
+
         public Random RNG => rng;
 
         /// <summary>
@@ -122,12 +125,19 @@ namespace TowerDefence.Scenes
         /// </summary>
         public static bool IsDebugPlay { get; set; } = false;
 
-        public void DamagePlayer(int amount)
+        public void DamagePlayer(int amount, bool isPlayer)
         {
             if (gameState == GameState.END) return;
 
-            vHealth = (byte)Math.Max(0, vHealth - amount);
-            vignetteOpac = 1.0f;
+            if (isPlayer)
+            {
+                vHealth = (byte)Math.Max(0, vHealth - amount);
+                vignetteOpac = 1.0f;
+            }
+            else
+            {
+                ovHealth = (byte)Math.Max(0, ovHealth - amount);
+            }
         }
 
         private static Texture2D CreateCircleTexture(int radius, Color color)
@@ -333,6 +343,13 @@ namespace TowerDefence.Scenes
                                 enemyUnits.Add(new() { x = x, y = y, dir = dir, id = id });
                             }
                         }
+                    }
+                    break;
+                case (byte)Header.SYNC:
+                    {
+                        string[] split = message.Split(",");
+                        vMoney = ushort.Parse(split[0]);
+                        vHealth = byte.Parse(split[1]);
                     }
                     break;
                 default:
@@ -552,15 +569,17 @@ namespace TowerDefence.Scenes
                     TextureCollection textures = new();
                     textures.AddTexture(AssetContainer.ReadTexture(Tower.towerDatas[towers.GetActiveIndex()].texIdle));
                     Animation anim = new(textures, 0);
-                    Tower tower = new(towers.GetActiveIndex(), new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset);
+                    Tower tower = new(towers.GetActiveIndex(), new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset, true);
                     entities.Add(tower);
+
+                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), $"+${tower.Data.cost}", 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                    entities.Add(popup);
+
+                    Client.Instance.SendMessage($"{Header.SPEND_MONEY}{Client.Instance.PlayerID},{Tower.towerDatas[towers.GetActiveIndex()].cost}");
 
                     towers.Clear();
                     towers.Update();
                     gameState = GameState.PLAY;
-
-                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), $"+${tower.Data.cost}", 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
-                    entities.Add(popup);
                 }
             }
         }
@@ -618,6 +637,16 @@ namespace TowerDefence.Scenes
                 platformTexture.Draw(t.GetPosition() + playFieldOffset, spriteBatch, Color.White);
                 t.Draw(spriteBatch);
             }
+        }
+
+        private void AddMoneyToServer()
+        {
+            if (moneyMadeThisFrame.Count == 0) return;
+
+            ushort total = 0;
+            while (moneyMadeThisFrame.Count > 0) total += moneyMadeThisFrame.Pop();
+            Client.Instance.SendMessage($"{Header.ADD_MONEY}{Client.Instance.PlayerID},{total}");
+            vMoney += total;
         }
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -1029,7 +1058,7 @@ namespace TowerDefence.Scenes
             while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
 
             HandleServer();
-            SendSnapShot();
+            if (tick % 500 == 0) SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
 
@@ -1055,7 +1084,7 @@ namespace TowerDefence.Scenes
                 Animation animation = new(textureCollection, 0);
                 Vector2 pos = enemySpawnPositions[0];
                 Vector2 absPos = playFieldOffset + (pos * TileSize);
-                Enemy enemy = new(name, absPos, pos, playFieldOffset, animation);
+                Enemy enemy = new(name, absPos, pos, playFieldOffset, animation, true);
                 entities.Add(enemy);
             }
 
@@ -1162,6 +1191,8 @@ namespace TowerDefence.Scenes
             ProcessStateMachine();
 
             if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
+            AddMoneyToServer();
+            tick++;
         }
 
         public Game() : base()

@@ -12,6 +12,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
     {
         public static List<Vector2> HQLocations = new();
 
+        public static Dictionary<string, Animation> enemyAnims = new();
         public static Dictionary<string, EnemyData> enemyDatas = new();
         public static byte[,] mapData;
 
@@ -20,9 +21,9 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         private ulong distanceTravelled;
         private int health;
         private bool checkForPosMovement = false;
-        private readonly Animation frames;
-        private readonly EnemyData data;
-        private readonly Vector2 drawOffset;
+        private Animation frames;
+        private EnemyData data;
+        private Vector2 drawOffset;
         private Vector2 absolutePosition;
         private int dir; //0 - up, 1 - right, 2 - down, 3 - left,
         private bool damagedThisFrame = false;
@@ -31,9 +32,79 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public ulong TotalDistance => distanceTravelled;
 
+        //|1,SX,SY,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;)
+        public override string Serialise()
+        {
+            StringBuilder sb = new();
+
+            sb.Append($"|1,{absolutePosition.X - drawOffset.X},{absolutePosition.Y - drawOffset.Y},{position.X},{position.Y},{dir},{distanceTravelled},{health},{elapsedTime},{data.name},");
+
+            StringBuilder directionChanges = new();
+            List<int> directions = this.directionChanges.ToList();
+            if (directions.Count > 0)
+            {
+                for (int i = 0; i < directions.Count; i++)
+                {
+                    directionChanges.Append(directions[i]);
+                    directionChanges.Append(';');
+                }
+                sb.Append(directionChanges);
+                sb.Length--;
+            }
+            else
+            {
+                sb.Append('0');
+            }
+
+            return sb.ToString();
+        }
+
         public override Entity Deserialise(string serialised)
         {
-            throw new NotImplementedException();
+            string[] csv = serialised.Split(',');
+
+            //Acquire all of the data we need
+            int absX = int.Parse(csv[1]);
+            int absY = int.Parse(csv[2]);
+
+            int x = int.Parse(csv[3]);
+            int y = int.Parse(csv[4]);
+
+            int dir = int.Parse(csv[5]);
+
+            ulong distanceTravelled = ulong.Parse(csv[6]);
+
+            int health = int.Parse(csv[7]);
+
+            float elapsedTime = float.Parse(csv[8]);
+
+            string name = csv[9];
+
+            string[] dirChangesCsv = csv[10].Split(';');
+
+            //Write the data we have now
+            drawOffset = Game.Instance.PlayerGameOffset;
+            absolutePosition = new(absX, absY);
+
+            position = new(x, y);
+
+            this.dir = dir;
+            this.distanceTravelled = distanceTravelled;
+            this.health = health;
+            this.elapsedTime = elapsedTime;
+            data = enemyDatas[name];
+            frames = enemyAnims[name];
+
+            directionChanges = new();
+            foreach (string s in dirChangesCsv)
+            {
+                if (s == string.Empty) continue;
+                directionChanges.Enqueue(int.Parse(s));
+            }
+
+            aabb = new((short)absX, (short)absY, 16, 16);
+
+            return this;
         }
 
         public void Damage()
@@ -54,24 +125,6 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public Vector2 GetScreenPosition() => absolutePosition;
 
         public override byte GetID() => data.id;
-
-        //|1,SX,SY,X,Y,DIR,DIST,HEALTH,ELAPSED,DIRECTIONCHANGES (CSV using ;)
-        public override string Serialise()
-        {
-            StringBuilder sb = new();
-
-            sb.Append($"|1,{absolutePosition.X - drawOffset.X},{absolutePosition.Y - drawOffset.Y},{position.X},{position.Y},{dir},{distanceTravelled},{health},{elapsedTime},");
-
-            StringBuilder directionChanges = new();
-            List<int> directions = this.directionChanges.ToList();
-            for (int i = 0; i < directions.Count; i++)
-            {
-                directionChanges.Append(directions[i]);
-                if (i < directions.Count - 1) directionChanges.Append(';');
-            } sb.Append(directionChanges);
-
-            return sb.ToString();
-        }
 
         private void Move()
         {
@@ -167,16 +220,6 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             return moves;
         }
 
-        private bool IsOutOfBounds() =>
-            dir switch
-            {
-                0 => position.Y < 1,
-                1 => position.X > 47,
-                2 => position.Y > 41,
-                3 => position.X < 1,
-                _ => false,
-            };
-
         private static bool IsHeadquarters(Vector2 position, int direction) =>
             direction switch
             {
@@ -232,11 +275,13 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             }
         }
 
-        public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, Animation textures, bool ownership)
+        public Enemy(string serialised) => Deserialise(serialised);
+
+        public Enemy(string name, Vector2 screenPosition, Vector2 gridPosition, Vector2 drawOffset, bool ownership)
         {
             absolutePosition = screenPosition;
             position = gridPosition;
-            frames = textures;
+            frames = enemyAnims[name];
             this.drawOffset = drawOffset;
             if (!enemyDatas.ContainsKey(name)) throw new($"No unit called '{name}' found");
             data = enemyDatas[name];

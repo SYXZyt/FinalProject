@@ -21,6 +21,7 @@ namespace TowerDefence.Scenes
 {
     internal sealed class Game : Scene
     {
+        #region Members
         private readonly Random rng;
 
         private readonly Stack<ushort> moneyMadeThisFrame = new();
@@ -90,9 +91,6 @@ namespace TowerDefence.Scenes
         private Label gameOverLabel;
         private ImageTextButton gameOverExit;
 
-        private int PlayfieldWidth => (int)(playfieldTextures[0][0].Width * GameSize.X);
-        private int PlayfieldHeight => (int)(playfieldTextures[0][0].Height * GameSize.Y);
-
         private Animation waterAnimation;
         private TextureCollection[] playfieldTextures;
 
@@ -105,18 +103,33 @@ namespace TowerDefence.Scenes
 
         private List<Entity> entities;
 
-        private List<ServerTowerData> enemyTowers;
-        private List<ServerEnemyData> enemyUnits;
-
-        public static Game Instance { get; private set; }
-
-        public List<Entity> Entities => entities;
+        private List<Entity> enemyEntities;
 
         private readonly Stack<Entity> entityBuffer = new();
 
-        public void AddEntity(Entity entity) => entityBuffer.Push(entity);
+        public static Game Instance { get; private set; }
 
-        public void AddMoneyThisFrame(ushort amount) => moneyMadeThisFrame.Push(amount);
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Get all active entities in the game
+        /// </summary>
+        public List<Entity> Entities => entities;
+
+        /// <summary>
+        /// How many pixels wide the play field is
+        /// </summary>
+        private int PlayfieldWidth => (int)(playfieldTextures[0][0].Width * GameSize.X);
+
+        /// <summary>
+        /// How many pixels tall the play field is
+        /// </summary>
+        private int PlayfieldHeight => (int)(playfieldTextures[0][0].Height * GameSize.Y);
+
+        public Vector2 PlayerGameOffset => playFieldOffset;
+        public Vector2 OpponentGameOffset => enemyPlayFieldOffset;
 
         public Random RNG => rng;
 
@@ -124,6 +137,12 @@ namespace TowerDefence.Scenes
         /// Is the game running in debug mode
         /// </summary>
         public static bool IsDebugPlay { get; set; } = false;
+
+        #endregion
+
+        public void AddEntity(Entity entity) => entityBuffer.Push(entity);
+
+        public void AddMoneyThisFrame(ushort amount) => moneyMadeThisFrame.Push(amount);
 
         public void DamagePlayer(int amount, bool isPlayer)
         {
@@ -142,8 +161,6 @@ namespace TowerDefence.Scenes
 
         private static Texture2D CreateCircleTexture(int radius, Color color)
         {
-            Console.WriteLine(radius);
-
             // Create a new texture with the same width and height as the radius
             Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
 
@@ -179,7 +196,6 @@ namespace TowerDefence.Scenes
             // Return the generated texture
             return circleTexture;
         }
-
 
         /// <summary>
         /// Update the game based on the current state
@@ -270,6 +286,8 @@ namespace TowerDefence.Scenes
             foreach (Entity e in entities) if (e is Tower or Enemy) builder.Append(e.Serialise());
 
             Client.Instance.SendMessage(builder.ToString());
+
+            Logging.Logger.Write(builder.ToString()[1..^1]);
         }
 
         /// <summary>
@@ -301,6 +319,8 @@ namespace TowerDefence.Scenes
             byte header = (byte)message[0];
             message = message[1..];
 
+            enemyEntities.Clear();
+
             switch (header)
             {
                 case (byte)Header.GAME_OVER:
@@ -315,9 +335,6 @@ namespace TowerDefence.Scenes
                         ovHealth = ss.Health;
                         ovMoney = ss.Money;
 
-                        enemyTowers.Clear();
-                        enemyUnits.Clear();
-
                         int offset = 27;
                         if (message.Length <= offset) break;
                         message = message[27..^1];
@@ -330,19 +347,16 @@ namespace TowerDefence.Scenes
 
                             if (csvData[0] == "0")
                             {
-                                if (!int.TryParse(csvData[1], out int x)) x = 0;
-                                if (!int.TryParse(csvData[2], out int y)) y = 0;
-                                if (!float.TryParse(csvData[3], out float rot)) rot = 0;
-                                if (!int.TryParse(csvData[4], out int id)) id = 0;
-                                enemyTowers.Add(new() { x = x, y = y, rot = rot, id = id });
+                                //if (!int.TryParse(csvData[1], out int x)) x = 0;
+                                //if (!int.TryParse(csvData[2], out int y)) y = 0;
+                                //if (!float.TryParse(csvData[3], out float rot)) rot = 0;
+                                //if (!int.TryParse(csvData[4], out int id)) id = 0;
+                                //enemyTowers.Add(new() { x = x, y = y, rot = rot, id = id });
                             }
                             else if (csvData[0] == "1")
                             {
-                                if (!int.TryParse(csvData[1], out int x)) x = 0;
-                                if (!int.TryParse(csvData[2], out int y)) y = 0;
-                                if (!int.TryParse(csvData[3], out int dir)) dir = 0;
-                                if (!int.TryParse(csvData[4], out int id)) id = 0;
-                                enemyUnits.Add(new() { x = x, y = y, dir = dir, id = id });
+                                Enemy enemy = new(data);
+                                enemyEntities.Add(enemy);
                             }
                         }
                     }
@@ -592,26 +606,12 @@ namespace TowerDefence.Scenes
         /// <param name="spriteBatch">SpriteBatch to draw with</param>
         private void DrawEnemyEntities(SpriteBatch spriteBatch)
         {
-            foreach (ServerTowerData towerData in enemyTowers)
-            {
-                Texture2D texture = AssetContainer.ReadTexture(Tower.towerDatas[towerData.id].texIdle);
-
-                Vector2 originOffset = new(8, 8);
-                Vector2 pos = new(towerData.x, towerData.y);
-                spriteBatch.Draw(texture, pos + originOffset + enemyPlayFieldOffset, null, Color.White, towerData.rot, originOffset, Vector2.One, SpriteEffects.None, 0f);
-            }
+            foreach (Entity e in enemyEntities) e.Draw(spriteBatch);
         }
 
         private void DrawEnemyUnits(SpriteBatch spriteBatch)
         {
-            foreach (ServerEnemyData unitData in enemyUnits)
-            {
-                string texName = $"sUnit_{unitData.id}_{unitData.dir}";
-                Texture2D texture = AssetContainer.ReadTexture(texName);
 
-                Vector2 pos = new(unitData.x, unitData.y);
-                texture.Draw(pos + enemyPlayFieldOffset, spriteBatch, Color.White);
-            }
         }
 
         /// <summary>
@@ -1005,6 +1005,7 @@ namespace TowerDefence.Scenes
             vignetteOpac = 0.0f;
             gameOverOpacity = 0f;
             entities = new();
+            enemyEntities = new();
             showDebugStats = false;
             pausedMenuUILayer = new();
             towers = new();
@@ -1013,8 +1014,6 @@ namespace TowerDefence.Scenes
             vHealth = 100;
             vMoney = 1000;
             gameState = GameState.PLAY;
-            enemyTowers = new();
-            enemyUnits = new();
 
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
@@ -1023,6 +1022,8 @@ namespace TowerDefence.Scenes
             InitPlayerField();
             LoadMap();
             SetUpUsernames();
+
+            Logging.Logger.Write(Client.Instance.PlayerName);
 
             uIManager.Add(towers);
 
@@ -1078,16 +1079,13 @@ namespace TowerDefence.Scenes
             if (KeyboardController.IsPressed(Keys.NumPad0))
             {
                 string name = "Debug Unit";
-                TextureCollection textureCollection = new();
-                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_0"));
-                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_1"));
-                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_2"));
-                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_3"));
-                Animation animation = new(textureCollection, 0);
                 Vector2 pos = enemySpawnPositions[0];
                 Vector2 absPos = playFieldOffset + (pos * TileSize);
-                Enemy enemy = new(name, absPos, pos, playFieldOffset, animation, true);
+                Enemy enemy = new(name, absPos, pos, playFieldOffset, true);
                 entities.Add(enemy);
+
+                //Force a snapshot send
+                tick = 0;
             }
 
             if (sellButton.IsClicked())
@@ -1132,6 +1130,8 @@ namespace TowerDefence.Scenes
 
             foreach (Entity e in entities) e.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
+            foreach (Entity e in enemyEntities) e.Update(gameTime);
+            enemyEntities.RemoveAll(e => e.MarkForDeletion);
 
             waterAnimation.Update(gameTime);
 

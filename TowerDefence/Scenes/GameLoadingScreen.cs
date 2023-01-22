@@ -3,6 +3,7 @@ using System.Xml;
 using UILibrary.Scenes;
 using System.Diagnostics;
 using AssetStreamer.Assets;
+using TowerDefence.Visuals;
 using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,6 +12,8 @@ using TowerDefence.Entities.GameObjects.Towers;
 using TowerDefence.Entities.GameObjects.Enemies;
 
 using Color = Microsoft.Xna.Framework.Color;
+using AssetStreamer;
+using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Scenes
 {
@@ -237,7 +240,6 @@ namespace TowerDefence.Scenes
                 TextureLoader.LoadTexture(Texture2D.FromStream(GraphicsDevice, stream), string.Empty);
             }
 
-
             //Get all of the asset files to load
             GetAssetsToLoad();
 
@@ -284,6 +286,15 @@ namespace TowerDefence.Scenes
                 }
                 else
                 {
+                    string name = "Debug Unit";
+                    TextureCollection textureCollection = new();
+                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_0"));
+                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_1"));
+                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_2"));
+                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_3"));
+                    Animation animation = new(textureCollection, 0);
+                    Enemy.enemyAnims[name] = animation;
+
                     timer.Stop();
                     Console.WriteLine($"Loaded assets in {timer.Elapsed.TotalMilliseconds}ms");
                     SceneManager.Instance.LoadScene("mainMenu");

@@ -339,19 +339,19 @@ namespace TowerDefenceServer
             tasks.Add(TryToFindLobby);
             tasks.Add(UpdateLobbies);
 
-            packetProcessor = new();
-            packetProcessor.SubscribeReusable<Snapshot>((snapshot) =>
-            {
-                Console.WriteLine($"Received game snapshot");
+            //packetProcessor = new();
+            //packetProcessor.SubscribeReusable<Snapshot>((snapshot) =>
+            //{
+            //    Console.WriteLine($"Received game snapshot");
 
-                Lobby lobby = FindLobbyWithID(snapshot.ID);
-                if (lobby is not null)
-                {
-                        //Send the snapshot to the other player
-                    NetPeer other = lobby.GetOtherPlayerFromID(snapshot.ID).clientRef;
-                    packetProcessor.Send(other, new Snapshot() { Health = snapshot.Health, ID = snapshot.ID, Money = snapshot.Money }, DeliveryMethod.ReliableOrdered);
-                }
-            });
+            //    Lobby lobby = FindLobbyWithID(snapshot.ID);
+            //    if (lobby is not null)
+            //    {
+            //            //Send the snapshot to the other player
+            //        NetPeer other = lobby.GetOtherPlayerFromID(snapshot.ID).clientRef;
+            //        packetProcessor.Send(other, new Snapshot() { Health = snapshot.Health, ID = snapshot.ID, Money = snapshot.Money }, DeliveryMethod.ReliableOrdered);
+            //    }
+            //});
 
             listener.ConnectionRequestEvent += request =>
             {

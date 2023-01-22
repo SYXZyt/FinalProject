@@ -64,7 +64,6 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 if (dist < data.range && e.Ownership == ownership)
                 {
                     enemiesInRange.Add(e);
-                    Console.WriteLine($"{dist}/{data.range}");
                 }
             }
 

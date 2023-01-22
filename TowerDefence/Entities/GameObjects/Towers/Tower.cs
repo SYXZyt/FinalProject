@@ -61,7 +61,11 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 float dist = Vector2.Distance(towerPos, enemyPos);
 
                 //If the object is within range, add it to the list and if it is our players enemy
-                if (dist <= data.range && e.Ownership == ownership) enemiesInRange.Add(e);
+                if (dist < data.range && e.Ownership == ownership)
+                {
+                    enemiesInRange.Add(e);
+                    Console.WriteLine($"{dist}/{data.range}");
+                }
             }
 
             //Now if we are have an enemy in range, we then need to get the closest and perform some trigonometry to get the angle to the object

@@ -142,6 +142,8 @@ namespace TowerDefence.Scenes
 
         private static Texture2D CreateCircleTexture(int radius, Color color)
         {
+            Console.WriteLine(radius);
+
             // Create a new texture with the same width and height as the radius
             Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
 
@@ -1058,7 +1060,7 @@ namespace TowerDefence.Scenes
             while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
 
             HandleServer();
-            if (tick % 500 == 0) SendSnapShot();
+            if (tick % 150 == 0) SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
 

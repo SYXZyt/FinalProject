@@ -286,8 +286,6 @@ namespace TowerDefence.Scenes
             foreach (Entity e in entities) if (e is Tower or Enemy) builder.Append(e.Serialise());
 
             Client.Instance.SendMessage(builder.ToString());
-
-            Logging.Logger.Write(builder.ToString()[1..^1]);
         }
 
         /// <summary>
@@ -319,8 +317,6 @@ namespace TowerDefence.Scenes
             byte header = (byte)message[0];
             message = message[1..];
 
-            enemyEntities.Clear();
-
             switch (header)
             {
                 case (byte)Header.GAME_OVER:
@@ -335,9 +331,14 @@ namespace TowerDefence.Scenes
                         ovHealth = ss.Health;
                         ovMoney = ss.Money;
 
-                        int offset = 27;
-                        if (message.Length <= offset) break;
-                        message = message[27..^1];
+                        enemyEntities.Clear();
+
+                        string[] temp = message.Split('|');
+                        StringBuilder sb = new();
+                        for (int i = 1; i < temp.Length; i++) sb.Append(temp[i]);
+                        message = sb.ToString();
+
+                        if (message == string.Empty) break;
 
                         //Get the data to parse
                         string[] entities = message.Split('|');
@@ -606,7 +607,10 @@ namespace TowerDefence.Scenes
         /// <param name="spriteBatch">SpriteBatch to draw with</param>
         private void DrawEnemyEntities(SpriteBatch spriteBatch)
         {
-            foreach (Entity e in enemyEntities) e.Draw(spriteBatch);
+            foreach (Entity e in enemyEntities)
+            {
+                e?.Draw(spriteBatch);
+            }
         }
 
         private void DrawEnemyUnits(SpriteBatch spriteBatch)
@@ -665,7 +669,7 @@ namespace TowerDefence.Scenes
             }
 
             UIManager.Draw(spriteBatch);
-            foreach (Entity e in entities) if (e is not Popup and not Tower) e.Draw(spriteBatch);
+            foreach (Entity e in entities) if (e is not Popup and not Tower) e?.Draw(spriteBatch);
             DrawTowers(spriteBatch);
             DrawEnemyEntities(spriteBatch);
             DrawEnemyUnits(spriteBatch);
@@ -1023,8 +1027,6 @@ namespace TowerDefence.Scenes
             LoadMap();
             SetUpUsernames();
 
-            Logging.Logger.Write(Client.Instance.PlayerName);
-
             uIManager.Add(towers);
 
             playFieldOffset = new(1920 / 2 + divider.Width, 96);
@@ -1061,7 +1063,7 @@ namespace TowerDefence.Scenes
             while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
 
             HandleServer();
-            if (tick % 150 == 0) SendSnapShot();
+            if (tick++ % 150 == 0) SendSnapShot();
             CheckForTowerPlacement();
             CheckForBuildMode();
 
@@ -1128,9 +1130,9 @@ namespace TowerDefence.Scenes
                 this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);
             }
 
-            foreach (Entity e in entities) e.Update(gameTime);
+            foreach (Entity e in entities) e?.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
-            foreach (Entity e in enemyEntities) e.Update(gameTime);
+            foreach (Entity e in enemyEntities) e?.Update(gameTime);
             enemyEntities.RemoveAll(e => e.MarkForDeletion);
 
             waterAnimation.Update(gameTime);
@@ -1194,7 +1196,6 @@ namespace TowerDefence.Scenes
 
             if (gameState is not GameState.MENU and not GameState.END) UIManager.Update();
             AddMoneyToServer();
-            tick++;
         }
 
         public Game() : base()

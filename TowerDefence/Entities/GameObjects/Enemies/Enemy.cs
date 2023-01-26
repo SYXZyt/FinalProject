@@ -32,12 +32,12 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public ulong TotalDistance => distanceTravelled;
 
-        //|1,SX,SY,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;)
+        //|1,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;)
         public override string Serialise()
         {
             StringBuilder sb = new();
 
-            sb.Append($"|1,{absolutePosition.X - drawOffset.X},{absolutePosition.Y - drawOffset.Y},{position.X},{position.Y},{dir},{distanceTravelled},{health},{elapsedTime},{data.name},");
+            sb.Append($"|1,{position.X},{position.Y},{dir},{distanceTravelled},{health},{elapsedTime},{data.name},");
 
             StringBuilder directionChanges = new();
             List<int> directions = this.directionChanges.ToList();
@@ -61,50 +61,54 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override Entity Deserialise(string serialised)
         {
-            string[] csv = serialised.Split(',');
-
-            //Acquire all of the data we need
-            int absX = int.Parse(csv[1]);
-            int absY = int.Parse(csv[2]);
-
-            int x = int.Parse(csv[3]);
-            int y = int.Parse(csv[4]);
-
-            int dir = int.Parse(csv[5]);
-
-            ulong distanceTravelled = ulong.Parse(csv[6]);
-
-            int health = int.Parse(csv[7]);
-
-            float elapsedTime = float.Parse(csv[8]);
-
-            string name = csv[9];
-
-            string[] dirChangesCsv = csv[10].Split(';');
-
-            //Write the data we have now
-            drawOffset = Game.Instance.PlayerGameOffset;
-            absolutePosition = new(absX, absY);
-
-            position = new(x, y);
-
-            this.dir = dir;
-            this.distanceTravelled = distanceTravelled;
-            this.health = health;
-            this.elapsedTime = elapsedTime;
-            data = enemyDatas[name];
-            frames = enemyAnims[name];
-
-            directionChanges = new();
-            foreach (string s in dirChangesCsv)
+            try
             {
-                if (s == string.Empty) continue;
-                directionChanges.Enqueue(int.Parse(s));
+                string[] csv = serialised.Split(',');
+
+                //Acquire all of the data we need
+                float absX = (float.Parse(csv[1]) * Game.TileSize) + Game.Instance.OpponentGameOffset.X;
+                float absY = (float.Parse(csv[2]) * Game.TileSize) + Game.Instance.OpponentGameOffset.Y;
+
+                float x = float.Parse(csv[1]);
+                float y = float.Parse(csv[2]);
+
+                int dir = int.Parse(csv[3]);
+
+                ulong distanceTravelled = ulong.Parse(csv[4]);
+
+                int health = int.Parse(csv[5]);
+
+                float elapsedTime = float.Parse(csv[6]);
+
+                string name = csv[7];
+
+                string[] dirChangesCsv = csv[8].Split(';');
+
+                //Write the data we have now
+                drawOffset = Game.Instance.PlayerGameOffset;
+                absolutePosition = new(absX, absY);
+
+                position = new(x, y);
+
+                this.dir = dir;
+                this.distanceTravelled = distanceTravelled;
+                this.health = health;
+                this.elapsedTime = elapsedTime;
+                data = enemyDatas[name];
+                frames = enemyAnims[name];
+
+                directionChanges = new();
+                foreach (string s in dirChangesCsv)
+                {
+                    if (s == string.Empty) continue;
+                    directionChanges.Enqueue(int.Parse(s));
+                }
+
+                aabb = new((short)absX, (short)absY, 16, 16);
+
+                return this;
             }
-
-            aabb = new((short)absX, (short)absY, 16, 16);
-
-            return this;
+            catch { return null; }
         }
 
         public void Damage()

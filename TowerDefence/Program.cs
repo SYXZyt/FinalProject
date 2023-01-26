@@ -30,7 +30,6 @@ namespace TowerDefence
             //Set up events
             AppDomain appDomain = AppDomain.CurrentDomain;
             appDomain.ProcessExit += new EventHandler(ExitEvent);
-            appDomain.ProcessExit += new EventHandler(Logging.Logger.CloseEvent);
 #if RELEASE
             appDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler);
 #endif
@@ -39,7 +38,6 @@ namespace TowerDefence
 
             _ = new SceneManager(new(1920, 1080));
             SceneManager.AddNewExitMethod(ExitHandler);
-            SceneManager.AddNewExitMethod(Logging.Logger.Close);
 
             GameLoadingScreen gameLoadingScreen = new();
             MainMenu mainMenu = new();

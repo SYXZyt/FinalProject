@@ -87,6 +87,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 //Write the data we have now
                 drawOffset = Game.Instance.PlayerGameOffset;
                 absolutePosition = new(absX, absY);
+                ownership = false;
 
                 position = new(x, y);
 
@@ -164,7 +165,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public override void Update(GameTime gameTime)
         {
-            if (health <= 0)
+            if (health <= 0 && ownership == true)
             {
                 Game.Instance.AddMoneyThisFrame(1);
                 markForDeletion = true;

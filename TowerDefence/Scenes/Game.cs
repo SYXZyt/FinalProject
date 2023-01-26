@@ -11,6 +11,7 @@ using TowerDefence.Settings;
 using Microsoft.Xna.Framework;
 using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects.Towers;
 using TowerDefence.Entities.GameObjects.Enemies;
@@ -333,7 +334,7 @@ namespace TowerDefence.Scenes
 
                         enemyEntities.Clear();
 
-                        string[] temp = message.Split('|');
+                        string[] temp = Regex.Split(message, "(?<=[|])");
                         StringBuilder sb = new();
                         for (int i = 1; i < temp.Length; i++) sb.Append(temp[i]);
                         message = sb.ToString();

@@ -519,8 +519,11 @@ namespace TowerDefence.Scenes
                         continue;
                     }
 
-                    string texName = p.value as string;
-                    AssetContainer.ReadTexture(texName).Dispose();
+                    try
+                    {
+                        string texName = p.value as string;
+                        AssetContainer.ReadTexture(texName).Dispose();
+                    } catch { }
                 }
             }
             else if (cheat.cmd == CheatCommand.FORCE_WIN)

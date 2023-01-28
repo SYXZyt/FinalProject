@@ -45,6 +45,7 @@ namespace TowerDefence
             Game gameScene = new();
             FindGame findGame = new();
             Scenes.Settings settings = new();
+            NoServerScene serverError = new();
 
             SceneManager.Instance.AddScene("gameLoadingScreen", gameLoadingScreen);
             SceneManager.Instance.AddScene("mainMenu", mainMenu);
@@ -52,6 +53,7 @@ namespace TowerDefence
             SceneManager.Instance.AddScene("mainGame", gameScene);
             SceneManager.Instance.AddScene("findGame", findGame);
             SceneManager.Instance.AddScene("settings", settings);
+            SceneManager.Instance.AddScene("serverError", serverError);
 
             SceneManager.Instance.SetScene("gameLoadingScreen");
             SceneManager.Instance.Run();

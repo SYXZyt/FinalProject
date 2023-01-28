@@ -131,7 +131,11 @@ namespace TowerDefence.Scenes
             else
             {
                 //Ping server and check if name is allowed
-                if (!client.IsConnected) throw new("Not connected to server");
+                if (!client.IsConnected)
+                {
+                    SceneManager.Instance.LoadScene("serverError");
+                    return;
+                }
 
                 //If the user hasn't changed their username, just skip this check
                 if (usernameBox.GetText().ToString().Trim() != lastName)

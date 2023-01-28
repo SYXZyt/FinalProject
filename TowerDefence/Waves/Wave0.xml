@@ -3,4 +3,5 @@
   <id>0</id>
   <count>1</count>
   <delay>10</delay>
+  <cooldown>0</cooldown>
 </SpawnGroup0>

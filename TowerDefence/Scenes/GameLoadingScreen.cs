@@ -187,6 +187,9 @@ namespace TowerDefence.Scenes
 
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
+
+                //Load wave data
+                Waves.Wave.GenerateWave(@"waves\Wave0.xml");
             }
         }
 

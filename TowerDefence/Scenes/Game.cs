@@ -1082,7 +1082,11 @@ namespace TowerDefence.Scenes
         public override void Update(GameTime gameTime)
         {
             if (!ready && !isWaveActive) readyButton.Update();
-            if (readyButton.IsClicked()) ready = true;
+            if (readyButton.IsClicked())
+            {
+                Client.Instance?.SendMessage($"{Header.READY_FOR_WAVE}{Client.Instance?.PlayerID}");
+                ready = true;
+            }
 
             while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
 
@@ -1095,7 +1099,7 @@ namespace TowerDefence.Scenes
             {
                 //Tell the server the game is over and the player lost
                 isDead = true;
-                Client.Instance?.SendMessage($"{Header.GAME_OVER}{Client.Instance.EnemyID}");
+                Client.Instance?.SendMessage($"{Header.GAME_OVER}{Client.Instance?.EnemyID}");
             }
 
             //Adjust the vignette opacity

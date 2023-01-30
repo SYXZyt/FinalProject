@@ -13,8 +13,6 @@ namespace TowerDefenceServer
         private static readonly EventBasedNetListener listener = new();
         private static NetManager server;
 
-        private static NetPacketProcessor packetProcessor;
-
         private delegate void ServerTask();
         private static readonly List<ServerTask> tasks = new();
 
@@ -24,7 +22,7 @@ namespace TowerDefenceServer
 
         private static readonly List<Map> loadedMaps = new();
 
-        private static string GetDateTime => $"[{DateTime.Now:T}]";
+        internal static string GetDateTime => $"[{DateTime.Now:T}]";
 
         /// <summary>
         /// Try to find an ongoing game using a player ID
@@ -134,7 +132,7 @@ namespace TowerDefenceServer
         /// <param name="peer">The client to connect to</param>
         /// <param name="message">The message to send</param>
         /// <param name="deliveryMethod">The method to use to send the message</param>
-        private static void SendMessageToPeer(NetPeer peer, string message, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        internal static void SendMessageToPeer(NetPeer peer, string message, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
         {
             NetDataWriter writer = new();
             writer.Put(message);
@@ -300,6 +298,19 @@ namespace TowerDefenceServer
                         Player player = lobby.GetPlayerFromID(playerId);
                         player.money += amountToAdd;
                         lobby.UpdatePlayer(playerId, player);
+                    }
+                    break;
+                case (byte)Header.READY_FOR_WAVE:
+                    {
+                        //Read the id of the player
+                        long id = long.Parse(data);
+
+                        Console.WriteLine($"Player {id} has voted to start");
+
+                        Lobby lobby = FindLobbyWithID(id);
+                        if (lobby is null) break;
+
+                        lobby.PlayerIsReady(id);
                     }
                     break;
                 default:

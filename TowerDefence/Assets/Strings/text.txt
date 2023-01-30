@@ -23,3 +23,4 @@ GM_END_LOSE||You Lost
 POPUP_POOR||Cannot afford tower
 POPUP_INV_LOC||Cannot place here
 LBL_ERROR_NO_SERVER||Could not connect to the server {0}:{1}
+GM_READY||Vote To Start

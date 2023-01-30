@@ -4,6 +4,7 @@ using UILibrary.IO;
 using AssetStreamer;
 using UILibrary.Scenes;
 using UILibrary.Buttons;
+using TowerDefence.Waves;
 using TowerDefencePackets;
 using TowerDefence.Visuals;
 using TowerDefence.Entities;
@@ -47,6 +48,8 @@ namespace TowerDefence.Scenes
         private ImageTextButton resumeButton;
         private ImageTextButton disconnectButton;
 
+        private ImageTextButton readyButton;
+
         private Texture2D platformTexture;
         private Texture2D divider;
         private Texture2D menuFilter;
@@ -59,6 +62,8 @@ namespace TowerDefence.Scenes
 
         private bool showDebugStats;
 
+        private Wave currentWave;
+
         private int tmx;
         private int tmy;
 
@@ -69,6 +74,9 @@ namespace TowerDefence.Scenes
         private ushort vMoney;
 
         private bool isDead;
+
+        private bool isWaveActive;
+        private bool ready;
 
         private byte ovHealth;
         private ushort ovMoney;
@@ -787,6 +795,7 @@ namespace TowerDefence.Scenes
             }
 
             foreach (Popup popup in entities.OfType<Popup>()) popup.Draw(spriteBatch);
+            if (!ready && !isWaveActive) readyButton.Draw(spriteBatch);
         }
 
         public override void LoadContent()
@@ -854,6 +863,10 @@ namespace TowerDefence.Scenes
 
                 sellButton = new(new(buttonsX, (short)(towerSelClick.Height * 3 + towerSelClick.Height * TowerCount), 64, 32), AssetContainer.ReadTexture("sSellUnlick"), AssetContainer.ReadTexture("sSellClick"));
                 uIManager.Add(sellButton);
+
+
+                AABB readyButtonBB = new((short)((SceneManager.Instance.graphics.PreferredBackBufferWidth / 2) - (165 / 2)), 950, 165, 48);
+                readyButton = new(readyButtonBB, AssetContainer.ReadTexture("sMenuButtonUnclicked"), AssetContainer.ReadTexture("sMenuButtonClicked"), AssetContainer.ReadString("GM_READY"), 1f, AssetContainer.GetFont("fMain"));
 
                 //Swap stats if needed
                 if (!GlobalSettings.PlayerOnRight)
@@ -1023,6 +1036,10 @@ namespace TowerDefence.Scenes
             vMoney = 1000;
             gameState = GameState.PLAY;
 
+            ready = false;
+            isWaveActive = false;
+            currentWave = null;
+
             SceneManager.Instance.ManagedUIManager = false; //We need to draw a layer over the UI when paused, so we need to take full control
 
             LoadTextures();
@@ -1064,6 +1081,9 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            if (!ready && !isWaveActive) readyButton.Update();
+            if (readyButton.IsClicked()) ready = true;
+
             while (entityBuffer.Count > 0) entities.Add(entityBuffer.Pop());
 
             HandleServer();

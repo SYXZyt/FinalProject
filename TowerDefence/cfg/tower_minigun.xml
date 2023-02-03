@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>2</tower_id>
+  <tower_name>Minigun</tower_name>
+  <range>130</range>
+  <cost>1100</cost>
+  <texture_idle>tower_minigun</texture_idle>
+  <texture_button>tower_minigun_button</texture_button>
+  <projectile>bullet</projectile>
+  <rate>5</rate>
+</tower>

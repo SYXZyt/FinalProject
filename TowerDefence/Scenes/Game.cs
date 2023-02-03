@@ -1134,7 +1134,7 @@ namespace TowerDefence.Scenes
             vignetteOpac = (float)Math.Max(0, vignetteOpac - vignetteSpeed * gameTime.ElapsedGameTime.TotalSeconds);
 
             //Debug stuff
-            if (KeyboardController.IsPressed(Keys.NumPad0))
+            if (KeyboardController.IsPressed(Keys.NumPad0) || Keyboard.GetState().IsKeyDown(Keys.NumPad1))
             {
                 string name = "Debug Unit";
                 Vector2 pos = enemySpawnPositions[0];

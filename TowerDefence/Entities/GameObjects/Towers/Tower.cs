@@ -63,7 +63,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
             {
                 case "bullet":
                     {
-                        Bullet bullet = new(position + drawOffset, rotation);
+                        Vector2 originOffset = new(8);
+                        Bullet bullet = new(position + drawOffset + originOffset, rotation);
                         Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
                         elapsedTime = 0;
                     }

@@ -191,6 +191,9 @@ namespace TowerDefence.Scenes
                 TowerData advancedTower = LoadTower(@"cfg\tower_advanced.xml");
                 Tower.towerDatas.Add(advancedTower.id, advancedTower);
 
+                TowerData minigunTower = LoadTower(@"cfg\tower_minigun.xml");
+                Tower.towerDatas.Add(minigunTower.id, minigunTower);
+
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
 
@@ -343,6 +346,8 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_0.png", "tower_basic_button"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_1.png", "tower_advanced"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_1.png", "tower_advanced_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_2.png", "tower_minigun"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_2.png", "tower_minigun_button"));
 
             //Load loading texture
             for (int i = 0; i < 8; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @$"Assets\Textures\load_{i}.png", $"sLoad_{i}"));

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>1</tower_id>
+  <tower_name>Cannon</tower_name>
+  <range>170</range>
+  <cost>350</cost>
+  <texture_idle>tower_advanced</texture_idle>
+  <texture_button>tower_advanced_button</texture_button>
+  <projectile>bullet_double</projectile>
+  <rate>0.5</rate>
+</tower>

@@ -1,10 +1,8 @@
-﻿using TowerDefence.Entities.GameObjects.Enemies;
-
-namespace TowerDefence.Waves
+﻿namespace TowerDefence.Waves
 {
     internal struct SpawnGroup
     {
-        public int id;
+        public string id;
         public int count;
         public float delay;
         public float cooldown;

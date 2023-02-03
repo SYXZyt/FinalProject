@@ -378,6 +378,16 @@ namespace TowerDefence.Scenes
                         vHealth = byte.Parse(split[1]);
                     }
                     break;
+                case (byte)Header.ROUND_BEGIN:
+                    {
+                        int number = int.Parse(message);
+                        currentWave = Wave.waves[number];
+                        isWaveActive = true;
+                        ready = false;
+
+                        Console.WriteLine($"Starting round {number}");
+                    }
+                    break;
                 default:
                     break;
             }
@@ -531,7 +541,8 @@ namespace TowerDefence.Scenes
                     {
                         string texName = p.value as string;
                         AssetContainer.ReadTexture(texName).Dispose();
-                    } catch { }
+                    }
+                    catch { }
                 }
             }
             else if (cheat.cmd == CheatCommand.FORCE_WIN)
@@ -625,11 +636,6 @@ namespace TowerDefence.Scenes
             }
         }
 
-        private void DrawEnemyUnits(SpriteBatch spriteBatch)
-        {
-
-        }
-
         /// <summary>
         /// Draw tower icons onto the tower buttons
         /// </summary>
@@ -643,7 +649,7 @@ namespace TowerDefence.Scenes
                 TowerData towerData = Tower.towerDatas[i];
                 Texture2D texture = AssetContainer.ReadTexture(towerData.texButton);
 
-                Switch swtch = towers[0];
+                Switch swtch = towers[i];
                 texture.Draw(new(swtch.AABB.X + ((swtch.AABB.Width - texture.Width) / 2), swtch.AABB.Y + (swtch.AABB.Height - texture.Height) / 2), spriteBatch, Color.White);
             }
         }
@@ -667,6 +673,17 @@ namespace TowerDefence.Scenes
             vMoney += total;
         }
 
+        public void SpawnEnemyFromWave(string name)
+        {
+            Vector2 pos = enemySpawnPositions[0];
+            Vector2 absPos = playFieldOffset + (pos * TileSize);
+            entities.Add(new Enemy(name, absPos, pos, playFieldOffset, true));
+            enemyEntities.Add(new Enemy(name, absPos, pos, playFieldOffset, false));
+
+            //Force a snapshot send
+            tick = 0;
+        }
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             bkg.Draw(Vector2.Zero, spriteBatch, Color.White);
@@ -684,7 +701,6 @@ namespace TowerDefence.Scenes
             foreach (Entity e in entities) if (e is not Popup and not Tower) e?.Draw(spriteBatch);
             DrawTowers(spriteBatch);
             DrawEnemyEntities(spriteBatch);
-            DrawEnemyUnits(spriteBatch);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
@@ -1081,6 +1097,17 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
+            if (currentWave is not null)
+            {
+                currentWave.Update(gameTime);
+                if (currentWave.IsOver)
+                {
+                    currentWave = null;
+                    Client.Instance?.SendMessage($"{Header.ROUND_END}{Client.Instance?.PlayerID}");
+                    isWaveActive = false;
+                }
+            }
+
             if (!ready && !isWaveActive) readyButton.Update();
             if (readyButton.IsClicked())
             {

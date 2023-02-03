@@ -14,46 +14,57 @@ namespace TowerDefence.Waves
             COOLDOWN,
         }
 
-        private List<SpawnGroup> groups;
-        private SpawnGroup active;
-        private Queue<Enemy> enemiesBuffer;
+        private readonly List<SpawnGroup> groups;
+        private SpawnGroup? active;
+        private readonly Queue<Enemy> enemiesBuffer;
         private WaveState state;
 
         private double elapsedTime = 0;
         private int spawned = 0;
 
-        public bool IsOver => groups.Any() && enemiesBuffer.Count == 0;
+        public bool IsOver => groups.Any() && active is null &&  enemiesBuffer.Count == 0;
 
         public void Update(GameTime gameTime)
         {
-            elapsedTime += gameTime.TotalGameTime.TotalSeconds;
+            elapsedTime += (gameTime.ElapsedGameTime.TotalSeconds * 10);
+
+            if (active is null)
+            {
+                active = groups[0];
+            }
+
+            System.Diagnostics.Debug.WriteLine($"WAVE: {state} - ({spawned}/{((SpawnGroup)active).count}) - ({elapsedTime}/{((SpawnGroup)active).delay})");
 
             if (state == WaveState.SPAWNING)
             {
                 //If our elapsed time is over the set time, then we need to spawn and reset
-                if (elapsedTime > active.delay)
+                if (elapsedTime > ((SpawnGroup)active).delay)
                 {
                     elapsedTime = 0;
-                    //Spawn enemy
+                    Scenes.Game.Instance.SpawnEnemyFromWave(((SpawnGroup)active).id);
                     spawned++;
                 }
 
-                if (spawned == active.count)
+                if (spawned == ((SpawnGroup)active).count)
                 {
+                    state = WaveState.COOLDOWN;
+                }
+            }
+            else
+            {
+                //Check if the cooldown is over
+                if (elapsedTime > ((SpawnGroup)active).cooldown)
+                {
+                    state = WaveState.SPAWNING;
+
                     if (groups.Count > 0)
                     {
                         active = groups[0];
                         groups.RemoveAt(0);
                         spawned = 0;
                     }
-                }
-            }
-            else
-            {
-                //Check if the cooldown is over
-                if (elapsedTime > active.cooldown)
-                {
-                    state = WaveState.SPAWNING;
+
+                    elapsedTime = 0;
                 }
             }
         }
@@ -80,7 +91,7 @@ namespace TowerDefence.Waves
                 XmlNode delay = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/delay");
                 XmlNode cooldown = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/cooldown");
 
-                group.id = int.Parse(id.InnerText);
+                group.id = id.InnerText;
                 group.count = int.Parse(count.InnerText);
                 group.delay = float.Parse(delay.InnerText);
                 group.cooldown = float.Parse(cooldown.InnerText);

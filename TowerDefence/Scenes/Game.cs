@@ -160,6 +160,7 @@ namespace TowerDefence.Scenes
             if (isPlayer)
             {
                 vHealth = (byte)Math.Max(0, vHealth - amount);
+                Client.Instance?.SendMessage($"{Header.TAKE_HEALTH}{Client.Instance.PlayerID},{amount}");
                 vignetteOpac = 1.0f;
             }
             else
@@ -1100,7 +1101,7 @@ namespace TowerDefence.Scenes
             if (currentWave is not null)
             {
                 currentWave.Update(gameTime);
-                if (currentWave.IsOver)
+                if (currentWave.IsOver && !entities.Where(e => e is Enemy).Any())
                 {
                     currentWave = null;
                     Client.Instance?.SendMessage($"{Header.ROUND_END}{Client.Instance?.PlayerID}");

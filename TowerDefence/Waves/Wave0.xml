@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <SpawnGroup0>
   <id>Debug Unit</id>
-  <count>1</count>
+  <count>4</count>
   <delay>10</delay>
   <cooldown>10</cooldown>
 </SpawnGroup0>

@@ -22,15 +22,18 @@ namespace TowerDefence.Waves
         private double elapsedTime = 0;
         private int spawned = 0;
 
-        public bool IsOver => groups.Any() && active is null &&  enemiesBuffer.Count == 0;
+        public bool IsOver => !groups.Any() && active is null && enemiesBuffer.Count == 0;
 
         public void Update(GameTime gameTime)
         {
-            elapsedTime += (gameTime.ElapsedGameTime.TotalSeconds * 10);
+            elapsedTime += (gameTime.ElapsedGameTime.TotalSeconds * 20);
 
             if (active is null)
             {
+                if (groups.Count == 0) return;
+
                 active = groups[0];
+                groups.RemoveAt(0);
             }
 
             System.Diagnostics.Debug.WriteLine($"WAVE: {state} - ({spawned}/{((SpawnGroup)active).count}) - ({elapsedTime}/{((SpawnGroup)active).delay})");
@@ -61,6 +64,11 @@ namespace TowerDefence.Waves
                     {
                         active = groups[0];
                         groups.RemoveAt(0);
+                        spawned = 0;
+                    }
+                    else
+                    {
+                        active = null;
                         spawned = 0;
                     }
 

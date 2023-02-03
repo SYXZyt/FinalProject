@@ -313,6 +313,19 @@ namespace TowerDefenceServer
                         lobby.PlayerIsReady(id);
                     }
                     break;
+                case (byte)Header.ROUND_END:
+                    {
+                        //Read the id of the player
+                        long id = long.Parse(data);
+
+                        Console.WriteLine($"Player {id} has finished the round");
+
+                        Lobby lobby = FindLobbyWithID(id);
+                        if (lobby is null) break;
+
+                        lobby.PlayerHasFinished(id);
+                    }
+                    break;
                 default:
                     Console.WriteLine($"Received: {data}' from {peer.EndPoint} with unknown header 0x{op:x2}");
                     break;

@@ -19,6 +19,9 @@ namespace TowerDefenceServer.ServerData
         private bool playerAReady;
         private bool playerBReady;
 
+        private bool playerAHasFinished;
+        private bool playerBHasFinished;
+
         public bool IsOver { get; set; } = false;
 
         public GameState GameState { get => gameState; set => gameState = value; }
@@ -32,6 +35,8 @@ namespace TowerDefenceServer.ServerData
         {
             if (gameState == GameState.WAITING && playerAReady && playerBReady)
             {
+                playerAHasFinished = playerBHasFinished = false;
+
                 gameState = GameState.IN_PROGRESS;
                 playerAReady = playerBReady = false;
 
@@ -43,18 +48,22 @@ namespace TowerDefenceServer.ServerData
 
                 round++;
             }
+            else if (gameState == GameState.IN_PROGRESS && playerAHasFinished && playerBHasFinished)
+            {
+                gameState = GameState.WAITING;
+            }
         }
 
         public void PlayerIsReady(long id)
         {
-            if (pA.playerNumber == id)
-            {
-                playerAReady = true;
-            }
-            else
-            {
-                playerBReady = true;
-            }
+            if (pA.playerNumber == id) playerAReady = true;
+            else playerBReady = true;
+        }
+
+        public void PlayerHasFinished(long id)
+        {
+            if (pA.playerNumber == id) playerAHasFinished = true;
+            else playerBHasFinished = true;
         }
 
         public void UpdatePlayer(long id, Player player)

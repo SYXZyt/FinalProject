@@ -117,6 +117,9 @@ namespace TowerDefence.Scenes
                 XmlNode towerRate = xml.SelectSingleNode("/tower/rate");
                 towerData.rate = (float)Convert.ToDouble(towerRate.InnerText);
 
+                XmlNode projectile = xml.SelectSingleNode("/tower/projectile");
+                towerData.projectile = projectile.InnerText;
+
                 return towerData;
             }
 

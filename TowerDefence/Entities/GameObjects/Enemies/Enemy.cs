@@ -116,6 +116,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         {
             if (!damagedThisFrame)
             {
+                Game.Instance.AddMoneyThisFrame(2);
                 health--;
                 damagedThisFrame = true;
             }
@@ -167,7 +168,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         {
             if (health <= 0 && ownership == true)
             {
-                Game.Instance.AddMoneyThisFrame(1);
+                Game.Instance.AddMoneyThisFrame(5);
                 markForDeletion = true;
             }
 

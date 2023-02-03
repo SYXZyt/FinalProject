@@ -25,6 +25,19 @@ namespace TowerDefence.Entities.GameObjects.Towers
         public double Rotation => rotation;
         public TowerData Data => data;
 
+#if DEBUG
+        //This method is just for debugging purposes
+        private static void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Color color, int width = 1)
+        {
+            Rectangle r = new((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
+            Vector2 v = Vector2.Normalize(begin - end);
+            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
+            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
+            Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
+            spriteBatch.Draw(x, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
+        }
+#endif
+
         public override Entity Deserialise(string serialised)
         {
             throw new NotImplementedException();
@@ -42,6 +55,45 @@ namespace TowerDefence.Entities.GameObjects.Towers
         public override string Serialise()
         {
             return $"|0,{position.X},{position.Y},{rotation},{data.id}";
+        }
+
+        private void SpawnBullet()
+        {
+            switch (data.projectile)
+            {
+                case "bullet":
+                    {
+                        Bullet bullet = new(position + drawOffset, rotation);
+                        Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
+                        elapsedTime = 0;
+                    }
+                    break;
+                case "bullet_double":
+                    {
+                        //For the double bullet we need to do a little bit of maths
+                        //We want to get the centre point, then do some trig to get an offset following a given angle
+                        Vector2 originOffset = new(8);
+                        Vector2 centre = position + drawOffset + originOffset;
+
+                        (int width, int height) = (anim.GetCurrentTexture.Width, anim.GetCurrentTexture.Height);
+
+                        Vector2 halfSize = new(width / 2, height / 2);
+
+                        Matrix rotationMatrix = Matrix.CreateRotationZ((float)rotation);
+
+                        Vector2 bulletA = Vector2.Transform(new Vector2(-halfSize.X, 0), rotationMatrix) + centre;
+                        Vector2 bulletB = Vector2.Transform(new Vector2(halfSize.X, 0), rotationMatrix) + centre;
+
+                        Bullet bA = new(bulletA, rotation);
+                        Bullet bB = new(bulletB, rotation);
+
+                        Game.Instance.AddEntity(bA);
+                        Game.Instance.AddEntity(bB);
+                        elapsedTime = 0;
+                    }
+                    break;
+                default: break;
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -87,10 +139,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 //Fire at enemy
                 if (elapsedTime * data.rate >= 1)
                 {
-                    //Bullets use degrees where as the tower uses radians, so we need to convert
-                    Bullet bullet = new(position + drawOffset, rotation);
-                    Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
-                    elapsedTime = 0;
+                    SpawnBullet();
                 }
             }
 

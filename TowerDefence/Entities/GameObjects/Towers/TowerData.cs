@@ -9,5 +9,6 @@
         public string texIdle;
         public string texButton;
         public float rate;
+        public string projectile;
     }
 }

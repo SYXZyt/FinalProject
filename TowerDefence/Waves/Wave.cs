@@ -14,15 +14,42 @@ namespace TowerDefence.Waves
             COOLDOWN,
         }
 
-        private readonly List<SpawnGroup> groups;
+        private List<SpawnGroup> groups;
         private SpawnGroup? active;
-        private readonly Queue<Enemy> enemiesBuffer;
+        private Queue<Enemy> enemiesBuffer;
         private WaveState state;
 
         private double elapsedTime = 0;
         private int spawned = 0;
 
         public bool IsOver => !groups.Any() && active is null && enemiesBuffer.Count == 0;
+
+        public Wave DeepCopy()
+        {
+            Wave copy = new()
+            {
+                groups = new(),
+                enemiesBuffer = new(),
+                state = state,
+                elapsedTime = elapsedTime,
+                spawned = spawned
+            };
+
+            if (active is null) copy.active = null;
+            else copy.active = new((SpawnGroup)active);
+
+            //Copy over the enemyBuffer
+            if (enemiesBuffer.Any())
+            {
+                List<Enemy> buffer = enemiesBuffer.ToList();
+                foreach (Enemy e in buffer) copy.enemiesBuffer.Enqueue(e);
+            }
+
+            //Finally, copy the groups
+            foreach (SpawnGroup group in groups) copy.groups.Add(group);
+
+            return copy;
+        }
 
         public void Update(GameTime gameTime)
         {

@@ -382,7 +382,7 @@ namespace TowerDefence.Scenes
                 case (byte)Header.ROUND_BEGIN:
                     {
                         int number = int.Parse(message);
-                        currentWave = Wave.waves[number];
+                        currentWave = Wave.waves[number].DeepCopy();
                         isWaveActive = true;
                         ready = false;
 

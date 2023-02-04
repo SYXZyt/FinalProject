@@ -22,6 +22,10 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public static Dictionary<int, TowerData> towerDatas;
 
+#if DEBUG
+        private readonly List<Vector2> spawnPos = new();
+#endif
+
         public double Rotation => rotation;
         public TowerData Data => data;
 
@@ -36,6 +40,15 @@ namespace TowerDefence.Entities.GameObjects.Towers
             Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
             spriteBatch.Draw(x, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
+
+        private static void DrawLineByAngle(SpriteBatch spriteBatch, Vector2 begin, float angle, float length, Color color, int width = 1)
+        {
+            Vector2 end = begin + new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * length;
+            Rectangle r = new((int)begin.X, (int)begin.Y, (int)length + width, width);
+            Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
+            spriteBatch.Draw(x, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
+        }
+
 #endif
 
         public override Entity Deserialise(string serialised)
@@ -49,14 +62,14 @@ namespace TowerDefence.Entities.GameObjects.Towers
             Vector2 originOffset = new(8);
             spriteBatch.Draw(texture, position + drawOffset + originOffset, null, Color.White, (float)rotation, originOffset, Vector2.One, SpriteEffects.None, 0f);
 
+#if DEBUG
             if (enemiesInRange.Any())
             {
                 Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
 
-                Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
-                Vector2 tower = position + drawOffset + originOffset;
-                DrawLine(spriteBatch, tower, closest.GetScreenPosition() + originOffset, Color.White);
+                //foreach (Vector2 pos in spawnPos) DrawLineByAngle(spriteBatch, pos, (float)(rotation - (Math.PI / 2)), 100, Color.White);
             }
+#endif
         }
 
         public override byte GetID() => data.id;
@@ -68,39 +81,69 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         private void SpawnBullet()
         {
+#if DEBUG
+            spawnPos.Clear();
+#endif
+
+            #region Spawn Methods
+            void SpawnSingleBullet()
+            {
+                Vector2 originOffset = new(8);
+                Vector2 bulletOriginOffset = new(-2);
+                Bullet bullet = new(position + drawOffset + originOffset + bulletOriginOffset, rotation);
+                Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
+                elapsedTime = 0;
+
+#if DEBUG
+                spawnPos.Add(position + drawOffset + originOffset + bulletOriginOffset);
+#endif
+            }
+
+            void SpawnDoubleBullet()
+            {
+                //For the double bullet we need to do a little bit of maths
+                Vector2 originOffset = new(8);
+                Vector2 centre = position + drawOffset + originOffset;
+
+                (int width, int height) = (anim.GetCurrentTexture.Width, anim.GetCurrentTexture.Height);
+
+                Vector2 halfSize = new(width / 2, height / 2);
+
+                Matrix rotationMatrix = Matrix.CreateRotationZ((float)rotation);
+
+                Vector2 bulletA = Vector2.Transform(new Vector2(-halfSize.X, 0), rotationMatrix) + centre;
+                Vector2 bulletB = Vector2.Transform(new Vector2(halfSize.X, 0), rotationMatrix) + centre;
+
+                Bullet bA = new(bulletA, rotation);
+                Bullet bB = new(bulletB, rotation);
+
+                Game.Instance.AddEntity(bA);
+                Game.Instance.AddEntity(bB);
+                elapsedTime = 0;
+
+#if DEBUG
+                spawnPos.Add(bulletA);
+                spawnPos.Add(bulletB);
+#endif
+            }
+            #endregion
+
             switch (data.projectile)
             {
                 case "bullet":
                     {
-                        Vector2 originOffset = new(8);
-                        Vector2 bulletOriginOffset = new(-2);
-                        Bullet bullet = new(position + drawOffset + originOffset + bulletOriginOffset, rotation);
-                        Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
-                        elapsedTime = 0;
+                        SpawnSingleBullet();
                     }
                     break;
                 case "bullet_double":
                     {
-                        //For the double bullet we need to do a little bit of maths
-                        //We want to get the centre point, then do some trig to get an offset following a given angle
-                        Vector2 originOffset = new(8);
-                        Vector2 centre = position + drawOffset + originOffset;
-
-                        (int width, int height) = (anim.GetCurrentTexture.Width, anim.GetCurrentTexture.Height);
-
-                        Vector2 halfSize = new(width / 2, height / 2);
-
-                        Matrix rotationMatrix = Matrix.CreateRotationZ((float)rotation);
-
-                        Vector2 bulletA = Vector2.Transform(new Vector2(-halfSize.X, 0), rotationMatrix) + centre;
-                        Vector2 bulletB = Vector2.Transform(new Vector2(halfSize.X, 0), rotationMatrix) + centre;
-
-                        Bullet bA = new(bulletA, rotation);
-                        Bullet bB = new(bulletB, rotation);
-
-                        Game.Instance.AddEntity(bA);
-                        Game.Instance.AddEntity(bB);
-                        elapsedTime = 0;
+                        SpawnDoubleBullet();
+                    }
+                    break;
+                case "bullet_triple":
+                    {
+                        SpawnSingleBullet();
+                        SpawnDoubleBullet();
                     }
                     break;
                 default: break;

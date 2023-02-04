@@ -233,6 +233,9 @@
     <None Update="Assets\Textures\towers\tower_2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\towers\tower_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\towers_render\tower_0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -240,6 +243,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\towers_render\tower_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Textures\towers_render\tower_3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Textures\tower_platform.png">
@@ -276,6 +282,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="cfg\tower_minigun.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="cfg\tower_super.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="cfg\unit_dev.xml">

@@ -807,7 +807,7 @@ namespace TowerDefence.Scenes
 
             if (showDebugStats)
             {
-                string message = $"PING: {Client.Instance.Peer.Ping}ms";
+                string message = $"PING: {(Client.Instance.Peer.Ping)}ms";
                 spriteBatch.DrawString(AssetContainer.GetFont("fMain"), message, new Vector2(100, 100), Color.White);
             }
 
@@ -1180,7 +1180,7 @@ namespace TowerDefence.Scenes
                 }
             }
 
-            if (!Tower.towerDatas.ContainsKey(towers.GetActiveIndex()) && gameState == GameState.PLACEMENT && towers.GetActiveIndex() != -1)
+            if (Tower.towerDatas.ContainsKey(towers.GetActiveIndex()) && gameState == GameState.PLACEMENT && towers.GetActiveIndex() != -1)
             {
                 int selectedTower = towers.GetActiveIndex();
                 this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);

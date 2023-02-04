@@ -48,6 +48,15 @@ namespace TowerDefence.Entities.GameObjects.Towers
             Texture2D texture = anim.GetCurrentTexture;
             Vector2 originOffset = new(8);
             spriteBatch.Draw(texture, position + drawOffset + originOffset, null, Color.White, (float)rotation, originOffset, Vector2.One, SpriteEffects.None, 0f);
+
+            if (enemiesInRange.Any())
+            {
+                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
+
+                Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
+                Vector2 tower = position + drawOffset + originOffset;
+                DrawLine(spriteBatch, tower, closest.GetScreenPosition() + originOffset, Color.White);
+            }
         }
 
         public override byte GetID() => data.id;
@@ -64,7 +73,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 case "bullet":
                     {
                         Vector2 originOffset = new(8);
-                        Bullet bullet = new(position + drawOffset + originOffset, rotation);
+                        Vector2 bulletOriginOffset = new(-2);
+                        Bullet bullet = new(position + drawOffset + originOffset + bulletOriginOffset, rotation);
                         Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
                         elapsedTime = 0;
                     }

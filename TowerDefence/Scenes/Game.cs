@@ -613,7 +613,7 @@ namespace TowerDefence.Scenes
                     Tower tower = new(towers.GetActiveIndex(), new(tmx - playFieldOffset.X, tmy - playFieldOffset.Y), anim, playFieldOffset, true);
                     entities.Add(tower);
 
-                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), $"+${tower.Data.cost}", 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
+                    Popup popup = new(new(MouseController.GetMousePosition().x, MouseController.GetMousePosition().y), $"-${tower.Data.cost}", 1f, GlobalSettings.TextError, AssetContainer.GetFont("fMain"), 1.75f, new(0, -9f));
                     entities.Add(popup);
 
                     Client.Instance.SendMessage($"{Header.SPEND_MONEY}{Client.Instance.PlayerID},{Tower.towerDatas[towers.GetActiveIndex()].cost}");
@@ -671,7 +671,7 @@ namespace TowerDefence.Scenes
             ushort total = 0;
             while (moneyMadeThisFrame.Count > 0) total += moneyMadeThisFrame.Pop();
             Client.Instance.SendMessage($"{Header.ADD_MONEY}{Client.Instance.PlayerID},{total}");
-            vMoney += total;
+            vMoney = (ushort)Math.Min(vMoney + total, ushort.MaxValue);
         }
 
         public void SpawnEnemyFromWave(string name)

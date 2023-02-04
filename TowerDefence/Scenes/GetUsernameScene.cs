@@ -19,9 +19,9 @@ namespace TowerDefence.Scenes
 
         private string lastName;
 
-        private Texture2D   tick;
-        private Texture2D  cross;
-        private Texture2D  tickD;
+        private Texture2D tick;
+        private Texture2D cross;
+        private Texture2D tickD;
         private Texture2D crossD;
 
         private Vector2 textboxOffset;
@@ -79,10 +79,10 @@ namespace TowerDefence.Scenes
 
             Console.WriteLine("LOAD GetUsernameScene");
 
-            tick =        AssetContainer.ReadTexture("sTick");
-            cross =      AssetContainer.ReadTexture("sCross");
+            tick = AssetContainer.ReadTexture("sTick");
+            cross = AssetContainer.ReadTexture("sCross");
             crossD = AssetContainer.ReadTexture("sCrossDrop");
-            tickD =   AssetContainer.ReadTexture("sTickDrop");
+            tickD = AssetContainer.ReadTexture("sTickDrop");
 
             Vector2 pos = new(SceneManager.Instance.graphics.PreferredBackBufferWidth / 2, 50);
             title = new(AssetContainer.ReadString("STR_GAME_NAME"), 2f, pos, Color.White, AssetContainer.GetFont("fMain"), Origin.MIDDLE_CENTRE, 0f);
@@ -92,7 +92,7 @@ namespace TowerDefence.Scenes
 
             pos.Y = 468;
             usernameLabel = new(AssetContainer.ReadString("LBL_USERNAME"), 1f, pos, Color.White, AssetContainer.GetFont("fMain"), Origin.BOTTOM_CENTRE, 0f);
-            
+
             pos.Y = usernameBox.GetBoundingBox.Y + usernameBox.GetBoundingBox.Height + 32;
             usernameAllowed = new(string.Empty, 1f, pos, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_CENTRE, 0f);
 

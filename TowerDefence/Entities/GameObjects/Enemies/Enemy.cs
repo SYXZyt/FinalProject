@@ -1,6 +1,7 @@
 ﻿using UILibrary;
 using System.Text;
 using TowerDefence.Visuals;
+using TowerDefence.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,6 +28,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         private Vector2 absolutePosition;
         private int dir; //0 - up, 1 - right, 2 - down, 3 - left,
         private bool damagedThisFrame = false;
+
+        private readonly List<DamageEffectComponent> components = new();
 
         private float elapsedTime;
 
@@ -112,20 +115,30 @@ namespace TowerDefence.Entities.GameObjects.Enemies
             catch { return null; }
         }
 
-        public void Damage()
+        public void Damage(int amount)
         {
             if (!damagedThisFrame)
             {
-                Game.Instance.AddMoneyThisFrame(1);
-                health--;
+                Game.Instance.AddMoneyThisFrame((ushort)(1 * amount));
+                health -= amount;
                 damagedThisFrame = true;
             }
         }
 
+        public void Damage() => Damage(1);
+
+        public bool HasComponent<T>() => components.OfType<T>().Any();
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D frame = frames.GetFrame(dir);
-            frame.Draw(absolutePosition, spriteBatch, Color.White);
+            frame.Draw(absolutePosition, spriteBatch, HasComponent<FireDamage>() ? Color.Red : Color.White);
+        }
+
+        public void AddDamageComponent(DamageEffectComponent damageEffectComponent)
+        {
+            components.Add(damageEffectComponent);
+            damageEffectComponent.Enemy = this;
         }
 
         public Vector2 GetScreenPosition() => absolutePosition;
@@ -196,7 +209,10 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 checkForPosMovement = true;
             }
 
+            foreach (DamageEffectComponent component in components) component.Update(gameTime);
+
             damagedThisFrame = false;
+            components.RemoveAll(c => c.MarkForRemoval);
         }
 
         private static List<int> CheckNextDirection(Vector2 position, int dir)

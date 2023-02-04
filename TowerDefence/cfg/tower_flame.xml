@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tower>
+  <tower_id>4</tower_id>
+  <tower_name>Flamethrower</tower_name>
+  <range>80</range>
+  <cost>1000</cost>
+  <texture_idle>tower_fire</texture_idle>
+  <texture_button>tower_fire_button</texture_button>
+  <projectile>fire</projectile>
+  <rate>3</rate>
+</tower>

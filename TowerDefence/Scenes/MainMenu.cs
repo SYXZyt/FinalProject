@@ -24,10 +24,7 @@ namespace TowerDefence.Scenes
             title.DrawWithShadow(spriteBatch);
         }
 
-        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-
-        }
+        public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime) { }
 
         public override void LoadContent()
         {

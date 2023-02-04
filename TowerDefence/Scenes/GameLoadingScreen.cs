@@ -1,10 +1,12 @@
 ﻿using UILibrary;
 using System.Xml;
+using AssetStreamer;
 using UILibrary.Scenes;
 using System.Diagnostics;
 using AssetStreamer.Assets;
 using TowerDefence.Visuals;
 using TowerDefence.Settings;
+using TowerDefence.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects;
@@ -12,7 +14,6 @@ using TowerDefence.Entities.GameObjects.Towers;
 using TowerDefence.Entities.GameObjects.Enemies;
 
 using Color = Microsoft.Xna.Framework.Color;
-using AssetStreamer;
 using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Scenes
@@ -152,7 +153,7 @@ namespace TowerDefence.Scenes
 
             private static void LoadColours()
             {
-                if (!File.Exists(@"cfg\rgb.xml")) return;
+                if (!File.Exists(@"cfg\rgb.xml")) throw new FileNotFoundException(@"cfg\rgb.xml", @"cfg\rgb.xml");
 
                 XmlDocument xml = new();
                 xml.Load(@"cfg\rgb.xml");
@@ -177,11 +178,32 @@ namespace TowerDefence.Scenes
                 GlobalSettings.TextWarning = warning;
             }
 
+            private static void LoadEffects()
+            {
+                if (!File.Exists(@"Effects\Flame.xml")) throw new FileNotFoundException(@"Effects\Flame.xml", @"Effects\Flame.xml");
+
+                XmlDocument xml = new();
+                xml.Load(@"Effects\Flame.xml");
+
+                XmlNode name = xml.SelectSingleNode("/effect/effect_name");
+                XmlNode timer = xml.SelectSingleNode("/effect/effect_timer");
+                XmlNode damage = xml.SelectSingleNode("effect//effect_damage");
+
+                DamageEffectStats fireDamageStats = new()
+                {
+                    time = float.Parse(timer.InnerText),
+                    damage = int.Parse(damage.InnerText)
+                };
+
+                DamageEffectComponent.damageEffectStats[name.InnerText] = fireDamageStats;
+            }
+
             public static void Load()
             {
                 LoadBulletCfg();
                 LoadColours();
-                
+                LoadEffects();
+
                 TowerData debugTower = LoadTower(@"cfg\tower_dev.xml");
                 Tower.towerDatas.Add(debugTower.id, debugTower);
 
@@ -196,6 +218,9 @@ namespace TowerDefence.Scenes
 
                 TowerData superTower = LoadTower(@"cfg\tower_super.xml");
                 Tower.towerDatas.Add(superTower.id, superTower);
+
+                TowerData flameTower = LoadTower(@"cfg\tower_flame.xml");
+                Tower.towerDatas.Add(flameTower.id, flameTower);
 
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
@@ -353,9 +378,14 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_2.png", "tower_minigun_button"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_3.png", "tower_super"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_3.png", "tower_super_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_4.png", "tower_fire"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_4.png", "tower_fire_button"));
 
             //Load loading texture
             for (int i = 0; i < 8; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @$"Assets\Textures\load_{i}.png", $"sLoad_{i}"));
+
+            //Load fire texture 
+            for (int i = 0; i < 6; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\fire_{i}.png", $"sFire_{i}"));
 
             //Load the map textures
             for (int i = 0; i < 29; i++)

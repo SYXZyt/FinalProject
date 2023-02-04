@@ -60,14 +60,18 @@ namespace TowerDefence.Entities.GameObjects
         }
 
         [SuppressMessage("Style", "IDE0002")]
-        public Bullet(Vector2 position, double direction) : base()
+        public Bullet(Vector2 position, double direction, bool ownership) : base()
         {
-            base.position = position;
-            base.textures = new();
-
             texture = AssetContainer.ReadTexture(TextureName);
+
+            base.position = new(position.X - texture.Width * 0.5f, position.Y - texture.Height * 0.5f);
+            base.textures = new();
+            base.ownership = ownership;
+
             this.direction = direction;
-            aabb = new((short)position.X, (short)position.Y, (short)(texture.Width*1.2), (short)(texture.Height*1.2));
+            aabb = new((short)(position.X - texture.Width * 0.5), (short)(position.Y - texture.Height * 0.5), (short)(texture.Width*1.5), (short)(texture.Height*1.5));
+
+            System.Diagnostics.Debug.WriteLine($"{direction}");
         }
     }
 }

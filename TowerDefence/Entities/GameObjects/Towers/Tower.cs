@@ -22,34 +22,8 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public static Dictionary<int, TowerData> towerDatas;
 
-#if DEBUG
-        private readonly List<Vector2> spawnPos = new();
-#endif
-
         public double Rotation => rotation;
         public TowerData Data => data;
-
-#if DEBUG
-        //This method is just for debugging purposes
-        private static void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Color color, int width = 1)
-        {
-            Rectangle r = new((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
-            Vector2 v = Vector2.Normalize(begin - end);
-            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
-            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
-            Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
-            spriteBatch.Draw(x, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
-        }
-
-        private static void DrawLineByAngle(SpriteBatch spriteBatch, Vector2 begin, float angle, float length, Color color, int width = 1)
-        {
-            Vector2 end = begin + new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * length;
-            Rectangle r = new((int)begin.X, (int)begin.Y, (int)length + width, width);
-            Texture2D x = Extension.CreateTexture(UILibrary.Scenes.SceneManager.Instance.GraphicsDevice, 1, 1, c => Color.Magenta);
-            spriteBatch.Draw(x, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
-        }
-
-#endif
 
         public override Entity Deserialise(string serialised)
         {
@@ -61,15 +35,6 @@ namespace TowerDefence.Entities.GameObjects.Towers
             Texture2D texture = anim.GetCurrentTexture;
             Vector2 originOffset = new(8);
             spriteBatch.Draw(texture, position + drawOffset + originOffset, null, Color.White, (float)rotation, originOffset, Vector2.One, SpriteEffects.None, 0f);
-
-#if DEBUG
-            if (enemiesInRange.Any())
-            {
-                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
-
-                //foreach (Vector2 pos in spawnPos) DrawLineByAngle(spriteBatch, pos, (float)(rotation - (Math.PI / 2)), 100, Color.White);
-            }
-#endif
         }
 
         public override byte GetID() => data.id;
@@ -81,22 +46,14 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         private void SpawnBullet()
         {
-#if DEBUG
-            spawnPos.Clear();
-#endif
-
             #region Spawn Methods
             void SpawnSingleBullet()
             {
                 Vector2 originOffset = new(8);
                 Vector2 bulletOriginOffset = new(-2);
-                Bullet bullet = new(position + drawOffset + originOffset + bulletOriginOffset, rotation);
+                Bullet bullet = new(position + drawOffset + originOffset + bulletOriginOffset, rotation, ownership);
                 Game.Instance.AddEntity(bullet); //Hand off ownership of the bullet
                 elapsedTime = 0;
-
-#if DEBUG
-                spawnPos.Add(position + drawOffset + originOffset + bulletOriginOffset);
-#endif
             }
 
             void SpawnDoubleBullet()
@@ -114,38 +71,51 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 Vector2 bulletA = Vector2.Transform(new Vector2(-halfSize.X, 0), rotationMatrix) + centre;
                 Vector2 bulletB = Vector2.Transform(new Vector2(halfSize.X, 0), rotationMatrix) + centre;
 
-                Bullet bA = new(bulletA, rotation);
-                Bullet bB = new(bulletB, rotation);
+                Bullet bA = new(bulletA, rotation, ownership);
+                Bullet bB = new(bulletB, rotation, ownership);
 
                 Game.Instance.AddEntity(bA);
                 Game.Instance.AddEntity(bB);
                 elapsedTime = 0;
+            }
 
-#if DEBUG
-                spawnPos.Add(bulletA);
-                spawnPos.Add(bulletB);
-#endif
+            void SpawnFireRound()
+            {
+                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
+                Vector2 position = closest.GetPosition() * Game.TileSize;
+                position += ownership ? Game.Instance.PlayerGameOffset : Game.Instance.OpponentGameOffset;
+
+                Vector2 rngOff = new(Game.Instance.RNG.Next(-6, 7), Game.Instance.RNG.Next(-6, 7));
+                position += rngOff;
+                Flame flame = new(position, ownership);
+                Game.Instance.AddEntity(flame);
+                elapsedTime = 0;
             }
             #endregion
 
             switch (data.projectile)
             {
                 case "bullet":
-                    {
-                        SpawnSingleBullet();
-                    }
-                    break;
+                {
+                    SpawnSingleBullet();
+                }
+                break;
                 case "bullet_double":
-                    {
-                        SpawnDoubleBullet();
-                    }
-                    break;
+                {
+                    SpawnDoubleBullet();
+                }
+                break;
                 case "bullet_triple":
-                    {
-                        SpawnSingleBullet();
-                        SpawnDoubleBullet();
-                    }
-                    break;
+                {
+                    SpawnSingleBullet();
+                    SpawnDoubleBullet();
+                }
+                break;
+                case "fire":
+                {
+                    SpawnFireRound();
+                }
+                break;
                 default: break;
             }
         }

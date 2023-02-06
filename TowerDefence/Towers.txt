@@ -7,4 +7,4 @@
 6: Sniper
 7: Nuke
 8: Super Sniper
-9: Crusher
+9: Rocket Battery

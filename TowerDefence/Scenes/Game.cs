@@ -26,6 +26,10 @@ namespace TowerDefence.Scenes
         #region Members
         private readonly Random rng;
 
+        private Texture2D rangeTexture;
+        private int rangeTextureRad;
+        private const int RangeTextureLimit = 2500;
+
         private readonly Stack<ushort> moneyMadeThisFrame = new();
         private readonly List<Vector2> enemySpawnPositions = new();
 
@@ -169,12 +173,15 @@ namespace TowerDefence.Scenes
             }
         }
 
-        private static Texture2D CreateCircleTexture(int radius, Color color)
+        private Texture2D CreateCircleTexture(int radius, Color color)
         {
-            if (radius > 15000) radius = 15000;
+            if (radius > RangeTextureLimit) radius = RangeTextureLimit;
 
             // Create a new texture with the same width and height as the radius
             Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
+
+            rangeTexture?.Dispose();
+            rangeTexture = circleTexture;
 
             // Create an array to hold the texture color data
             Color[] colorData = new Color[radius * radius];
@@ -774,8 +781,15 @@ namespace TowerDefence.Scenes
                     {
                         TowerData data = Tower.towerDatas[towers.GetActiveIndex()];
 
-                        Texture2D range = CreateCircleTexture(data.range, canPlace ? Color.White : Color.Red);
-                        range.Draw(new Vector2(tmx - range.Width / 2 + TileSize / 2, tmy - range.Height / 2 + TileSize / 2), spriteBatch, Color.White * 0.2f);
+                        //Check if we should recreate the texture
+                        if (rangeTexture is null || rangeTextureRad != data.range)
+                        {
+                            CreateCircleTexture(data.range, Color.White);
+                        }
+                        rangeTexture.Draw(new Vector2(tmx - rangeTexture.Width / 2 + TileSize / 2, tmy - rangeTexture.Height / 2 + TileSize / 2), spriteBatch, (canPlace ? Color.White : Color.Red) * 0.2f);
+
+                        //Update our buffers
+                        rangeTextureRad = data.range;
                     }
                 }
             }
@@ -1096,6 +1110,7 @@ namespace TowerDefence.Scenes
             Console.WriteLine($"UNLOAD Game");
             SceneManager.Instance.ManagedUIManager = true; //Pass control back to the SceneManager
             UIManager.Clear();
+            rangeTexture = null;
         }
 
         public override void Update(GameTime gameTime)

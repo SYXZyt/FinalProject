@@ -222,6 +222,21 @@ namespace TowerDefence.Scenes
                 TowerData flameTower = LoadTower(@"cfg\tower_flame.xml");
                 Tower.towerDatas.Add(flameTower.id, flameTower);
 
+                TowerData rocketTower = LoadTower(@"cfg\tower_rocket.xml");
+                Tower.towerDatas.Add(rocketTower.id, rocketTower);
+
+                TowerData sniperTower = LoadTower(@"cfg\tower_sniper.xml");
+                Tower.towerDatas.Add(sniperTower.id, sniperTower);
+
+                TowerData nukeTower = LoadTower(@"cfg\tower_nuke.xml");
+                Tower.towerDatas.Add(nukeTower.id, nukeTower);
+
+                TowerData teslaTower = LoadTower(@"cfg\tower_tesla.xml");
+                Tower.towerDatas.Add(teslaTower.id, teslaTower);
+
+                TowerData batteryTower = LoadTower(@"cfg\tower_missile.xml");
+                Tower.towerDatas.Add(batteryTower.id, batteryTower);
+
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
 
@@ -380,6 +395,16 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_3.png", "tower_super_button"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_4.png", "tower_fire"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_4.png", "tower_fire_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_5.png", "tower_rocket"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_5.png", "tower_rocket_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_6.png", "tower_sniper"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_6.png", "tower_sniper_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_7.png", "tower_nuke"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_7.png", "tower_nuke_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_8.png", "tower_tesla"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_8.png", "tower_tesla_button"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers\tower_9.png", "tower_missile"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\towers_render\tower_9.png", "tower_missile_button"));
 
             //Load loading texture
             for (int i = 0; i < 8; i++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @$"Assets\Textures\load_{i}.png", $"sLoad_{i}"));

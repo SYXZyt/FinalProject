@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>5</tower_id>
+  <tower_name>Rocket Launcher</tower_name>
+  <range>180</range>
+  <cost>600</cost>
+  <texture_idle>tower_rocket</texture_idle>
+  <texture_button>tower_rocket_button</texture_button>
+  <projectile>rocket</projectile>
+  <rate>0.45</rate>
+</tower>

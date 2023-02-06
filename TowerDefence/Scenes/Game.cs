@@ -171,6 +171,8 @@ namespace TowerDefence.Scenes
 
         private static Texture2D CreateCircleTexture(int radius, Color color)
         {
+            if (radius > 15000) radius = 15000;
+
             // Create a new texture with the same width and height as the radius
             Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
 

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>8</tower_id>
+  <tower_name>Tesla Coil</tower_name>
+  <range>120</range>
+  <cost>1100</cost>
+  <texture_idle>tower_tesla</texture_idle>
+  <texture_button>tower_tesla_button</texture_button>
+  <projectile>lightning</projectile>
+  <rate>0.6</rate>
+</tower>

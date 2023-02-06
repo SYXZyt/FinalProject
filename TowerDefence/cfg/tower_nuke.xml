@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>7</tower_id>
+  <tower_name>Nuke</tower_name>
+  <range>64000</range>
+  <cost>5000</cost>
+  <texture_idle>tower_nuke</texture_idle>
+  <texture_button>tower_nuke_button</texture_button>
+  <projectile>nuke</projectile>
+  <rate>0.05</rate>
+</tower>

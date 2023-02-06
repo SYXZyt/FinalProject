@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>6</tower_id>
+  <tower_name>Sniper</tower_name>
+  <range>64000</range>
+  <cost>650</cost>
+  <texture_idle>tower_sniper</texture_idle>
+  <texture_button>tower_sniper_button</texture_button>
+  <projectile>bullet_instant</projectile>
+  <rate>1</rate>
+</tower>

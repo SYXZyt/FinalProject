@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tower>
+  <tower_id>9</tower_id>
+  <tower_name>Missile Battery</tower_name>
+  <range>250</range>
+  <cost>1200</cost>
+  <texture_idle>tower_missile</texture_idle>
+  <texture_button>tower_missile_button</texture_button>
+  <projectile>battery</projectile>
+  <rate>0.3</rate>
+</tower>

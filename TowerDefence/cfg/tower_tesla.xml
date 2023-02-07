@@ -8,4 +8,5 @@
   <texture_button>tower_tesla_button</texture_button>
   <projectile>lightning</projectile>
   <rate>0.6</rate>
+  <rotate>0</rotate>
 </tower>

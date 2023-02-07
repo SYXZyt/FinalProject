@@ -3,9 +3,10 @@
   <tower_id>3</tower_id>
   <tower_name>Super Gun</tower_name>
   <range>190</range>
-  <cost>5000</cost>
+  <cost>1500</cost>
   <texture_idle>tower_super</texture_idle>
   <texture_button>tower_super_button</texture_button>
   <projectile>bullet_triple</projectile>
   <rate>3</rate>
+  <rotate>1</rotate>
 </tower>

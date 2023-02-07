@@ -10,5 +10,6 @@
         public string texButton;
         public float rate;
         public string projectile;
+        public bool rotate;
     }
 }

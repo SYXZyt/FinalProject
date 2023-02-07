@@ -9,7 +9,7 @@ namespace TowerDefence.Visuals
         LOOP,
     }
 
-    internal sealed class Animation
+    internal sealed class Animation : ICopyable<Animation>
     {
         private readonly TextureCollection frames;
         private int frame;
@@ -20,11 +20,15 @@ namespace TowerDefence.Visuals
 
         public bool HasEnded => frame == -1;
 
+        public int FrameIndex => frame;
+
         public Texture2D GetFrame(int frame) => frames[frame];
 
         public Texture2D GetActiveFrame() => frames[frame == -1 ? frames.Count - 1 : frame];
 
         public void SetFreeze(bool freeze) => this.freeze = freeze;
+
+        public Animation Copy() => new(frames, animationSpeed, playType);
 
         public void Update(GameTime gameTime)
         {

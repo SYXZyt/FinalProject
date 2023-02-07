@@ -8,4 +8,5 @@
   <texture_button>tower_minigun_button</texture_button>
   <projectile>bullet</projectile>
   <rate>5</rate>
+  <rotate>1</rotate>
 </tower>

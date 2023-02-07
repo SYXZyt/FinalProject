@@ -8,4 +8,5 @@
   <texture_button>tower_missile_button</texture_button>
   <projectile>battery</projectile>
   <rate>0.3</rate>
+  <rotate>1</rotate>
 </tower>

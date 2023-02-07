@@ -8,4 +8,5 @@
   <texture_button>tower_sniper_button</texture_button>
   <projectile>bullet_instant</projectile>
   <rate>1</rate>
+  <rotate>1</rotate>
 </tower>

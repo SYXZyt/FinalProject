@@ -270,6 +270,9 @@ namespace TowerDefence.Scenes
         private int loadTaskCount = 0;
         private readonly Queue<LoadFile> filesToLoad;
 
+        private Texture2D filledTexture;
+        private Texture2D unfilledTexture;
+
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
         }
@@ -320,8 +323,11 @@ namespace TowerDefence.Scenes
             Color u = new(0);
             AABB progressBarBox = new(5, (short)(SceneManager.Instance.graphics.PreferredBackBufferHeight - 18), (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - 10), 6);
 
+            filledTexture = CreateTexture(GraphicsDevice, 1, 4, c => f);
+            unfilledTexture = CreateTexture(GraphicsDevice, 1, 4, c => u);
+
             loadTaskCount = filesToLoad.Count;
-            progressBar = new(CreateTexture(GraphicsDevice, 1, 4, c => f), CreateTexture(GraphicsDevice, 1, 4, c => u), progressBarBox, loadTaskCount);
+            progressBar = new(filledTexture, unfilledTexture, progressBarBox, loadTaskCount);
 
             ConfigLoader.Load();
         }
@@ -330,6 +336,8 @@ namespace TowerDefence.Scenes
         {
             Console.WriteLine($"UNLOAD GameLoadingScreen");
             UIManager.Clear();
+            filledTexture.Dispose();
+            unfilledTexture.Dispose();
         }
 
         public override void Update(GameTime gameTime)

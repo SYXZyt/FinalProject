@@ -26,6 +26,11 @@ namespace TowerDefence.Scenes
         #region Members
         private readonly Random rng;
 
+        #region Nuke Data
+        private float nukeFlashOpacity;
+        private Texture2D nukeFlash;
+        #endregion
+
         private Texture2D rangeTexture;
         private int rangeTextureRad;
         private const int RangeTextureLimit = 2500;
@@ -126,6 +131,12 @@ namespace TowerDefence.Scenes
 
         #region Properties
 
+        public float NukeFlashOpacity
+        {
+            get => nukeFlashOpacity;
+            set => nukeFlashOpacity = value;
+        }
+
         /// <summary>
         /// Get all active entities in the game
         /// </summary>
@@ -177,28 +188,29 @@ namespace TowerDefence.Scenes
         {
             if (radius > RangeTextureLimit) radius = RangeTextureLimit;
 
-            // Create a new texture with the same width and height as the radius
+            //Create a new texture with the same width and height as the radius
             Texture2D circleTexture = new(SceneManager.Instance.GraphicsDevice, radius, radius);
 
             rangeTexture?.Dispose();
             rangeTexture = circleTexture;
 
-            // Create an array to hold the texture color data
+            //Create an array to hold the texture color data
             Color[] colorData = new Color[radius * radius];
 
-            // Set the center of the circle
-            Vector2 center = new(radius / 2f, radius / 2f);
+            //Set the center of the circle
+            int center = radius / 2;
+            float squareRadius = (radius / 2f) * (radius / 2f);
 
-            // Fill the color data array with the circle color
+            //Fill the color data array with the circle color
             for (int x = 0; x < radius; x++)
             {
+                int xDist = x - center;
                 for (int y = 0; y < radius; y++)
                 {
-                    // Calculate the distance between the current pixel and the center of the circle
-                    float distance = Vector2.Distance(center, new Vector2(x, y));
+                    int yDist = y - center;
 
-                    // If the distance is less than or equal to the radius, color the pixel
-                    if (distance <= radius / 2f)
+                    //Calculate the distance between the current pixel and the center of the circle
+                    if (xDist * xDist + yDist * yDist <= squareRadius)
                     {
                         colorData[x + y * radius] = color;
                     }
@@ -209,12 +221,13 @@ namespace TowerDefence.Scenes
                 }
             }
 
-            // Set the color data on the texture
+            //Set the color data on the texture
             circleTexture.SetData(colorData);
 
-            // Return the generated texture
+            //Return the generated texture
             return circleTexture;
         }
+
 
         /// <summary>
         /// Update the game based on the current state
@@ -711,6 +724,8 @@ namespace TowerDefence.Scenes
             foreach (Entity e in entities) if (e is not Popup and not Tower) e?.Draw(spriteBatch);
             DrawTowers(spriteBatch);
             DrawEnemyEntities(spriteBatch);
+
+            spriteBatch.Draw(nukeFlash, new Rectangle(0, 0, SceneManager.Instance.graphics.PreferredBackBufferWidth, SceneManager.Instance.graphics.PreferredBackBufferHeight), Color.White * nukeFlashOpacity);
         }
 
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
@@ -837,6 +852,9 @@ namespace TowerDefence.Scenes
 
             void LoadTextures()
             {
+                nukeFlash = new Texture2D(GraphicsDevice, 1, 1);
+                nukeFlash.SetData(new Color[] { Color.White });
+
                 bkg = AssetContainer.ReadTexture("sMenu");
                 vignette = AssetContainer.ReadTexture("sVignette");
                 divider = AssetContainer.ReadTexture("sBorder");
@@ -1056,6 +1074,8 @@ namespace TowerDefence.Scenes
 
             }
 
+            nukeFlashOpacity = 0f;
+
             vignetteOpac = 0.0f;
             gameOverOpacity = 0f;
             entities = new();
@@ -1108,6 +1128,7 @@ namespace TowerDefence.Scenes
         public override void UnloadContent()
         {
             Console.WriteLine($"UNLOAD Game");
+            nukeFlash.Dispose();
             SceneManager.Instance.ManagedUIManager = true; //Pass control back to the SceneManager
             UIManager.Clear();
             rangeTexture = null;
@@ -1149,6 +1170,9 @@ namespace TowerDefence.Scenes
 
             //Adjust the vignette opacity
             vignetteOpac = (float)Math.Max(0, vignetteOpac - vignetteSpeed * gameTime.ElapsedGameTime.TotalSeconds);
+
+            //Adjust the nuke flash
+            nukeFlashOpacity = (float)Math.Max(0, nukeFlashOpacity - 1 * gameTime.ElapsedGameTime.TotalSeconds);
 
             //Debug stuff
             if (KeyboardController.IsPressed(Keys.NumPad0) || Keyboard.GetState().IsKeyDown(Keys.NumPad1))

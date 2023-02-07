@@ -7,5 +7,6 @@
   <texture_idle>tower_nuke</texture_idle>
   <texture_button>tower_nuke_button</texture_button>
   <projectile>nuke</projectile>
-  <rate>0.05</rate>
+  <rate>0.09</rate>
+  <rotate>0</rotate>
 </tower>

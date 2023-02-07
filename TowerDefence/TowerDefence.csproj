@@ -77,6 +77,9 @@
     <None Update="Assets\Textures\fire_5.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Textures\icbm.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Textures\load_0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -8,4 +8,5 @@
   <texture_button>map_0</texture_button>
   <projectile>bullet</projectile>
   <rate>1000</rate>
+  <rotate>1</rotate>
 </tower>

@@ -105,6 +105,17 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 Game.Instance.AddEntity(flame);
                 elapsedTime = 0;
             }
+
+            void SpawnNuke()
+            {
+                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
+                Vector2 position = closest.GetPosition() * Game.TileSize;
+                position += ownership ? Game.Instance.PlayerGameOffset : Game.Instance.OpponentGameOffset;
+
+                Nuke nuke = new(position, ownership);
+                Game.Instance.AddEntity(nuke);
+                elapsedTime = 0;
+            }
             #endregion
 
             switch (data.projectile)
@@ -135,7 +146,16 @@ namespace TowerDefence.Entities.GameObjects.Towers
                     SpawnInstaBullet();
                 }
                 break;
-                default: break;
+                case "nuke":
+                {
+                    SpawnNuke();
+                }
+                break;
+                default:
+                {
+                    Console.WriteLine($"[WARNING] Tower attack '{data.projectile}' has no implementation");
+                }
+                break;
             }
         }
 
@@ -165,6 +185,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
             //Now if we are have an enemy in range, we then need to get the closest and perform some trigonometry to get the angle to the object
             if (enemiesInRange.Count > 0)
             {
+                elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
 
                 //Calculate positions and stuff
@@ -186,7 +207,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 }
             }
 
-            elapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (!data.rotate) rotation = 0;
         }
 
 

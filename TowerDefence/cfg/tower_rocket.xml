@@ -8,4 +8,5 @@
   <texture_button>tower_rocket_button</texture_button>
   <projectile>rocket</projectile>
   <rate>0.45</rate>
+  <rotate>1</rotate>
 </tower>

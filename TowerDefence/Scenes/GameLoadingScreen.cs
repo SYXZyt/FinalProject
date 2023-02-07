@@ -368,6 +368,10 @@ namespace TowerDefence.Scenes
                     Animation animation = new(textureCollection, 0);
                     Enemy.enemyAnims[name] = animation;
 
+                    TextureCollection nukeTexture = new();
+                    for (int i = 0; i < 244; i++) nukeTexture.AddTexture(AssetContainer.ReadTexture($"sNuke_{i}"));
+                    AnimationStreamer.AddAnimation(new(nukeTexture, 30, AnimationPlayType.PAUSE_AT_END), "aNuke");
+
                     timer.Stop();
                     Console.WriteLine($"Loaded assets in {timer.Elapsed.TotalMilliseconds}ms");
                     SceneManager.Instance.LoadScene("mainMenu");
@@ -444,6 +448,12 @@ namespace TowerDefence.Scenes
                 {
                     for (int j = 0; j < 3; j++) filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\maps\{i}_{j + 1}.png", $"map_{i}_{j}"));
                 }
+            }
+
+            //Load the nuke explosion textures
+            for (int i = 0; i < 244; i++)
+            {
+                filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\nuke\nuke_{i}.png", $"sNuke_{i}"));
             }
         }
 

@@ -33,6 +33,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         private float elapsedTime;
 
+        public bool DamagedThisFrame => damagedThisFrame;
+
         public ulong TotalDistance => distanceTravelled;
 
         //|1,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;)

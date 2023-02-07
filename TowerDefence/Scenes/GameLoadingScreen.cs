@@ -187,15 +187,33 @@ namespace TowerDefence.Scenes
 
                 XmlNode name = xml.SelectSingleNode("/effect/effect_name");
                 XmlNode timer = xml.SelectSingleNode("/effect/effect_timer");
-                XmlNode damage = xml.SelectSingleNode("effect//effect_damage");
+                XmlNode damage = xml.SelectSingleNode("effect/effect_damage");
+                XmlNode damageCancel = xml.SelectSingleNode("/effect/effect_damage_cancel");
 
                 DamageEffectStats fireDamageStats = new()
                 {
                     time = float.Parse(timer.InnerText),
-                    damage = int.Parse(damage.InnerText)
+                    damage = int.Parse(damage.InnerText),
+                    damageCancel = damageCancel.InnerText == "1",
                 };
 
                 DamageEffectComponent.damageEffectStats[name.InnerText] = fireDamageStats;
+
+                xml.Load(@"Effects\Shock.xml");
+
+                name = xml.SelectSingleNode("/effect/effect_name");
+                timer = xml.SelectSingleNode("/effect/effect_timer");
+                damage = xml.SelectSingleNode("effect/effect_damage");
+                damageCancel = xml.SelectSingleNode("/effect/effect_damage_cancel");
+
+                DamageEffectStats shockDamageStats = new()
+                {
+                    time = float.Parse(timer.InnerText),
+                    damage = int.Parse(damage.InnerText),
+                    damageCancel = damageCancel.InnerText == "1",
+                };
+
+                DamageEffectComponent.damageEffectStats[name.InnerText] = shockDamageStats;
             }
 
             public static void Load()

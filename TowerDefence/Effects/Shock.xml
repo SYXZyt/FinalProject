@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <effect>
-  <effect_name>Fire Damage</effect_name>
+  <effect_name>Shock Damage</effect_name>
   <effect_timer>1</effect_timer>
   <effect_damage>1</effect_damage>
-  <effect_damage_cancel>1</effect_damage_cancel>
+  <effect_damage_cancel>0</effect_damage_cancel>
 </effect>

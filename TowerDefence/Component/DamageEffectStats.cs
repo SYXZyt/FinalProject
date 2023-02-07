@@ -4,5 +4,6 @@
     {
         public float time;
         public int damage;
+        public bool damageCancel;
     }
 }

@@ -365,6 +365,9 @@
     <None Update="Effects\Flame.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Effects\Shock.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="MessageBox.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

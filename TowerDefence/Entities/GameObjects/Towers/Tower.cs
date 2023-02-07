@@ -79,6 +79,20 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 elapsedTime = 0;
             }
 
+            void SpawnInstaBullet()
+            {
+                Enemy[] enimies = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray();
+                for (int i = enimies.Length - 1; i >= 0; i--)
+                {
+                    if (!enimies[i].DamagedThisFrame)
+                    {
+                        enimies[i].Damage(1);
+                        elapsedTime = 0;
+                        break;
+                    }
+                }
+            }
+
             void SpawnFireRound()
             {
                 Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
@@ -114,6 +128,11 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 case "fire":
                 {
                     SpawnFireRound();
+                }
+                break;
+                case "bullet_instant":
+                {
+                    SpawnInstaBullet();
                 }
                 break;
                 default: break;

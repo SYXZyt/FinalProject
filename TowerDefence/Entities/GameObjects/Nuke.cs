@@ -1,4 +1,5 @@
 ﻿using UILibrary;
+using AssetStreamer;
 using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,10 +8,20 @@ namespace TowerDefence.Entities.GameObjects
 {
     internal class Nuke : Entity
     {
+        private enum NukeState
+        {
+            LAUNCH,
+            ATTACK,
+        }
+
         public static byte ID = 0;
         private readonly Animation frames;
+        private readonly Texture2D icbmTexture;
         private float darkness;
         private float opacity;
+        private Vector2 targetPosition;
+        private NukeState state;
+        private ulong tick;
 
         private const int FadeFrame = 115;
 
@@ -18,9 +29,16 @@ namespace TowerDefence.Entities.GameObjects
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            byte v = (byte)(255 - this.darkness);
-            Color darkness = new(v, v, v);
-            frames.GetActiveFrame().Draw(position, spriteBatch, darkness * opacity);
+            if (state == NukeState.ATTACK)
+            {
+                byte v = (byte)(255 - this.darkness);
+                Color darkness = new(v, v, v);
+                frames.GetActiveFrame().Draw(targetPosition, spriteBatch, darkness * opacity);
+            }
+            else
+            {
+                icbmTexture.Draw(position, spriteBatch, Color.White);
+            }
         }
 
         public override byte GetID() => ID;
@@ -29,28 +47,44 @@ namespace TowerDefence.Entities.GameObjects
 
         public override void Update(GameTime gameTime)
         {
-            frames.Update(gameTime);
-
-            if (frames.FrameIndex >= FadeFrame)
+            if (state == NukeState.ATTACK)
             {
-                opacity = (float)Math.Max(0, opacity - 1f * gameTime.ElapsedGameTime.TotalSeconds);
-                darkness -= 0.01f;
-            }
+                if (tick == 0) Scenes.Game.Instance.NukeFlashOpacity = 1f;
 
-            if (opacity == 0) markForDeletion = true;
+                tick++;
+
+                frames.Update(gameTime);
+
+                if (frames.FrameIndex >= FadeFrame)
+                {
+                    opacity = (float)Math.Max(0, opacity - 1f * gameTime.ElapsedGameTime.TotalSeconds);
+                    darkness -= 0.01f;
+                }
+
+                if (opacity == 0) markForDeletion = true;
+            }
+            else
+            {
+                position = new Vector2(position.X, (float)(position.Y - 256f * gameTime.ElapsedGameTime.TotalSeconds));
+
+                if (position.Y < -96) state = NukeState.ATTACK;
+            }
         }
 
-        public Nuke(Vector2 position, bool ownership)
+        public Nuke(Vector2 targetPosition, Vector2 launchPosition, bool ownership)
         {
             this.ownership = ownership;
             frames = AnimationStreamer.ReadAnimation("aNuke").Copy();
+            icbmTexture = AssetContainer.ReadTexture("sICBM");
 
-            Vector2 v = new(frames.GetFrame(0).Width / 2, frames.GetFrame(0).Height / 2);
-            this.position = position - v;
+            position = launchPosition;
+
+            Vector2 vb = new(frames.GetFrame(0).Width / 2, frames.GetFrame(0).Height / 2);
+            this.targetPosition = targetPosition - vb;
             opacity = 1;
             darkness = 0;
-
-            Scenes.Game.Instance.NukeFlashOpacity = 1f;
+            state = NukeState.LAUNCH;
+            tick = 0;
         }
     }
 }

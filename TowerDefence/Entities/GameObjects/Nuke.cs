@@ -3,6 +3,7 @@ using AssetStreamer;
 using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TowerDefence.Entities.GameObjects.Enemies;
 
 namespace TowerDefence.Entities.GameObjects
 {
@@ -49,7 +50,15 @@ namespace TowerDefence.Entities.GameObjects
         {
             if (state == NukeState.ATTACK)
             {
-                if (tick == 0) Scenes.Game.Instance.NukeFlashOpacity = 1f;
+                if (tick == 0)
+                {
+                    Scenes.Game.Instance.NukeFlashOpacity = 1f;
+
+                    //Damage all enemies
+                    List<Enemy> enemies = Scenes.Game.Instance.Entities.OfType<Enemy>().Where(e => e.Ownership == ownership).ToList();
+
+                    foreach (Enemy e in enemies) e.Damage(150);
+                }
 
                 tick++;
 

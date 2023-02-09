@@ -111,8 +111,9 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
                 Vector2 position = closest.GetPosition() * Game.TileSize;
                 position += ownership ? Game.Instance.PlayerGameOffset : Game.Instance.OpponentGameOffset;
+                Vector2 enemyOff = new(8);
 
-                Nuke nuke = new(position, this.position + drawOffset, ownership);
+                Nuke nuke = new(position, this.position + drawOffset + enemyOff, ownership);
                 Game.Instance.AddEntity(nuke);
                 elapsedTime = 0;
             }

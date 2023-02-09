@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<effect>
+  <effect_name>Radiation</effect_name>
+  <effect_timer>0.6</effect_timer>
+  <effect_damage>5</effect_damage>
+  <effect_damage_cancel>0</effect_damage_cancel>
+</effect>

@@ -121,6 +121,9 @@ namespace TowerDefence.Scenes
                 XmlNode projectile = xml.SelectSingleNode("/tower/projectile");
                 towerData.projectile = projectile.InnerText;
 
+                XmlNode rotate = xml.SelectSingleNode("/tower/rotate");
+                towerData.rotate = rotate.InnerText == "1";
+
                 return towerData;
             }
 

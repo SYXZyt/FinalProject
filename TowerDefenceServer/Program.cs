@@ -300,6 +300,34 @@ namespace TowerDefenceServer
                         lobby.UpdatePlayer(playerId, player);
                     }
                     break;
+                case (byte)Header.SPEND_MONEY:
+                {
+                    string[] split = data.Split(",");
+                    long playerId = long.Parse(split[0]);
+                    ushort amountToTake = ushort.Parse(split[1]);
+
+                    Lobby lobby = FindLobbyWithID(playerId);
+                    if (lobby is null) break;
+
+                    Player player = lobby.GetPlayerFromID(playerId);
+                    player.money -= amountToTake;
+                    lobby.UpdatePlayer(playerId, player);
+                }
+                break;
+                case (byte)Header.TAKE_HEALTH:
+                {
+                    string[] split = data.Split(",");
+                    long playerId = long.Parse(split[0]);
+                    byte amountToTake = byte.Parse(split[1]);
+
+                    Lobby lobby = FindLobbyWithID(playerId);
+                    if (lobby is null) break;
+
+                    Player player = lobby.GetPlayerFromID(playerId);
+                    player.health -= amountToTake;
+                    lobby.UpdatePlayer(playerId, player);
+                }
+                break;
                 case (byte)Header.READY_FOR_WAVE:
                     {
                         //Read the id of the player

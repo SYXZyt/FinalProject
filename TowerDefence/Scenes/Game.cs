@@ -142,6 +142,8 @@ namespace TowerDefence.Scenes
         /// </summary>
         public List<Entity> Entities => entities;
 
+        public List<Entity> EnemyEntities => enemyEntities;
+
         /// <summary>
         /// How many pixels wide the play field is
         /// </summary>
@@ -227,7 +229,6 @@ namespace TowerDefence.Scenes
             //Return the generated texture
             return circleTexture;
         }
-
 
         /// <summary>
         /// Update the game based on the current state
@@ -357,60 +358,57 @@ namespace TowerDefence.Scenes
                     gameOverLabel.SetLabelText(AssetContainer.ReadString(isWinner ? "GM_END_WIN" : "GM_END_LOSE"));
                     break;
                 case (byte)Header.SNAPSHOT:
+                {
+                    Snapshot ss = new();
+                    ss.Deserialize(message);
+                    ovHealth = ss.Health;
+                    ovMoney = ss.Money;
+
+                    enemyEntities.Clear();
+
+                    string[] temp = Regex.Split(message, "(?<=[|])");
+                    StringBuilder sb = new();
+                    for (int i = 1; i < temp.Length; i++) sb.Append(temp[i]);
+                    message = sb.ToString();
+
+                    if (message == string.Empty) break;
+
+                    //Get the data to parse
+                    string[] entities = message.Split('|');
+                    foreach (string data in entities)
                     {
-                        Snapshot ss = new();
-                        ss.Deserialize(message);
-                        ovHealth = ss.Health;
-                        ovMoney = ss.Money;
+                        string[] csvData = data.Split(',');
 
-                        enemyEntities.Clear();
-
-                        string[] temp = Regex.Split(message, "(?<=[|])");
-                        StringBuilder sb = new();
-                        for (int i = 1; i < temp.Length; i++) sb.Append(temp[i]);
-                        message = sb.ToString();
-
-                        if (message == string.Empty) break;
-
-                        //Get the data to parse
-                        string[] entities = message.Split('|');
-                        foreach (string data in entities)
+                        if (csvData[0] == "0")
                         {
-                            string[] csvData = data.Split(',');
-
-                            if (csvData[0] == "0")
-                            {
-                                //if (!int.TryParse(csvData[1], out int x)) x = 0;
-                                //if (!int.TryParse(csvData[2], out int y)) y = 0;
-                                //if (!float.TryParse(csvData[3], out float rot)) rot = 0;
-                                //if (!int.TryParse(csvData[4], out int id)) id = 0;
-                                //enemyTowers.Add(new() { x = x, y = y, rot = rot, id = id });
-                            }
-                            else if (csvData[0] == "1")
-                            {
-                                Enemy enemy = new(data);
-                                enemyEntities.Add(enemy);
-                            }
+                            Tower tower = new(data);
+                            enemyEntities.Add(tower);
+                        }
+                        else if (csvData[0] == "1")
+                        {
+                            Enemy enemy = new(data);
+                            enemyEntities.Add(enemy);
                         }
                     }
-                    break;
+                }
+                break;
                 case (byte)Header.SYNC:
-                    {
-                        string[] split = message.Split(",");
-                        vMoney = ushort.Parse(split[0]);
-                        vHealth = byte.Parse(split[1]);
-                    }
-                    break;
+                {
+                    string[] split = message.Split(",");
+                    vMoney = ushort.Parse(split[0]);
+                    vHealth = byte.Parse(split[1]);
+                }
+                break;
                 case (byte)Header.ROUND_BEGIN:
-                    {
-                        int number = int.Parse(message);
-                        currentWave = Wave.waves[number].DeepCopy();
-                        isWaveActive = true;
-                        ready = false;
+                {
+                    int number = int.Parse(message);
+                    currentWave = Wave.waves[number].DeepCopy();
+                    isWaveActive = true;
+                    ready = false;
 
-                        Console.WriteLine($"Starting round {number}");
-                    }
-                    break;
+                    Console.WriteLine($"Starting round {number}");
+                }
+                break;
                 default:
                     break;
             }
@@ -655,6 +653,8 @@ namespace TowerDefence.Scenes
         {
             foreach (Entity e in enemyEntities)
             {
+                if (e is Tower) platformTexture.Draw(e.GetPosition() + enemyPlayFieldOffset, spriteBatch, Color.White);
+
                 e?.Draw(spriteBatch);
             }
         }

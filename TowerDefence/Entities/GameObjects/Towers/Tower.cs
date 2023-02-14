@@ -1,11 +1,11 @@
-﻿using UILibrary;
-using TowerDefence.Scenes;
+﻿using AssetStreamer;
 using TowerDefence.Visuals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects.Enemies;
 
 using Game = TowerDefence.Scenes.Game;
+using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Entities.GameObjects.Towers
 {
@@ -13,12 +13,12 @@ namespace TowerDefence.Entities.GameObjects.Towers
     {
         private double rotation;
         private TowerData data;
-        private readonly AnimationCollection anim;
-        private readonly Vector2 drawOffset;
+        private AnimationCollection anim;
+        private Vector2 drawOffset;
 
         private float elapsedTime;
 
-        private readonly List<Enemy> enemiesInRange;
+        private List<Enemy> enemiesInRange;
 
         public static Dictionary<int, TowerData> towerDatas;
 
@@ -27,7 +27,32 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public override Entity Deserialise(string serialised)
         {
-            throw new NotImplementedException();
+            string[] parts = serialised.Split(',');
+
+            float x = float.Parse(parts[1]);
+            float y = float.Parse(parts[2]);
+            float rot = float.Parse(parts[3]);
+            int id = int.Parse(parts[4]);
+            float elapsed = float.Parse(parts[5]);
+
+            drawOffset = Game.Instance.OpponentGameOffset;
+            position = new(x * Game.TileSize, y * Game.TileSize);
+            ownership = false;
+
+            rotation = rot;
+            data = towerDatas[id];
+            enemiesInRange = new();
+            elapsedTime = elapsed;
+
+            TextureCollection textures = new();
+            textures.AddTexture(AssetContainer.ReadTexture(towerDatas[id].texIdle));
+            Animation idleAnim = new(textures, 0);
+
+            anim = new();
+            anim.AddAnimation("state_idle", idleAnim);
+            anim.SetCurrentAnimation("state_idle");
+
+            return this;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -39,9 +64,10 @@ namespace TowerDefence.Entities.GameObjects.Towers
 
         public override byte GetID() => data.id;
 
+        //ID,X,Y,ROT,ID,ELAPSED,
         public override string Serialise()
         {
-            return $"|0,{position.X},{position.Y},{rotation},{data.id}";
+            return $"|0,{(position.X) / Game.TileSize},{(position.Y) / Game.TileSize},{rotation},{data.id},{elapsedTime}";
         }
 
         private void SpawnBullet()
@@ -163,7 +189,7 @@ namespace TowerDefence.Entities.GameObjects.Towers
         public override void Update(GameTime gameTime)
         {
             //Loop over every enemy and check if any are within range
-            Enemy[] allEnemies = Game.Instance.Entities.OfType<Enemy>().ToArray();
+            Enemy[] allEnemies = ownership ? Game.Instance.Entities.OfType<Enemy>().ToArray() : Game.Instance.EnemyEntities.OfType<Enemy>().ToArray();
             enemiesInRange.Clear();
 
             foreach (Enemy e in allEnemies)
@@ -211,6 +237,9 @@ namespace TowerDefence.Entities.GameObjects.Towers
             if (!data.rotate) rotation = 0;
         }
 
+        private Tower() { }
+
+        public Tower(string serialised) => Deserialise(serialised);
 
         public Tower(int id, Vector2 position, Animation idleAnim, Vector2 drawOffset, bool ownership)
         {

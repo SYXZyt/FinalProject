@@ -146,7 +146,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         {
             if (!damagedThisFrame)
             {
-                Game.Instance.AddMoneyThisFrame((ushort)(1 * amount));
+                Game.Instance.AddMoneyThisFrame((ushort)(2 * amount));
                 health -= amount;
                 damagedThisFrame = true;
             }
@@ -159,7 +159,13 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         public override void Draw(SpriteBatch spriteBatch)
         {
             Texture2D frame = frames.GetFrame(dir);
-            frame.Draw(absolutePosition, spriteBatch, HasComponent<FireDamage>() ? Color.Red : Color.White);
+
+            Color c;
+            if (HasComponent<FireDamage>()) c = Color.Red;
+            else if (HasComponent<ShockDamage>()) c = Color.LightBlue;
+            else c = Color.White;
+
+            frame.Draw(absolutePosition, spriteBatch, c);
         }
 
         public void AddDamageComponent(DamageEffectComponent damageEffectComponent)
@@ -236,7 +242,14 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 checkForPosMovement = true;
             }
 
-            foreach (DamageEffectComponent component in components) component.Update(gameTime);
+            try
+            {
+                for (int i = 0; i < components.Count; i++) components[i]?.Update(gameTime);
+            }
+            catch
+            {
+                Console.WriteLine("????????");
+            }
 
             damagedThisFrame = false;
             components.RemoveAll(c => c.MarkForRemoval);

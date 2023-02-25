@@ -14,7 +14,6 @@ using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
-using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
 using TowerDefence.Entities.GameObjects.Enemies;
 
@@ -46,7 +45,6 @@ namespace TowerDefence.Scenes
         }
     }
 
-
     internal sealed class Game : Scene
     {
         #region Members
@@ -56,6 +54,8 @@ namespace TowerDefence.Scenes
         private float nukeFlashOpacity;
         private Texture2D nukeFlash;
         #endregion
+
+        private Label[] towerCostLabels;
 
         private Texture2D rangeTexture;
         private int rangeTextureRad;
@@ -700,6 +700,8 @@ namespace TowerDefence.Scenes
 
                 Switch swtch = towers[i];
                 texture.Draw(new(swtch.AABB.X + ((swtch.AABB.Width - texture.Width) / 2), swtch.AABB.Y + (swtch.AABB.Height - texture.Height) / 2), spriteBatch, Color.White);
+
+                foreach (Label l in towerCostLabels) l.DrawWithShadow(spriteBatch);
             }
         }
 
@@ -920,11 +922,16 @@ namespace TowerDefence.Scenes
             {
                 short buttonsX = GlobalSettings.PlayerOnRight ? (short)(SceneManager.Instance.graphics.PreferredBackBufferWidth - towerSelClick.Width) : (short)0;
 
+                towerCostLabels = new Label[TowerCount];
+
                 for (int i = 0; i < TowerCount; i++)
                 {
                     AABB aabb = new(buttonsX, (short)((towerSelClick.Height * 3) + towerSelClick.Height * i - towerSelClick.Height * 1.5), (short)(towerSelClick.Width), (short)(towerSelClick.Height));
                     Switch s = new(aabb, towerSelUnclick, towerSelClick, false);
                     towers.AddSwitch(s);
+
+                    Label costLabel = new($"${Tower.towerDatas[i].cost}", 1f, new(buttonsX, towerSelClick.Height * 3 + towerSelClick.Height * i - towerSelClick.Height * 1.5f + towerSelClick.Height), GlobalSettings.TextMain, AssetContainer.GetFont("fMain"), Origin.BOTTOM_LEFT);
+                    towerCostLabels[i] = costLabel;
                 }
 
                 Vector2 topRight = new(SceneManager.Instance.graphics.PreferredBackBufferWidth, 0);
@@ -1112,7 +1119,7 @@ namespace TowerDefence.Scenes
             showCheatPanel = false;
             cheatPanel = null;
             vHealth = 100;
-            vMoney = 1000;
+            vMoney = 10000;
             gameState = GameState.PLAY;
 
             ready = false;
@@ -1253,31 +1260,10 @@ namespace TowerDefence.Scenes
                 this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);
             }
 
-            //Update the entities with multithreading now
-            //Divide the entities into smaller chunks
-            IEnumerable<List<Entity>> entityChunks = entities.ChunkBy(Environment.ProcessorCount);
-
-            //Update the entities in parallel using TPL
-            Parallel.ForEach(entityChunks, chunk =>
-            {
-                foreach (Entity e in chunk) e?.Update(gameTime);
-            });
-
-            //Remove the entities marked for deletion
+            foreach (Entity e in entities) e?.Update(gameTime);
             entities.RemoveAll(e => e.MarkForDeletion);
-
-            //Divide the enemyEntities into smaller chunks
-            IEnumerable<List<Entity>> enemyEntityChunks = enemyEntities.ChunkBy(Environment.ProcessorCount);
-
-            //Update the enemyEntities in parallel using TPL
-            Parallel.ForEach(enemyEntityChunks, chunk =>
-            {
-                foreach (Entity e in chunk) e?.Update(gameTime);
-            });
-
-            //Remove the enemyEntities marked for deletion
+            foreach (Entity e in enemyEntities) e?.Update(gameTime);
             enemyEntities.RemoveAll(e => e.MarkForDeletion);
-
 
             waterAnimation.Update(gameTime);
 

@@ -384,6 +384,10 @@ namespace TowerDefence.Scenes
                     for (int i = 0; i < 244; i++) nukeTexture.AddTexture(AssetContainer.ReadTexture($"sNuke_{i}"));
                     AnimationStreamer.AddAnimation(new(nukeTexture, 30, AnimationPlayType.PAUSE_AT_END), "aNuke");
 
+                    TextureCollection explosionTexture = new();
+                    for (int i = 0; i < 16; i++) explosionTexture.AddTexture(AssetContainer.ReadTexture($"sExp_{i}"));
+                    AnimationStreamer.AddAnimation(new(explosionTexture, 30, AnimationPlayType.PAUSE_AT_END), "aExplosion");
+
                     timer.Stop();
                     Console.WriteLine($"Loaded assets in {timer.Elapsed.TotalMilliseconds}ms");
                     SceneManager.Instance.LoadScene("mainMenu");

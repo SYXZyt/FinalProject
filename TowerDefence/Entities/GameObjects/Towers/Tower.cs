@@ -1,5 +1,6 @@
 ﻿using AssetStreamer;
 using TowerDefence.Visuals;
+using TowerDefence.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TowerDefence.Entities.GameObjects.Enemies;
@@ -143,6 +144,49 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 Game.Instance.AddEntity(nuke);
                 elapsedTime = 0;
             }
+
+            void SpawnMiniExplosion()
+            {
+                Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
+                Vector2 pos = closest.GetPosition() * Game.TileSize;
+                pos += ownership ? Game.Instance.PlayerGameOffset : Game.Instance.OpponentGameOffset;
+
+                RocketExplosion rocketExplosion = new(pos, ownership);
+                Game.Instance.AddEntity(rocketExplosion);
+                elapsedTime = 0;
+            }
+
+            void SpawnBarrage()
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector2 v = new(Game.Instance.RNG.Next(-32, 32), Game.Instance.RNG.Next(-32, 32));
+                    Enemy closest = enemiesInRange.OrderBy(x => x.TotalDistance).ToArray()[^1];
+                    Vector2 pos = closest.GetPosition() * Game.TileSize;
+                    pos += ownership ? Game.Instance.PlayerGameOffset : Game.Instance.OpponentGameOffset;
+                    pos += v;
+
+                    RocketExplosion rocketExplosion = new(pos, ownership);
+                    Game.Instance.AddEntity(rocketExplosion);
+                }
+
+                elapsedTime = 0;
+            }
+
+            void SpawnShock()
+            {
+                Enemy[] inRangeOrder = enemiesInRange.OrderBy(x => x.TotalDistance).Reverse().ToArray();
+
+                //Get the closest which does not have the effect
+                for (int i = 0; i < inRangeOrder.Length; i++)
+                {
+                    if (!inRangeOrder[i].HasComponent<ShockDamage>())
+                    {
+                        inRangeOrder[i].AddDamageComponent(new ShockDamage());
+                        break;
+                    }
+                }
+            }
             #endregion
 
             switch (data.projectile)
@@ -176,6 +220,21 @@ namespace TowerDefence.Entities.GameObjects.Towers
                 case "nuke":
                 {
                     SpawnNuke();
+                }
+                break;
+                case "rocket":
+                {
+                    SpawnMiniExplosion();
+                }
+                break;
+                case "battery":
+                {
+                    SpawnBarrage();
+                }
+                break;
+                case "lightning":
+                {
+                    SpawnShock();
                 }
                 break;
                 default:

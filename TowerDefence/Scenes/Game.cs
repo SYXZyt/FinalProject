@@ -14,6 +14,7 @@ using TowerDefence.CheatEngine;
 using Microsoft.Xna.Framework.Input;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
+using TowerDefence.Entities.GameObjects;
 using TowerDefence.Entities.GameObjects.Towers;
 using TowerDefence.Entities.GameObjects.Enemies;
 
@@ -21,6 +22,31 @@ using TextureCollection = TowerDefence.Visuals.TextureCollection;
 
 namespace TowerDefence.Scenes
 {
+    public static class EnumerableExtensions
+    {
+        public static IEnumerable<List<T>> ChunkBy<T>(this IEnumerable<T> source, int chunkSize)
+        {
+            var chunk = new List<T>(chunkSize);
+
+            foreach (var item in source)
+            {
+                chunk.Add(item);
+
+                if (chunk.Count == chunkSize)
+                {
+                    yield return chunk;
+                    chunk = new List<T>(chunkSize);
+                }
+            }
+
+            if (chunk.Count > 0)
+            {
+                yield return chunk;
+            }
+        }
+    }
+
+
     internal sealed class Game : Scene
     {
         #region Members
@@ -1227,10 +1253,31 @@ namespace TowerDefence.Scenes
                 this.selectedTower.SetLabelText(Tower.towerDatas[selectedTower].name);
             }
 
-            foreach (Entity e in entities) e?.Update(gameTime);
+            //Update the entities with multithreading now
+            //Divide the entities into smaller chunks
+            IEnumerable<List<Entity>> entityChunks = entities.ChunkBy(Environment.ProcessorCount);
+
+            //Update the entities in parallel using TPL
+            Parallel.ForEach(entityChunks, chunk =>
+            {
+                foreach (Entity e in chunk) e?.Update(gameTime);
+            });
+
+            //Remove the entities marked for deletion
             entities.RemoveAll(e => e.MarkForDeletion);
-            foreach (Entity e in enemyEntities) e?.Update(gameTime);
+
+            //Divide the enemyEntities into smaller chunks
+            IEnumerable<List<Entity>> enemyEntityChunks = enemyEntities.ChunkBy(Environment.ProcessorCount);
+
+            //Update the enemyEntities in parallel using TPL
+            Parallel.ForEach(enemyEntityChunks, chunk =>
+            {
+                foreach (Entity e in chunk) e?.Update(gameTime);
+            });
+
+            //Remove the enemyEntities marked for deletion
             enemyEntities.RemoveAll(e => e.MarkForDeletion);
+
 
             waterAnimation.Update(gameTime);
 

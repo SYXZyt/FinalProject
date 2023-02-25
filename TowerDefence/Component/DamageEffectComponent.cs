@@ -9,9 +9,26 @@ namespace TowerDefence.Component
 
         public static Dictionary<string, DamageEffectStats> damageEffectStats = new();
 
-        protected readonly float damageTime;
+        protected float damageTime;
         protected float elapsedTime;
-        protected readonly int damage;
+        protected int damage;
+
+        //damageTime=elapsedTime
+        public string Serialise() => $"{damageTime}:{elapsedTime}:{damage}";
+
+        public static DamageEffectComponent Deserialise(string serialised)
+        {
+            string[] parts = serialised.Split(":");
+
+            DamageEffectComponent comp = new()
+            {
+                damageTime = float.Parse(parts[0]),
+                elapsedTime = float.Parse(parts[1]),
+                damage = int.Parse(parts[2]),
+            };
+
+            return comp;
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -23,6 +40,8 @@ namespace TowerDefence.Component
                 MarkForRemoval = true;
             }
         }
+
+        private DamageEffectComponent() { }
 
         public DamageEffectComponent(float damageTime, int damage)
         {

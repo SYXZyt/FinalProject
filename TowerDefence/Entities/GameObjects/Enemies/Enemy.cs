@@ -29,7 +29,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
         private int dir; //0 - up, 1 - right, 2 - down, 3 - left,
         private bool damagedThisFrame = false;
 
-        private readonly List<DamageEffectComponent> components = new();
+        private List<DamageEffectComponent> components = new();
 
         private float elapsedTime;
 
@@ -37,7 +37,7 @@ namespace TowerDefence.Entities.GameObjects.Enemies
 
         public ulong TotalDistance => distanceTravelled;
 
-        //|1,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;)
+        //|1,X,Y,DIR,DIST,HEALTH,ELAPSED,NAME,DIRECTIONCHANGES (CSV using ;),COMPONENTS (CSV using :)
         public override string Serialise()
         {
             StringBuilder sb = new();
@@ -61,6 +61,18 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 sb.Append('0');
             }
 
+            sb.Append(',');
+            if (components.Any())
+            {
+                foreach (DamageEffectComponent component in components) sb.Append(component.Serialise());
+
+                sb.Length--;
+            }
+            else
+            {
+                sb.Append("NONE");
+            }
+
             return sb.ToString();
         }
 
@@ -73,6 +85,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 //Acquire all of the data we need
                 float absX = (float.Parse(csv[1]) * Game.TileSize) + Game.Instance.OpponentGameOffset.X;
                 float absY = (float.Parse(csv[2]) * Game.TileSize) + Game.Instance.OpponentGameOffset.Y;
+
+                aabb = new((short)absX, (short)absY, 16, 16);
 
                 float x = float.Parse(csv[1]);
                 float y = float.Parse(csv[2]);
@@ -88,6 +102,8 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                 string name = csv[7];
 
                 string[] dirChangesCsv = csv[8].Split(';');
+
+                string[] components = csv[9].Split(':');
 
                 //Write the data we have now
                 drawOffset = Game.Instance.PlayerGameOffset;
@@ -110,7 +126,16 @@ namespace TowerDefence.Entities.GameObjects.Enemies
                     directionChanges.Enqueue(int.Parse(s));
                 }
 
-                aabb = new((short)absX, (short)absY, 16, 16);
+                this.components = new();
+
+                if (components.Length > 1 && components[0] != "NONE")
+                {
+                    foreach (string c in components)
+                    {
+                        DamageEffectComponent comp = DamageEffectComponent.Deserialise(c);
+                        this.components.Add(comp);
+                    }
+                }
 
                 return this;
             }

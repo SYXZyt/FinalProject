@@ -75,7 +75,9 @@ namespace TowerDefence
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
                 messages.Add(dataReader.GetString());
+#if DEBUG
                 Console.WriteLine($"Received From Server: {messages[^1]}");
+#endif
                 dataReader.Recycle();
             };
         }

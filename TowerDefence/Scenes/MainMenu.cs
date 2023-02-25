@@ -75,9 +75,8 @@ namespace TowerDefence.Scenes
         public override void Update(GameTime gameTime)
         {
             if (exitButton.IsClicked()) SceneManager.Instance.Exit();
-
-            if (playButton.IsClicked()) SceneManager.Instance.LoadScene("getUsername");
-            if (settingsButton.IsClicked()) SceneManager.Instance.LoadScene("settings");
+            else if (playButton.IsClicked()) SceneManager.Instance.LoadScene("getUsername");
+            else if (settingsButton.IsClicked()) SceneManager.Instance.LoadScene("settings");
 
 #if DEBUG
             if (debugPlayButton.IsClicked())

@@ -262,7 +262,8 @@ namespace TowerDefence.Scenes
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
 
                 //Load wave data
-                Waves.Wave.GenerateWave(@"waves\Wave0.xml");
+                for (int i = 0; i < 2; i++)
+                    Waves.Wave.GenerateWave(@$"waves\Wave{i}.xml");
             }
         }
 
@@ -466,6 +467,10 @@ namespace TowerDefence.Scenes
             for (int i = 0; i < 244; i++)
             {
                 filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\nuke\nuke_{i}.png", $"sNuke_{i}"));
+            }
+            for (int i = 0; i < 16; i++)
+            {
+                filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, $@"Assets\Textures\explosion\exp_{i}.png", $"sExp_{i}"));
             }
         }
 

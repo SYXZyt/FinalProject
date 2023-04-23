@@ -268,14 +268,17 @@ namespace TowerDefence.Scenes
         }
 
         private ProgressBar progressBar;
+        
 
         private readonly Stopwatch timer;
 
         private int loadTaskCount = 0;
+        private int totalTaskCount;
         private readonly Queue<LoadFile> filesToLoad;
 
         private Texture2D filledTexture;
         private Texture2D unfilledTexture;
+        private Label progressCounter;
 
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -284,6 +287,7 @@ namespace TowerDefence.Scenes
         public override void DrawGUI(SpriteBatch spriteBatch, GameTime gameTime)
         {
             progressBar.Draw(spriteBatch);
+            progressCounter?.DrawWithShadow(spriteBatch);
         }
 
         public override void LoadContent()
@@ -330,7 +334,7 @@ namespace TowerDefence.Scenes
             filledTexture = CreateTexture(GraphicsDevice, 1, 4, c => f);
             unfilledTexture = CreateTexture(GraphicsDevice, 1, 4, c => u);
 
-            loadTaskCount = filesToLoad.Count;
+            totalTaskCount = loadTaskCount = filesToLoad.Count;
             progressBar = new(filledTexture, unfilledTexture, progressBarBox, loadTaskCount);
 
             ConfigLoader.Load();
@@ -348,6 +352,13 @@ namespace TowerDefence.Scenes
         {
             i++;
 
+            //Check whether the font has been loaded yet
+            if (progressCounter is null && AssetContainer.Contains<SpriteFont>("fMain"))
+            {
+                Console.WriteLine("Font has been loaded. Progress counter can now be displayed");
+                progressCounter = new("0%", 1.0f, Vector2.Zero, Color.White, AssetContainer.GetFont("fMain"), Origin.TOP_LEFT);
+            }
+
             if (!timer.IsRunning)
             {
                 timer.Start();
@@ -364,6 +375,8 @@ namespace TowerDefence.Scenes
             if (i > 100)
             {
                 progressBar.UpdateProgress(loadTaskCount - filesToLoad.Count);
+                progressCounter?.SetLabelText($"{Math.Round(((float)(loadTaskCount - filesToLoad.Count) / totalTaskCount * 100f), 2)}% Loaded");
+
                 if (filesToLoad.Count > 0)
                 {
                     LoadFile task = filesToLoad.Dequeue();
@@ -371,6 +384,7 @@ namespace TowerDefence.Scenes
                 }
                 else
                 {
+                    //Load all the unique stuff that cannot be loaded through the custom system I developed
                     string name = "Debug Unit";
                     TextureCollection textureCollection = new();
                     textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_0"));
@@ -397,8 +411,8 @@ namespace TowerDefence.Scenes
 
         private void GetAssetsToLoad()
         {
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXT, @"Assets\Strings\text.txt"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.FONT, @"Assets\Fonts\MilkyCoffee.ttf", "fMain"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXT, @"Assets\Strings\text.txt"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menu.png", "sMenu"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonClicked.png", "sMenuButtonClicked"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\menuButtonUnclicked.png", "sMenuButtonUnclicked"));

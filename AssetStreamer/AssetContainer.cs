@@ -86,6 +86,29 @@ namespace AssetStreamer
             return sounds[name];
         }
 
+        public static bool Contains<T>(string name) where T : class
+        {
+            //Check the type
+            if (typeof(T) == typeof(Texture2D))
+            {
+                return textures.ContainsKey(name);
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                return strings.ContainsKey(name);
+            }
+            else if (typeof(T) == typeof(SpriteFont))
+            {
+                return fonts.ContainsKey(name);
+            }
+            else if (typeof(T) == typeof(SoundEffect))
+            {
+                return sounds.ContainsKey(name);
+            }
+
+            return false;
+        }
+
         #endregion
 
         static AssetContainer()

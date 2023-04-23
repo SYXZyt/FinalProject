@@ -1,6 +1,6 @@
 ﻿namespace TowerDefence.Visuals
 {
-    internal sealed class AnimationStreamer
+    internal static class AnimationStreamer
     {
         private static readonly Dictionary<string, Animation> animations;
 

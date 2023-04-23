@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="TowerDefence.Scenes.Game" Collapsed="true">
+    <Position X="5" Y="1" Width="2.75" />
+    <Members>
+      <Field Name="bkg" Hidden="true" />
+      <Field Name="cheatPanel" Hidden="true" />
+      <Method Name="CreateCircleTexture" Hidden="true" />
+      <Field Name="disconnectButton" Hidden="true" />
+      <Field Name="divider" Hidden="true" />
+      <Field Name="enemyEntities" Hidden="true" />
+      <Field Name="enemyPlayFieldOffset" Hidden="true" />
+      <Field Name="enemySpawnPositions" Hidden="true" />
+      <Field Name="entityBuffer" Hidden="true" />
+      <Field Name="gameOverExit" Hidden="true" />
+      <Field Name="gameOverLabel" Hidden="true" />
+      <Field Name="gameOverOpacity" Hidden="true" />
+      <Field Name="GameOverOpacitySpeed" Hidden="true" />
+      <Field Name="GameSize" Hidden="true" />
+      <Field Name="health" Hidden="true" />
+      <Field Name="isDead" Hidden="true" />
+      <Property Name="IsDebugPlay" Hidden="true" />
+      <Field Name="isWaveActive" Hidden="true" />
+      <Field Name="isWinner" Hidden="true" />
+      <Field Name="menuFilter" Hidden="true" />
+      <Field Name="money" Hidden="true" />
+      <Field Name="moneyMadeThisFrame" Hidden="true" />
+      <Field Name="nukeFlash" Hidden="true" />
+      <Field Name="nukeFlashOpacity" Hidden="true" />
+      <Property Name="NukeFlashOpacity" Hidden="true" />
+      <Field Name="oHealth" Hidden="true" />
+      <Field Name="oMoney" Hidden="true" />
+      <Property Name="OpponentGameOffset" Hidden="true" />
+      <Field Name="otherUsername" Hidden="true" />
+      <Method Name="ParseCheat" Hidden="true" />
+      <Field Name="pausedMenuUILayer" Hidden="true" />
+      <Field Name="placementIsOverplayfield" Hidden="true" />
+      <Field Name="platformTexture" Hidden="true" />
+      <Property Name="PlayerGameOffset" Hidden="true" />
+      <Field Name="playFieldOffset" Hidden="true" />
+      <Field Name="playfieldTextures" Hidden="true" />
+      <Field Name="rangeTexture" Hidden="true" />
+      <Field Name="RangeTextureLimit" Hidden="true" />
+      <Field Name="rangeTextureRad" Hidden="true" />
+      <Field Name="ready" Hidden="true" />
+      <Field Name="readyButton" Hidden="true" />
+      <Method Name="ResetCheatPanel" Hidden="true" />
+      <Field Name="resumeButton" Hidden="true" />
+      <Field Name="selectedTower" Hidden="true" />
+      <Field Name="sellButton" Hidden="true" />
+      <Field Name="showCheatPanel" Hidden="true" />
+      <Field Name="showDebugStats" Hidden="true" />
+      <Field Name="statPanel" Hidden="true" />
+      <Field Name="towerCostLabels" Hidden="true" />
+      <Field Name="vignette" Hidden="true" />
+      <Field Name="vignetteOpac" Hidden="true" />
+      <Field Name="vignetteSpeed" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ISfcGZjgCQLAg0EgAakQAMEAkBQgXRCOfJEmpUBAOcw=</HashCode>
+      <FileName>Scenes\Game.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UILibrary.Scenes.Scene">
+    <Position X="2.5" Y="1" Width="2.25" />
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Field Name="uIManager" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="TowerDefence.Scenes.FindGame" Collapsed="true">
+    <Position X="5" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AARAEAAAAAAAAoAAAAAAAAAAAAAAAAAAAAACAAAACAQ=</HashCode>
+      <FileName>Scenes\FindGame.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TowerDefence.Scenes.GameLoadingScreen" Collapsed="true">
+    <Position X="5" Y="2.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="TowerDefence.Scenes.GameLoadingScreen.LoadFile" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Scenes\GameLoadingScreen.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="TowerDefence.Scenes.GameLoadingScreen.ConfigLoader" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Scenes\GameLoadingScreen.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AARAEIAQAAgAAoAAAAAAAgAAAAAAAAAIIAACAAAAAAQ=</HashCode>
+      <FileName>Scenes\GameLoadingScreen.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TowerDefence.Scenes.GetUsernameScene" Collapsed="true">
+    <Position X="8.25" Y="1" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAVAEAAAQEAAAgAAAAAAAIAAAAAAAIIQgAACDAgAAAw=</HashCode>
+      <FileName>Scenes\GetUsernameScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TowerDefence.Scenes.MainMenu" Collapsed="true">
+    <Position X="8.25" Y="2.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAQAAAAgAAIAAAAAAAAIBAAAIAAAACAAAAAAQ=</HashCode>
+      <FileName>Scenes\MainMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UILibrary.UIManager">
+    <Position X="0.5" Y="1" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="TowerDefence.Scenes.NoServerScene" Collapsed="true">
+    <Position X="6.75" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAAAAAAhAAAAAAAAAAAQAAAAAAAAACAAAACAQ=</HashCode>
+      <FileName>Scenes\NoServerScene.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TowerDefence.Scenes.Settings" Collapsed="true">
+    <Position X="8.25" Y="1.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAEJAAAAABAgAAAAAAAIEBAUAAAAAAIAACACAECAY=</HashCode>
+      <FileName>Scenes\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

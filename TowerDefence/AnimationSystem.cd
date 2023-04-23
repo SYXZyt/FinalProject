@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="TowerDefence.Visuals.Animation">
+    <Position X="9.25" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAIQAABCAAAAAAAEAAAgAAAAAACCAAAwAQAAA=</HashCode>
+      <FileName>Visuals\Animation.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="frames" />
+      <Field Name="playType" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TowerDefence.Visuals.AnimationCollection">
+    <Position X="3.25" Y="2.75" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAQABAAAAABAAAAAAAAAAEAAAABAAAAAAADAAAAAAAA=</HashCode>
+      <FileName>Visuals\AnimationCollection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CurrentAnim" />
+      <Property Name="GetCurrentTexture" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="TowerDefence.Visuals.AnimationStreamer">
+    <Position X="4.25" Y="5.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAIAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Visuals\AnimationStreamer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="animations" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="TowerDefence.Visuals.TextureCollection">
+    <Position X="4.25" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAEBAAAAACAAAAAQAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Visuals\TextureCollection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="rng" />
+      <Property Name="this[System.Int32]" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="textures" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Microsoft.Xna.Framework.Graphics.Texture2D">
+    <Position X="1.25" Y="0.75" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Microsoft.Xna.Framework.Graphics.Texture2D.SurfaceType" Collapsed="true">
+        <TypeIdentifier />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="System.Random" Collapsed="true">
+    <Position X="8.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Enum Name="TowerDefence.Visuals.AnimationPlayType">
+    <Position X="7.75" Y="7" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAACAAA=</HashCode>
+      <FileName>Visuals\Animation.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

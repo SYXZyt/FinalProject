@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="TowerDefence.Entities.GameObjects.Towers.Tower">
+    <Position X="5.75" Y="6.25" Width="1.75" />
+    <Members>
+      <Field Name="anim" Hidden="true" />
+      <Property Name="Data" Hidden="true" />
+      <Method Name="Deserialise" Hidden="true" />
+      <Method Name="Draw" Hidden="true" />
+      <Method Name="GetID" Hidden="true" />
+      <Property Name="Rotation" Hidden="true" />
+      <Method Name="Serialise" Hidden="true" />
+      <Method Name="SpawnBullet" Hidden="true" />
+      <Method Name="Tower" Hidden="true" />
+      <Method Name="Update" Hidden="true" />
+    </Members>
+    <InheritanceLine Type="TowerDefence.Entities.Entity" FixedFromPoint="true">
+      <Path>
+        <Point X="8.438" Y="5.738" />
+        <Point X="8.438" Y="5.875" />
+        <Point X="6.625" Y="5.875" />
+        <Point X="6.625" Y="6.25" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAQBCAQAAQAAAoAAAASAgAAAACAAABAAAQAQAAEAAAA=</HashCode>
+      <FileName>Entities\GameObjects\Towers\Tower.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="enemiesInRange" />
+      <Field Name="towerDatas" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="TowerDefence.Entities.GameObjects.Enemies.Enemy">
+    <Position X="9.75" Y="6.25" Width="3.25" />
+    <Members>
+      <Method Name="AddDamageComponent" Hidden="true" />
+      <Method Name="CheckNextDirection" Hidden="true" />
+      <Method Name="Damage" Hidden="true" />
+      <Property Name="DamagedThisFrame" Hidden="true" />
+      <Method Name="Deserialise" Hidden="true" />
+      <Method Name="Draw" Hidden="true" />
+      <Method Name="Enemy" Hidden="true" />
+      <Method Name="GeneratePath" Hidden="true" />
+      <Method Name="GetID" Hidden="true" />
+      <Method Name="GetScreenPosition" Hidden="true" />
+      <Method Name="HasComponent" Hidden="true" />
+      <Method Name="IsHeadquarters" Hidden="true" />
+      <Method Name="IsNotBlocked" Hidden="true" />
+      <Method Name="Move" Hidden="true" />
+      <Method Name="MovePosition" Hidden="true" />
+      <Method Name="Serialise" Hidden="true" />
+      <Property Name="TotalDistance" Hidden="true" />
+      <Method Name="Update" Hidden="true" />
+    </Members>
+    <AssociationLine Name="frames" Type="TowerDefence.Visuals.Animation" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="13" Y="8.883" />
+        <Point X="16.188" Y="8.883" />
+        <Point X="16.188" Y="8.43" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="enemyAnims" Type="TowerDefence.Visuals.Animation" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="13" Y="8.009" />
+        <Point X="13.5" Y="8.009" />
+        <Point X="13.5" Y="8.68" />
+        <Point X="15.5" Y="8.68" />
+        <Point X="15.5" Y="8.43" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>QAYBCAiAAaACgggAGACAkAAggCAAAAAAgCCQQQBAAIg=</HashCode>
+      <FileName>Entities\GameObjects\Enemies\Enemy.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="frames" />
+      <Field Name="data" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="enemyAnims" />
+      <Field Name="enemyDatas" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="TowerDefence.Entities.Entity">
+    <Position X="7.75" Y="4.25" Width="2" />
+    <Members>
+      <Property Name="AABB" Hidden="true" />
+      <Method Name="Deserialise" Hidden="true" />
+      <Method Name="Draw" Hidden="true" />
+      <Method Name="Entity" Hidden="true" />
+      <Method Name="GetID" Hidden="true" />
+      <Method Name="GetPosition" Hidden="true" />
+      <Property Name="MarkForDeletion" Hidden="true" />
+      <Property Name="Ownership" Hidden="true" />
+      <Method Name="Serialise" Hidden="true" />
+      <Property Name="Textures" Hidden="true" />
+      <Method Name="Update" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAQBAAAAAGAAAgBAAAAApAAAASAAABEAAAAQAEAAAAA=</HashCode>
+      <FileName>Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="aabb" />
+      <Field Name="textures" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="UILibrary.AABB">
+    <Position X="4.75" Y="4.5" Width="1.5" />
+    <Members>
+      <Method Name="AABB" Hidden="true" />
+      <Method Name="Centre" Hidden="true" />
+      <Method Name="CollisionCheck" Hidden="true" />
+      <Method Name="DrawDebugOverlay" Hidden="true" />
+      <Method Name="Equals" Hidden="true" />
+      <Method Name="op_Explicit" Hidden="true" />
+      <Method Name="GetHashCode" Hidden="true" />
+      <Method Name="Move" Hidden="true" />
+      <Method Name="op_Inequality" Hidden="true" />
+      <Method Name="op_Equality" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="TowerDefence.Visuals.AnimationCollection">
+    <Position X="10.75" Y="4.5" Width="4.75" />
+    <Members>
+      <Method Name="AddAnimation" Hidden="true" />
+      <Method Name="AnimationCollection" Hidden="true" />
+      <Property Name="CurrentAnim" Hidden="true" />
+      <Property Name="GetCurrentTexture" Hidden="true" />
+      <Method Name="SetCurrentAnimation" Hidden="true" />
+      <Method Name="Update" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAQABAAAAABAAAAAAAAAAEAAAABAAAAAAADAAAAAAAA=</HashCode>
+      <FileName>Visuals\AnimationCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TowerDefence.Visuals.Animation">
+    <Position X="15.5" Y="6.75" Width="2" />
+    <Members>
+      <Method Name="Animation" Hidden="true" />
+      <Method Name="Copy" Hidden="true" />
+      <Property Name="FrameIndex" Hidden="true" />
+      <Method Name="GetActiveFrame" Hidden="true" />
+      <Method Name="GetFrame" Hidden="true" />
+      <Property Name="HasEnded" Hidden="true" />
+      <Method Name="Reset" Hidden="true" />
+      <Method Name="SetFreeze" Hidden="true" />
+      <Method Name="Update" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAQAEAAAIQAABCAAAAAAAEAAAgAAAAAACCAAAwAQAAA=</HashCode>
+      <FileName>Visuals\Animation.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="playType" />
+      <Field Name="frames" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TowerDefence.Visuals.TextureCollection">
+    <Position X="16" Y="4.75" Width="2.25" />
+    <Members>
+      <Method Name="AddTexture" Hidden="true" />
+      <Property Name="Count" Hidden="true" />
+      <Method Name="GetRandom" Hidden="true" />
+      <Method Name="TextureCollection" Hidden="true" />
+      <Property Name="this" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAEBAAAAACAAAAAQAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Visuals\TextureCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="TowerDefence.Entities.GameObjects.Towers.TowerData">
+    <Position X="8" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAEAIAAAAAgAAAAAQAAAAAgAUAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Entities\GameObjects\Towers\TowerData.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="TowerDefence.Entities.GameObjects.Enemies.EnemyData">
+    <Position X="13.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAEAQAAAAAAAAAAAgg=</HashCode>
+      <FileName>Entities\GameObjects\Enemies\EnemyData.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="TowerDefence.Visuals.AnimationPlayType">
+    <Position X="14" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAACAAA=</HashCode>
+      <FileName>Visuals\Animation.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

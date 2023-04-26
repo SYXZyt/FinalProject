@@ -20,8 +20,6 @@ namespace TowerDefence.Scenes
 {
     internal sealed class GameLoadingScreen : Scene
     {
-        private int i = 0;
-
         private sealed class LoadFile
         {
             public enum TypeToLoad
@@ -261,6 +259,12 @@ namespace TowerDefence.Scenes
                 EnemyData debugUnit = LoadEnemy(@"cfg\unit_dev.xml");
                 Enemy.enemyDatas.Add(debugUnit.name, debugUnit);
 
+                EnemyData basicEnemy = LoadEnemy(@"cfg\unit_basic.xml");
+                Enemy.enemyDatas.Add(basicEnemy.name, basicEnemy);
+
+                EnemyData advancedEnemy = LoadEnemy(@"cfg\unit_advanced.xml");
+                Enemy.enemyDatas.Add(advancedEnemy.name, advancedEnemy);
+
                 //Load wave data
                 for (int i = 0; i < 2; i++)
                     Waves.Wave.GenerateWave(@$"waves\Wave{i}.xml");
@@ -268,7 +272,6 @@ namespace TowerDefence.Scenes
         }
 
         private ProgressBar progressBar;
-        
 
         private readonly Stopwatch timer;
 
@@ -350,8 +353,6 @@ namespace TowerDefence.Scenes
 
         public override void Update(GameTime gameTime)
         {
-            i++;
-
             //Check whether the font has been loaded yet
             if (progressCounter is null && AssetContainer.Contains<SpriteFont>("fMain"))
             {
@@ -363,49 +364,46 @@ namespace TowerDefence.Scenes
             {
                 timer.Start();
             }
+            progressBar.UpdateProgress(loadTaskCount - filesToLoad.Count);
+            progressCounter?.SetLabelText($"{Math.Round(((float)(loadTaskCount - filesToLoad.Count) / totalTaskCount * 100f), 2)}% Loaded");
 
-            //If there is anything to load, load it
-            //For some absolutely unknown reason to me, I have to wait 30 frames
-            //before I can load any assets
-            //30 is the lowest consistent number it takes in order to run correctly
-            //If I wait any less than 30, the draw function may not call
-            //Monogame, pls fix
-            //So for some reason, draw still isn't being called correctly.
-            //I cannot figure it out
-            if (i > 100)
+            if (filesToLoad.Count > 0)
             {
-                progressBar.UpdateProgress(loadTaskCount - filesToLoad.Count);
-                progressCounter?.SetLabelText($"{Math.Round(((float)(loadTaskCount - filesToLoad.Count) / totalTaskCount * 100f), 2)}% Loaded");
+                LoadFile task = filesToLoad.Dequeue();
+                task.Load();
+            }
+            else
+            {
+                //Load all the unique stuff that cannot be loaded through the custom system I developed
+                string name = "Basic Unit";
+                TextureCollection textureCollection = new();
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_0"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_1"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_2"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_3"));
+                Animation animation = new(textureCollection, 0);
+                Enemy.enemyAnims[name] = animation;
 
-                if (filesToLoad.Count > 0)
-                {
-                    LoadFile task = filesToLoad.Dequeue();
-                    task.Load();
-                }
-                else
-                {
-                    //Load all the unique stuff that cannot be loaded through the custom system I developed
-                    string name = "Debug Unit";
-                    TextureCollection textureCollection = new();
-                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_0"));
-                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_1"));
-                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_2"));
-                    textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_0_3"));
-                    Animation animation = new(textureCollection, 0);
-                    Enemy.enemyAnims[name] = animation;
+                name = "Advanced Unit";
+                textureCollection = new();
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_1_0"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_1_1"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_1_2"));
+                textureCollection.AddTexture(AssetContainer.ReadTexture("sUnit_1_3"));
+                animation = new(textureCollection, 0);
+                Enemy.enemyAnims[name] = animation;
 
-                    TextureCollection nukeTexture = new();
-                    for (int i = 0; i < 244; i++) nukeTexture.AddTexture(AssetContainer.ReadTexture($"sNuke_{i}"));
-                    AnimationStreamer.AddAnimation(new(nukeTexture, 30, AnimationPlayType.PAUSE_AT_END), "aNuke");
+                TextureCollection nukeTexture = new();
+                for (int i = 0; i < 244; i++) nukeTexture.AddTexture(AssetContainer.ReadTexture($"sNuke_{i}"));
+                AnimationStreamer.AddAnimation(new(nukeTexture, 30, AnimationPlayType.PAUSE_AT_END), "aNuke");
 
-                    TextureCollection explosionTexture = new();
-                    for (int i = 0; i < 16; i++) explosionTexture.AddTexture(AssetContainer.ReadTexture($"sExp_{i}"));
-                    AnimationStreamer.AddAnimation(new(explosionTexture, 30, AnimationPlayType.PAUSE_AT_END), "aExplosion");
+                TextureCollection explosionTexture = new();
+                for (int i = 0; i < 16; i++) explosionTexture.AddTexture(AssetContainer.ReadTexture($"sExp_{i}"));
+                AnimationStreamer.AddAnimation(new(explosionTexture, 30, AnimationPlayType.PAUSE_AT_END), "aExplosion");
 
-                    timer.Stop();
-                    Console.WriteLine($"Loaded assets in {timer.Elapsed.TotalMilliseconds}ms");
-                    SceneManager.Instance.LoadScene("mainMenu");
-                }
+                timer.Stop();
+                Console.WriteLine($"Loaded assets in {timer.Elapsed.TotalMilliseconds}ms");
+                SceneManager.Instance.LoadScene("mainMenu");
             }
         }
 
@@ -431,10 +429,14 @@ namespace TowerDefence.Scenes
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\bullet.png", "sBullet"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellChecked.png", "sSellClick"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\sellUnchecked.png", "sSellUnlick"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_0.png", "sUnit_0_0"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_1.png", "sUnit_0_1"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_2.png", "sUnit_0_2"));
-            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\dev_3.png", "sUnit_0_3"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\basic_0.png", "sUnit_0_0"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\basic_1.png", "sUnit_0_1"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\basic_2.png", "sUnit_0_2"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\basic_3.png", "sUnit_0_3"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\advanced_0.png", "sUnit_1_0"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\advanced_1.png", "sUnit_1_1"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\advanced_2.png", "sUnit_1_2"));
+            filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\units\advanced_3.png", "sUnit_1_3"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\vig.png", "sVignette"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\icbm.png", "sICBM"));
             filesToLoad.Enqueue(new(LoadFile.TypeToLoad.TEXTURE, @"Assets\Textures\tower_platform.png", "sPlatform"));

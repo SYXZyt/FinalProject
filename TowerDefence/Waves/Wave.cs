@@ -117,14 +117,14 @@ namespace TowerDefence.Waves
             xml.Load(xmlFile);
 
             int groupIndex = 0;
-            while (xml.SelectSingleNode($"/SpawnGroup{groupIndex}") is not null)
+            while (xml.SelectSingleNode($"/SpawnGroups/SpawnGroup{groupIndex}") is not null)
             {
-                SpawnGroup group;
+                SpawnGroup group = new();
 
-                XmlNode id = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/id");
-                XmlNode count = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/count");
-                XmlNode delay = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/delay");
-                XmlNode cooldown = xml.SelectSingleNode($"/SpawnGroup{groupIndex}/cooldown");
+                XmlNode id = xml.SelectSingleNode($"/SpawnGroups/SpawnGroup{groupIndex}/id");
+                XmlNode count = xml.SelectSingleNode($"/SpawnGroups/SpawnGroup{groupIndex}/count");
+                XmlNode delay = xml.SelectSingleNode($"/SpawnGroups/SpawnGroup{groupIndex}/delay");
+                XmlNode cooldown = xml.SelectSingleNode($"/SpawnGroups/SpawnGroup{groupIndex}/cooldown");
 
                 group.id = id.InnerText;
                 group.count = int.Parse(count.InnerText);

@@ -1,7 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<SpawnGroup0>
-  <id>Debug Unit</id>
-  <count>12</count>
-  <delay>6</delay>
-  <cooldown>10</cooldown>
-</SpawnGroup0>
+<SpawnGroups>
+  <SpawnGroup0>
+    <id>Basic Unit</id>
+    <count>12</count>
+    <delay>6</delay>
+    <cooldown>10</cooldown>
+  </SpawnGroup0>
+  <SpawnGroup1>
+    <id>Advanced Unit</id>
+    <count>2</count>
+    <delay>5</delay>
+    <cooldown>1</cooldown>
+  </SpawnGroup1>
+</SpawnGroups>

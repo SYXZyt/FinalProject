@@ -1095,7 +1095,7 @@ namespace TowerDefence.Scenes
             showCheatPanel = false;
             cheatPanel = null;
             vHealth = 100;
-            vMoney = 10000;
+            vMoney = 800;
             gameState = GameState.PLAY;
 
             ready = false;
@@ -1183,10 +1183,12 @@ namespace TowerDefence.Scenes
             //Adjust the nuke flash
             nukeFlashOpacity = (float)Math.Max(0, nukeFlashOpacity - 1 * gameTime.ElapsedGameTime.TotalSeconds);
 
+#if DEBUG
+
             //Debug stuff
-            if (KeyboardController.IsPressed(Keys.NumPad0) || Keyboard.GetState().IsKeyDown(Keys.NumPad1))
+            if (KeyboardController.IsPressed(Keys.NumPad0))
             {
-                string name = "Debug Unit";
+                string name = "Basic Unit";
                 Vector2 pos = enemySpawnPositions[0];
                 Vector2 absPos = playFieldOffset + (pos * TileSize);
                 Enemy enemy = new(name, absPos, pos, playFieldOffset, true);
@@ -1195,6 +1197,18 @@ namespace TowerDefence.Scenes
                 //Force a snapshot send
                 tick = 0;
             }
+            else if (KeyboardController.IsPressed(Keys.NumPad1))
+            {
+                string name = "Advanced Unit";
+                Vector2 pos = enemySpawnPositions[0];
+                Vector2 absPos = playFieldOffset + (pos * TileSize);
+                Enemy enemy = new(name, absPos, pos, playFieldOffset, true);
+                entities.Add(enemy);
+
+                tick = 0;
+            }
+
+#endif
 
             if (sellButton.IsClicked())
             {

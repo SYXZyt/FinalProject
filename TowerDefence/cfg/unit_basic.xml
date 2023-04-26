@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <unit>
-  <unit_id>99</unit_id>
-  <unit_name>Debug Unit</unit_name>
+  <unit_id>0</unit_id>
+  <unit_name>Basic Unit</unit_name>
   <unit_speed>96</unit_speed>
   <unit_hitpoints>1</unit_hitpoints>
   <unit_damage>1</unit_damage>

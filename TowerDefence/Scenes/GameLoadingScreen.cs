@@ -266,8 +266,9 @@ namespace TowerDefence.Scenes
                 Enemy.enemyDatas.Add(advancedEnemy.name, advancedEnemy);
 
                 //Load wave data
-                for (int i = 0; i < 2; i++)
-                    Waves.Wave.GenerateWave(@$"waves\Wave{i}.xml");
+                int waveIndex = 0;
+                while (File.Exists($@"waves\Wave{waveIndex}.xml"))
+                    Waves.Wave.GenerateWave(@$"waves\Wave{waveIndex++}.xml");
             }
         }
 

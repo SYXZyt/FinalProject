@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<SpawnGroups>
+  <SpawnGroup0>
+    <id>Basic Unit</id>
+    <count>20</count>
+    <delay>6</delay>
+    <cooldown>10</cooldown>
+  </SpawnGroup0>
+</SpawnGroups>

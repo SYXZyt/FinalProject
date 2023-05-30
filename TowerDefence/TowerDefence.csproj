@@ -1196,6 +1196,9 @@
     <None Update="Waves\Wave2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Waves\Wave4.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Waves\Wave3.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
